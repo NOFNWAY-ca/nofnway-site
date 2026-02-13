@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>NOFNWAY | MAGNET STUDIO</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@900&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root { --brand: #3498db; --dark: #2c3e50; --bg: #f0f2f5; --magnet-size: 1in; }
+        body { margin: 0; font-family: 'Roboto', sans-serif; background: var(--bg); color: var(--dark); display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+        
+        /* Consistent Navbar */
+        .navbar { background: var(--dark); padding: 10px 30px; display: flex; justify-content: space-between; align-items: center; color: white; flex-shrink: 0; z-index: 100; }
+        .brand { font-family: 'Montserrat', sans-serif; font-weight: 900; font-size: 1.5rem; text-decoration: none; color: white; }
+        .brand span { color: var(--brand); }
+        .back-link { color: #aaa; text-decoration: none; font-size: 0.8rem; border: 1px solid #555; padding: 5px 10px; border-radius: 4px; }
+
+        /* Toolbar & Workspace */
+        .toolbar { background: white; padding: 10px 20px; display: flex; gap: 15px; border-bottom: 1px solid #ddd; flex-wrap: wrap; justify-content: center; }
+        .workspace { flex: 1; padding: 20px; overflow-y: auto; display: flex; justify-content: center; -webkit-overflow-scrolling: touch; }
+        
+        /* The Sheet */
+        .page-sheet { width: 8.5in; min-height: 11in; background: white; padding: 0.5in; box-shadow: 0 0 10px rgba(0,0,0,0.1); display: flex; flex-wrap: wrap; gap: 0.15in; justify-content: center; align-content: flex-start; }
+        
+        .circle { width: var(--magnet-size); height: var(--magnet-size); border: 2px dashed #ddd; border-radius: 50%; display: flex; justify-content: center; align-items: center; cursor: pointer; position: relative; overflow: hidden; background: #fafafa; }
+        .circle img { position: absolute; width: 100%; height: auto; pointer-events: none; }
+        .circle-hint { color: #ccc; font-size: 1.5rem; pointer-events: none; }
+
+        .btn-main { background: var(--brand); color: white; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; font-weight: bold; }
+
+        @media print {
+            .navbar, .toolbar { display: none !important; }
+            body { background: white; overflow: visible; }
+            .workspace { padding: 0; overflow: visible; }
+            .page-sheet { box-shadow: none; margin: 0; }
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <a href="index.html" class="brand">NO<span>FN</span>WAY</a>
+        <a href="index.html" class="back-link">← DASHBOARD</a>
+    </nav>
+
+    <div class="toolbar">
+        <select id="sizeSelect" onchange="updateSize()">
+            <option value="1in">1.0"</option>
+            <option value="1.25in">1.25"</option>
+            <option value="1.5in">1.5"</option>
+        </select>
+        <button class="btn-main" onclick="window.print()">🖨️ PRINT SHEET</button>
+        <button onclick="resetSheet()" style="background:none; border:1px solid #ccc; cursor:pointer; border-radius:4px; padding: 5px 10px;">Clear All</button>
+    </div>
+
+    <main class="workspace">
+        <div class="page-sheet" id="sheet"></div>
+    </main>
+
+    <input type="file" id="uploader" accept="image/*" style="display:none">
+
+    <script>
+        const sheet = document.getElementById('sheet');
+        const uploader = document.getElementById('uploader');
+        let activeCircle = null;
+
+        function init() {
+            sheet.innerHTML = '';
+            for(let i=0; i<35; i++) {
+                const c = document.createElement('div');
+                c.className = 'circle';
+                c.innerHTML = '<span class="circle-hint">+</span>';
+                c.onclick = () => { activeCircle = c; uploader.click(); };
+                sheet.appendChild(c);
+            }
+        }
+
+        uploader.onchange = (e) => {
+            const file = e.target.files[0];
+            if(!file || !activeCircle) return;
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                activeCircle.innerHTML = `<img src="${event.target.result}">`;
+            };
+            reader.readAsDataURL(file);
+        };
+
+        function updateSize() {
+            document.documentElement.style.setProperty('--magnet-size', document.getElementById('sizeSelect').value);
+        }
+
+        function resetSheet() { if(confirm("Reset entire sheet?")) init(); }
+        
+        init();
+    </script>
+</body>
+</html>

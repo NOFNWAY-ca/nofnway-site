@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NOFNWAY | Command Center</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@900&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root { --brand: #3498db; --dark: #2c3e50; --bg: #f0f2f5; }
+        body { margin: 0; font-family: 'Roboto', sans-serif; background: var(--bg); color: var(--dark); overflow-x: hidden; }
+        
+        /* Navbar */
+        .navbar { background: var(--dark); padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; color: white; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+        .brand { font-family: 'Montserrat', sans-serif; font-weight: 900; font-size: 1.8rem; letter-spacing: 1px; }
+        .brand span { color: var(--brand); }
+
+        /* Dashboard Layout */
+        .container { max-width: 1000px; margin: 40px auto; padding: 20px; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
+
+        /* Scannable App Cards */
+        .card { background: white; border-radius: 8px; padding: 25px; border: 1px solid #ddd; text-decoration: none; color: inherit; transition: 0.2s; display: flex; flex-direction: column; height: 100%; }
+        .card:hover { transform: translateY(-3px); border-color: var(--brand); box-shadow: 0 10px 20px rgba(0,0,0,0.05); }
+        .card h3 { margin: 0 0 10px 0; font-family: 'Montserrat', sans-serif; font-size: 1.2rem; color: var(--dark); }
+        .card p { margin: 0; font-size: 0.9rem; color: #666; line-height: 1.5; flex-grow: 1; }
+        
+        /* High-Contrast Status Bar */
+        .status { margin-top: 15px; font-size: 0.7rem; font-weight: bold; text-transform: uppercase; color: var(--brand); border-top: 1px solid #eee; padding-top: 10px; }
+
+        footer { text-align: center; padding: 40px; font-size: 0.8rem; color: #999; }
+        #clock { font-weight: bold; opacity: 0.8; font-family: monospace; font-size: 1.1rem; }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="brand">NO<span>FN</span>WAY</div>
+        <div id="clock">00:00:00</div>
+    </nav>
+
+    <div class="container">
+        <h2 style="margin-bottom:30px; border-left: 5px solid var(--brand); padding-left: 15px; font-family: 'Montserrat', sans-serif;">ACTIVE OPERATIONS</h2>
+        
+        <div class="grid" id="app-grid">
+            </div>
+    </div>
+
+    <footer>NOFNWAY STUDIOS &copy; 2026 | We give an F, especially when you've run out.</footer>
+
+    <script>
+    /* --- NOFNWAY MANIFEST --- */
+const apps = [
+    { 
+        name: "[FN] MAGNET STUDIO", 
+        desc: "Create and print custom 1-inch visual schedule magnets instantly.", 
+        link: "magnet.html", 
+        status: "ACTIVE" 
+    },
+    { 
+        name: "[FN] GET LOST", 
+        desc: "The running route generator that forces you to explore safely.", 
+        link: "get_lost.html", 
+        status: "STABLE" 
+    }
+];
+        // Render the grid
+        const grid = document.getElementById('app-grid');
+        apps.forEach(app => {
+            grid.innerHTML += `
+                <a href="${app.link}" class="card">
+                    <h3>${app.name}</h3>
+                    <p>${app.desc}</p>
+                    <div class="status">${app.status}</div>
+                </a>`;
+        });
+
+        // System Clock logic
+        function updateClock() { 
+            const now = new Date();
+            document.getElementById('clock').textContent = now.toLocaleTimeString([], {hour12:false}); 
+        }
+        setInterval(updateClock, 1000); 
+        updateClock();
+    </script>
+</body>
+</html>

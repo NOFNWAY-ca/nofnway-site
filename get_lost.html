@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>NOFNWAY | GET LOST</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@900&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.css" />
+    <style>
+        :root { --brand: #3498db; --dark: #2c3e50; --bg: #f0f2f5; --emergency: #c0392b; }
+        body { margin: 0; font-family: 'Roboto', sans-serif; background: var(--bg); color: var(--dark); display: flex; flex-direction: column; height: 100vh; overflow: hidden; }
+        
+        /* Unified Navbar */
+        .navbar { background: var(--dark); padding: 10px 30px; display: flex; justify-content: space-between; align-items: center; color: white; flex-shrink: 0; z-index: 2000; }
+        .brand { font-family: 'Montserrat', sans-serif; font-weight: 900; font-size: 1.5rem; text-decoration: none; color: white; }
+        .brand span { color: var(--brand); }
+        .back-link { color: #aaa; text-decoration: none; font-size: 0.8rem; border: 1px solid #555; padding: 5px 10px; border-radius: 4px; }
+
+        /* Map & Controls */
+        #map { flex: 1; width: 100%; }
+        #ui-overlay { background: white; padding: 15px; border-top: 2px solid var(--brand); z-index: 1000; display: flex; flex-direction: column; gap: 10px; padding-bottom: calc(15px + env(safe-area-inset-bottom)); }
+        
+        .chip-row { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 5px; }
+        .chip { background: #e2e8f0; padding: 8px 12px; border-radius: 6px; font-size: 0.8rem; cursor: pointer; border: 2px solid transparent; font-weight: bold; }
+        .chip.active { border-color: var(--brand); color: var(--brand); background: #ebf5ff; }
+        
+        .btn-go { background: var(--brand); color: white; border: none; padding: 15px; border-radius: 8px; font-weight: 900; font-size: 1rem; cursor: pointer; text-transform: uppercase; }
+        .btn-home { background: var(--emergency); color: white; border: none; padding: 5px 10px; border-radius: 4px; font-size: 0.7rem; font-weight: bold; cursor: pointer; }
+        .btn-reset { background: #eee; border: none; padding: 5px 10px; border-radius: 4px; font-size: 0.7rem; cursor: pointer; }
+
+        #status { font-size: 0.7rem; text-align: center; color: #666; font-weight: bold; }
+        .leaflet-routing-container { display: none !important; }
+    </style>
+</head>
+<body>
+
+<nav class="navbar">
+    <a href="index.html" class="brand">NO<span>FN</span>WAY</a>
+    <div style="display:flex; gap:10px; align-items:center;">
+        <button class="btn-reset" onclick="resetMarkers()">RESET</button>
+        <button class="btn-home" onclick="emergencyReturn()">HOME</button>
+        <a href="index.html" class="back-link">EXIT</a>
+    </div>
+</nav>
+
+<div id="map"></div>
+
+<div id="ui-overlay">
+    <div class="chip-row" id="vibe-select">
+        <div class="chip active" data-vibe="nature" onclick="selectChip(this, 'vibe')">SCENIC</div>
+        <div class="chip" data-vibe="lit" onclick="selectChip(this, 'vibe')">WELL-LIT</div>
+        <div class="chip" data-vibe="urban" onclick="selectChip(this, 'vibe')">URBAN</div>
+        <div class="chip" data-vibe="trail" onclick="selectChip(this, 'vibe')">TRAILS</div>
+    </div>
+    <button class="btn-go" onclick="startAdventure()">GO GET LOST</button>
+    <div id="status">Syncing GPS...</div>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.js"></script>
+
+<script>
+    /* Original App Logic Maintained */
+    let map, userMarker, routingControl, currentPos, startPin = null, endPin = null;
+    let selectedVibe = 'nature';
+
+    function initApp() {
+        map = L.map('map', { zoomControl: false, tap: false }).setView([0, 0], 2);
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png', { attribution: '© OSM' }).addTo(map);
+
+        if (navigator.geolocation) {
+            navigator.geolocation.watchPosition(pos => {
+                currentPos = L.latLng(pos.coords.latitude, pos.coords.longitude);
+                if (!userMarker) {
+                    map.setView(currentPos, 16);
+                    userMarker = L.circleMarker(currentPos, { color: '#3498db', radius: 8, fillOpacity: 1, weight: 3, fillColor: 'white' }).addTo(map);
+                    document.getElementById('status').innerText = "GPS ACTIVE. READY.";
+                } else { userMarker.setLatLng(currentPos); }
+            }, null, { enableHighAccuracy: true });
+        }
+
+        map.on('contextmenu', (e) => {
+            if (!startPin) {
+                startPin = L.marker(e.latlng, { draggable: true, icon: createIcon('blue') }).addTo(map);
+                document.getElementById('status').innerText = "START SET. LONG-PRESS FOR FINISH.";
+            } else if (!endPin) {
+                endPin = L.marker(e.latlng, { draggable: true, icon: 'gold' }).addTo(map); // Using simplified logic
+                document.getElementById('status').innerText = "FINISH SET. READY TO RUN.";
+            }
+        });
+    }
+
+    function createIcon(color) {
+        return L.divIcon({
+            className: 'custom-icon',
+            html: `<div style="background-color:${color === 'blue' ? '#3498db' : '#f1c40f'}; width:15px; height:15px; border-radius:50%; border:2px solid white;"></div>`,
+            iconSize: [15, 15]
+        });
+    }
+
+    function selectChip(el, type) {
+        document.querySelectorAll(`#${type}-select .chip`).forEach(c => c.classList.remove('active'));
+        el.classList.add('active');
+        selectedVibe = el.dataset.vibe;
+    }
+
+    async function startAdventure() {
+        if (routingControl) map.removeControl(routingControl);
+        let origin = startPin ? startPin.getLatLng() : currentPos;
+        let destination = endPin ? endPin.getLatLng() : await findInterestingPoint(origin, selectedVibe);
+        
+        routingControl = L.Routing.control({
+            waypoints: [origin, destination, (startPin && endPin ? null : origin)].filter(w => w !== null),
+            router: L.Routing.osrmv1({ serviceUrl: 'https://router.project-osrm.org/route/v1', profile: 'foot' }),
+            lineOptions: { styles: [{ color: '#3498db', opacity: 0.8, weight: 6 }] },
+            createMarker: () => null,
+            addWaypoints: false
+        }).addTo(map);
+        document.getElementById('status').innerText = "ADVENTURE LOCKED.";
+    }
+
+    async function findInterestingPoint(center, vibe) {
+        // Fallback random spot logic for simplicity in template
+        return L.latLng(center.lat + (Math.random() - 0.5) * 0.02, center.lng + (Math.random() - 0.5) * 0.02);
+    }
+
+    function resetMarkers() {
+        if (startPin) { map.removeLayer(startPin); startPin = null; }
+        if (endPin) { map.removeLayer(endPin); endPin = null; }
+        if (routingControl) map.removeControl(routingControl);
+        document.getElementById('status').innerText = "RESET COMPLETE.";
+    }
+
+    function emergencyReturn() {
+        if (!currentPos) return;
+        if (routingControl) map.removeControl(routingControl);
+        routingControl = L.Routing.control({
+            waypoints: [currentPos, startPin ? startPin.getLatLng() : currentPos],
+            router: L.Routing.osrmv1({ serviceUrl: 'https://router.project-osrm.org/route/v1', profile: 'foot' }),
+            lineOptions: { styles: [{ color: '#c0392b', weight: 8, dashArray: '5, 10' }] },
+            createMarker: () => null
+        }).addTo(map);
+        document.getElementById('status').innerText = "HEADING HOME...";
+    }
+
+    window.onload = initApp;
+</script>
+</body>
+</html>
