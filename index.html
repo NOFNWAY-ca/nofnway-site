@@ -13,7 +13,7 @@
         
         .nav-controls { display: flex; align-items: center; gap: 20px; }
 
-        /* Updated Gradient Button */
+        /* Gradient Light/Dark Toggle */
         .theme-toggle { 
             background: linear-gradient(135deg, #3498db 0%, #2c3e50 100%); 
             color: white; 
@@ -23,12 +23,12 @@
             cursor: pointer; 
             font-weight: bold; 
             font-family: 'Roboto', sans-serif;
-            transition: opacity 0.2s;
+            transition: 0.2s;
             text-transform: uppercase;
             letter-spacing: 1px;
             border: 1px solid rgba(255,255,255,0.1);
         }
-        .theme-toggle:hover { opacity: 0.9; }
+        .theme-toggle:hover { opacity: 0.9; transform: scale(1.02); }
 
         .container { max-width: 1100px; margin: 40px auto; padding: 20px; }
         .category-title { font-family: 'Montserrat', sans-serif; color: var(--brand); border-bottom: 1px solid var(--border); padding-bottom: 10px; margin-top: 40px; text-transform: uppercase; }
@@ -39,6 +39,7 @@
         .card h3 { margin: 10px 0; font-family: 'Montserrat', sans-serif; }
         .card p { color: var(--text-dim); line-height: 1.6; flex-grow: 1; }
 
+        /* Terminal Component */
         .terminal-container { font-family: monospace; font-size: 1.1rem; color: var(--brand); min-height: 1.5em; margin-bottom: 10px; }
         .cursor { display: inline-block; width: 8px; background-color: var(--brand); margin-left: 4px; animation: blink 1s infinite; }
         @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
@@ -79,13 +80,13 @@
         }
         applyTheme();
 
-        /* --- DATA MODEL --- */
+        /* --- DATA MODEL (All set to Working/Yellow) --- */
         const apps = [
-            { name: "[FN] HOW LONG?", desc: "Visual measurement controller for construction projects.", link: "how_long.html", status: "Ready", type: "ready", cat: "Production Tools" },
-            { name: "[FN] PDFer", desc: "Local mobile document scanner and editor.", link: "pdfer.html", status: "Testing", type: "working", cat: "Production Tools" },
+            { name: "[FN] HOW LONG?", desc: "Visual measurement controller for construction projects.", link: "how_long.html", status: "In Progress", type: "working", cat: "Production Tools" },
+            { name: "[FN] PDFer", desc: "Local mobile document scanner and editor.", link: "pdfer.html", status: "In Progress", type: "working", cat: "Production Tools" },
             { name: "[FN] GET LOST", desc: "The running route generator that enables you to explore safely.", link: "get_lost.html", status: "In Progress", type: "working", cat: "Active Projects" },
-            { name: "[FN] MAGNET STUDIO", desc: "Create and print custom 1-inch visual schedule magnets.", link: "magnet.html", status: "Under Construction", type: "dev", cat: "Active Projects" },
-            { name: "[FN] JPEGer", desc: "Direct-fill and precision stamping for PDFs.", link: "jpeger.html", status: "Reviewing", type: "dev", cat: "Active Projects" }
+            { name: "[FN] MAGNET STUDIO", desc: "Create and print custom 1-inch visual schedule magnets.", link: "magnet.html", status: "In Progress", type: "working", cat: "Active Projects" },
+            { name: "[FN] JPEGer", desc: "Direct-fill and precision stamping for PDFs.", link: "jpeger.html", status: "In Progress", type: "working", cat: "Active Projects" }
         ];
 
         /* --- TERMINAL EFFECT ENGINE --- */
@@ -115,7 +116,7 @@
 
             if (!isDeleting && charIdx === current.length) {
                 isDeleting = true;
-                speed = 30000; 
+                speed = 30000; // Delay for 30s
             } else if (isDeleting && charIdx === 0) {
                 isDeleting = false;
                 sloganIdx = (sloganIdx + 1) % slogans.length;

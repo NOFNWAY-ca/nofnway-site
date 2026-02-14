@@ -39,10 +39,9 @@ body {
     font-weight: 900;
     border-bottom-left-radius: 12px;
     text-transform: uppercase;
-    color: #000;
+    color: #000; /* High contrast for yellow/green */
 }
 
-/* Mapping 'type' to colors */
 .ready { background-color: var(--ready); }
 .working { background-color: var(--working); }
 .dev { background-color: var(--dev); color: #fff; }
