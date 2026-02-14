@@ -28,8 +28,12 @@
         .status-working { background: var(--working); color: #000; }
         .status-dev { background: var(--dev); color: #fff; }
 
-        #clock { font-family: monospace; font-size: 1.2rem; color: var(--brand); }
-        footer { text-align: center; padding: 60px; color: var(--text-dim); font-size: 0.8rem; }
+        /* Terminal Effect Styles */
+        .terminal-container { font-family: monospace; font-size: 1.1rem; color: var(--brand); min-height: 1.5em; margin-bottom: 10px; }
+        .cursor { display: inline-block; width: 8px; background-color: var(--brand); margin-left: 4px; animation: blink 1s infinite; }
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+
+        footer { text-align: center; padding: 60px; color: var(--text-dim); font-size: 0.8rem; border-top: 1px solid var(--border); margin-top: 40px; }
     </style>
 </head>
 <body>
@@ -37,14 +41,18 @@
     <nav class="navbar">
         <div class="brand">NO<span>FN</span>WAY</div>
         <div class="nav-controls">
-            <div id="clock">00:00:00</div>
             <button class="theme-toggle" onclick="toggleTheme()">TOGGLE MODE</button>
         </div>
     </nav>
 
     <div class="container" id="main-content"></div>
 
-    <footer>NOFNWAY &copy; 2026 | We give an F, especially when you've run out.</footer>
+    <footer>
+        <div class="terminal-container">
+            <span id="terminal-text"></span><span class="cursor">&nbsp;</span>
+        </div>
+        <div>NOFNWAY &copy; 2026</div>
+    </footer>
 
     <script>
         /* --- THEME LOGIC --- */
@@ -70,6 +78,44 @@
             { name: "[FN] JPEGer", desc: "Direct-fill and precision stamping for PDFs.", link: "jpeger.html", status: "Reviewing", type: "dev", cat: "Active Projects" }
         ];
 
+        /* --- TERMINAL SLOGAN LOGIC --- */
+        const slogans = [
+            "We give an F, especially when you've run out.",
+            "Frictionless tools for brains that work differently.",
+            "Building systems for executive dysfunction.",
+            "Offline-capable. No fluff. Just function."
+        ];
+        
+        let sloganIdx = 0;
+        let charIdx = 0;
+        let isDeleting = false;
+        const terminalEl = document.getElementById('terminal-text');
+
+        function typeSlogan() {
+            const current = slogans[sloganIdx];
+            
+            if (isDeleting) {
+                terminalEl.textContent = current.substring(0, charIdx - 1);
+                charIdx--;
+            } else {
+                terminalEl.textContent = current.substring(0, charIdx + 1);
+                charIdx++;
+            }
+
+            let speed = isDeleting ? 40 : 80;
+
+            if (!isDeleting && charIdx === current.length) {
+                isDeleting = true;
+                speed = 30000; // Hold for 30 seconds
+            } else if (isDeleting && charIdx === 0) {
+                isDeleting = false;
+                sloganIdx = (sloganIdx + 1) % slogans.length;
+                speed = 500;
+            }
+
+            setTimeout(typeSlogan, speed);
+        }
+
         function render() {
             const container = document.getElementById('main-content');
             const categories = [...new Set(apps.map(a => a.cat))];
@@ -90,10 +136,8 @@
             });
         }
 
-        function updateClock() { document.getElementById('clock').textContent = new Date().toLocaleTimeString([], {hour12:false}); }
-        setInterval(updateClock, 1000);
-        updateClock();
         render();
+        typeSlogan();
     </script>
 </body>
 </html>
