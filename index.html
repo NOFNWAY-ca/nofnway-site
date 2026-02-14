@@ -12,7 +12,23 @@
         .brand span { color: var(--brand); }
         
         .nav-controls { display: flex; align-items: center; gap: 20px; }
-        .theme-toggle { background: var(--brand); color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; font-weight: bold; }
+
+        /* Updated Gradient Button */
+        .theme-toggle { 
+            background: linear-gradient(135deg, #3498db 0%, #2c3e50 100%); 
+            color: white; 
+            border: none; 
+            padding: 10px 20px; 
+            border-radius: 5px; 
+            cursor: pointer; 
+            font-weight: bold; 
+            font-family: 'Roboto', sans-serif;
+            transition: opacity 0.2s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .theme-toggle:hover { opacity: 0.9; }
 
         .container { max-width: 1100px; margin: 40px auto; padding: 20px; }
         .category-title { font-family: 'Montserrat', sans-serif; color: var(--brand); border-bottom: 1px solid var(--border); padding-bottom: 10px; margin-top: 40px; text-transform: uppercase; }
@@ -23,7 +39,6 @@
         .card h3 { margin: 10px 0; font-family: 'Montserrat', sans-serif; }
         .card p { color: var(--text-dim); line-height: 1.6; flex-grow: 1; }
 
-        /* Terminal Component */
         .terminal-container { font-family: monospace; font-size: 1.1rem; color: var(--brand); min-height: 1.5em; margin-bottom: 10px; }
         .cursor { display: inline-block; width: 8px; background-color: var(--brand); margin-left: 4px; animation: blink 1s infinite; }
         @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
@@ -36,7 +51,7 @@
     <nav class="navbar">
         <div class="brand">NO<span>FN</span>WAY</div>
         <div class="nav-controls">
-            <button class="theme-toggle" onclick="toggleTheme()">TOGGLE MODE</button>
+            <button class="theme-toggle" onclick="toggleTheme()">Light/Dark Mode</button>
         </div>
     </nav>
 
@@ -100,7 +115,7 @@
 
             if (!isDeleting && charIdx === current.length) {
                 isDeleting = true;
-                speed = 30000; // Delay cycle for 30s
+                speed = 30000; 
             } else if (isDeleting && charIdx === 0) {
                 isDeleting = false;
                 sloganIdx = (sloganIdx + 1) % slogans.length;
