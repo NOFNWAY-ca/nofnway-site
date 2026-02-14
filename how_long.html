@@ -5,77 +5,100 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>NOFNWAY | HOW LONG?</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@900&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="theme.css">
+    
     <style>
         :root {
-            --brand: #3498db; --dark: #2c3e50; --bg: #09090b;
-            --bg-panel: #18181b; --bg-element: #27272a; --border: #3f3f46;
-            --text-main: #f4f4f5; --text-muted: #a1a1aa;
-            --accent-blue: #3b82f6; --accent-yellow: #facc15;
-            --accent-green: #4ade80; --accent-orange: #f97316; --danger: #ef4444;
+            /* Local specific accents preserved for high-visibility */
+            --accent-blue: #3b82f6; 
+            --accent-yellow: #facc15;
+            --accent-green: #4ade80; 
+            --accent-orange: #f97316; 
+            --danger: #ef4444;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-        body { font-family: 'Roboto', sans-serif; background: var(--bg); color: var(--text-main); height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+        
+        body { 
+            font-family: 'Roboto', sans-serif; 
+            background: var(--bg); 
+            color: var(--text-main); 
+            height: 100vh; 
+            display: flex; 
+            flex-direction: column; 
+            overflow: hidden; 
+        }
 
-        /* Unified Navbar */
-        .navbar { background: var(--dark); padding: 10px 30px; display: flex; justify-content: space-between; align-items: center; color: white; flex-shrink: 0; z-index: 100; border-bottom: 1px solid var(--border); }
+        /* Unified Navbar matching Command Center */
+        .navbar { 
+            background: #000; 
+            padding: 10px 30px; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            border-bottom: 2px solid var(--brand);
+            flex-shrink: 0; 
+            z-index: 100; 
+        }
         .brand { font-family: 'Montserrat', sans-serif; font-weight: 900; font-size: 1.5rem; text-decoration: none; color: white; }
         .brand span { color: var(--brand); }
         .back-link { color: #aaa; text-decoration: none; font-size: 0.8rem; border: 1px solid #555; padding: 5px 10px; border-radius: 4px; }
 
-        /* Main Workspace */
+        /* Workspace */
         .workspace { flex: 1; overflow-y: auto; padding: 1rem; display: flex; flex-direction: column; gap: 0.75rem; max-width: 600px; margin: 0 auto; width: 100%; }
 
         /* Visual Ruler */
         .visual-stage { background: #000; border: 1px solid var(--border); border-radius: 0.75rem; height: 70px; position: relative; flex-shrink: 0; overflow: hidden; }
-        .ruler-track { position: absolute; top: 15px; bottom: 0; left: 15px; right: 15px; border-bottom: 2px solid #3f3f46; }
+        .ruler-track { position: absolute; top: 15px; bottom: 0; left: 15px; right: 15px; border-bottom: 2px solid var(--border); }
         .tick { position: absolute; bottom: 0; width: 1px; background: #52525b; transform: translateX(-50%); }
         .tick.half { height: 60%; width: 2px; background: #a1a1aa; }
         .tick.quarter { height: 40%; }
         .tick.eighth { height: 25%; }
         .tick.sixteenth { height: 15%; }
+        
         .laser { position: absolute; top: 0; bottom: 0; width: 2px; transform: translateX(-50%); transition: left 0.1s linear; z-index: 10; }
         .laser.blue { background: var(--accent-blue); box-shadow: 0 0 10px var(--accent-blue); z-index: 20; }
         .laser.yellow { background: var(--accent-yellow); opacity: 0.5; z-index: 10; }
         .laser.green { background: var(--accent-green); box-shadow: 0 0 15px var(--accent-green); width: 3px; z-index: 30; }
-        .ruler-labels { position: absolute; bottom: 2px; left: 0; right: 0; display: flex; justify-content: space-between; padding: 0 10px; font-family: monospace; font-size: 0.7rem; color: var(--text-muted); }
+        .ruler-labels { position: absolute; bottom: 2px; left: 0; right: 0; display: flex; justify-content: space-between; padding: 0 10px; font-family: monospace; font-size: 0.7rem; color: var(--text-dim); }
 
         /* Readout */
-        .readout-card { background: var(--bg-panel); border: 1px solid var(--border); border-left: 4px solid var(--accent-blue); border-radius: 0.75rem; padding: 0.75rem 1rem; display: flex; justify-content: space-between; align-items: center; }
-        .readout-val { font-size: 2rem; font-weight: 800; color: white; line-height: 1; }
-        .readout-sub { font-family: monospace; color: var(--text-muted); font-size: 0.8rem; margin-top: 2px; }
+        .readout-card { background: var(--card-bg); border: 1px solid var(--border); border-left: 4px solid var(--accent-blue); border-radius: 0.75rem; padding: 0.75rem 1rem; display: flex; justify-content: space-between; align-items: center; }
+        .readout-val { font-size: 2rem; font-weight: 800; color: var(--text-main); line-height: 1; }
+        .readout-sub { font-family: monospace; color: var(--text-dim); font-size: 0.8rem; margin-top: 2px; }
         .fraction-hl { color: var(--accent-blue); }
         .dead-on .fraction-hl { color: var(--accent-green); }
-        .qty-badge { background: var(--bg-element); color: var(--accent-blue); font-size: 0.8rem; font-weight: 700; padding: 2px 6px; border-radius: 4px; border: 1px solid var(--accent-blue); margin-bottom: 4px; display: inline-block; }
+        .qty-badge { background: var(--bg); color: var(--accent-blue); font-size: 0.8rem; font-weight: 700; padding: 2px 6px; border-radius: 4px; border: 1px solid var(--accent-blue); margin-bottom: 4px; display: inline-block; }
         .qty-badge.hidden { display: none; }
 
         /* Drawer */
-        .drawer-container { border: 1px solid var(--border); border-radius: 0.75rem; background: #111; overflow: hidden; display: flex; flex-direction: column; flex: 1; min-height: 150px; }
+        .drawer-container { border: 1px solid var(--border); border-radius: 0.75rem; background: var(--bg); overflow: hidden; display: flex; flex-direction: column; flex: 1; min-height: 150px; }
         .drawer-tabs { display: flex; border-bottom: 1px solid var(--border); }
-        .tab { flex: 1; padding: 0.75rem; text-align: center; font-size: 0.75rem; font-weight: 800; letter-spacing: 0.1em; color: var(--text-muted); background: var(--bg-panel); cursor: pointer; }
-        .tab.active { background: #111; color: white; border-bottom: 2px solid var(--accent-blue); }
+        .tab { flex: 1; padding: 0.75rem; text-align: center; font-size: 0.75rem; font-weight: 800; color: var(--text-dim); background: var(--card-bg); cursor: pointer; }
+        .tab.active { background: var(--bg); color: var(--text-main); border-bottom: 2px solid var(--accent-blue); }
         .tab.buy-mode.active { border-bottom-color: var(--accent-orange); color: var(--accent-orange); }
+
         .list-view { padding: 0.5rem; overflow-y: auto; flex: 1; }
-        .item-card { display: flex; justify-content: space-between; align-items: center; background: var(--bg-element); padding: 0.75rem; border-radius: 6px; margin-bottom: 6px; border-left: 3px solid var(--border); }
-        .item-main { font-weight: 700; font-size: 1rem; color: white; }
-        .item-sub { font-size: 0.7rem; color: var(--text-muted); font-family: monospace; }
-        .label-pill { font-size: 0.6rem; font-weight: 800; padding: 2px 6px; border-radius: 4px; background: #333; color: #ccc; margin-right: 6px; text-transform: uppercase; }
-        .buy-card { border-left-color: var(--accent-orange); background: #2a1b12; }
+        .item-card { display: flex; justify-content: space-between; align-items: center; background: var(--card-bg); padding: 0.75rem; border-radius: 6px; margin-bottom: 6px; border-left: 3px solid var(--border); }
+        .item-main { font-weight: 700; font-size: 1rem; color: var(--text-main); }
+        .item-sub { font-size: 0.7rem; color: var(--text-dim); font-family: monospace; }
+        .label-pill { font-size: 0.6rem; font-weight: 800; padding: 2px 6px; border-radius: 4px; background: var(--border); color: var(--text-main); margin-right: 6px; text-transform: uppercase; }
+        .buy-card { border-left-color: var(--accent-orange); }
 
         /* Input Grid */
         .input-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; }
-        .field { background: var(--bg-element); border: 1px solid var(--border); border-radius: 0.5rem; padding: 0.5rem 0.75rem; position: relative; }
+        .field { background: var(--card-bg); border: 1px solid var(--border); border-radius: 0.5rem; padding: 0.5rem 0.75rem; position: relative; }
         .field.active { border-color: var(--accent-blue); background: rgba(59, 130, 246, 0.1); }
-        .field-lbl { font-size: 0.6rem; font-weight: 700; color: var(--text-muted); display: block; }
-        .field-val { font-family: monospace; font-size: 1.1rem; color: white; min-height: 1.4rem; }
+        .field-lbl { font-size: 0.6rem; font-weight: 700; color: var(--text-dim); display: block; }
+        .field-val { font-family: monospace; font-size: 1.1rem; color: var(--text-main); min-height: 1.4rem; }
         .cursor { display: inline-block; width: 2px; height: 1em; background: var(--accent-blue); animation: blink 1s infinite; margin-left: 2px; }
         @keyframes blink { 50% { opacity: 0; } }
 
         /* Keypad */
-        .keypad { background: var(--bg-panel); border-top: 1px solid var(--border); padding: 0.5rem; display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; height: 240px; flex-shrink: 0; padding-bottom: max(0.5rem, env(safe-area-inset-bottom)); }
-        .key { background: var(--bg-element); border: 1px solid var(--border); border-radius: 6px; color: white; font-size: 1.4rem; font-weight: 500; display: flex; align-items: center; justify-content: center; cursor: pointer; }
-        .key:active { background: #3f3f46; }
-        .key-action { font-size: 0.8rem; font-weight: 800; color: var(--text-muted); background: #1a1a1c; }
+        .keypad { background: var(--card-bg); border-top: 1px solid var(--border); padding: 0.5rem; display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; height: 240px; flex-shrink: 0; padding-bottom: max(0.5rem, env(safe-area-inset-bottom)); }
+        .key { background: var(--bg); border: 1px solid var(--border); border-radius: 6px; color: var(--text-main); font-size: 1.4rem; font-weight: 500; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+        .key:active { background: var(--border); }
+        .key-action { font-size: 0.8rem; font-weight: 800; color: var(--text-dim); }
         .key-mark { background: var(--accent-green); color: black; font-weight: 900; grid-column: span 2; font-size: 1rem; }
         .key-del { color: var(--danger); }
         .key-x { color: var(--accent-orange); font-weight: bold; }
@@ -83,10 +106,10 @@
         /* Modal */
         .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.8); z-index: 200; display: flex; align-items: flex-end; opacity: 0; pointer-events: none; transition: opacity 0.2s; }
         .modal-overlay.open { opacity: 1; pointer-events: auto; }
-        .modal-sheet { background: var(--bg-panel); width: 100%; border-top: 1px solid var(--border); border-radius: 1rem 1rem 0 0; padding: 1.5rem; padding-bottom: 3rem; transform: translateY(100%); transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
+        .modal-sheet { background: var(--card-bg); width: 100%; border-top: 1px solid var(--border); border-radius: 1rem 1rem 0 0; padding: 1.5rem; padding-bottom: 3rem; transform: translateY(100%); transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
         .modal-overlay.open .modal-sheet { transform: translateY(0); }
         .chip-grid { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 1rem; }
-        .chip { padding: 0.75rem 1.25rem; background: var(--bg-element); border: 1px solid var(--border); color: white; border-radius: 2rem; font-weight: 700; font-size: 0.9rem; cursor: pointer; }
+        .chip { padding: 0.75rem 1.25rem; background: var(--bg); border: 1px solid var(--border); color: var(--text-main); border-radius: 2rem; font-weight: 700; font-size: 0.9rem; cursor: pointer; }
         .chip.blue { border-color: var(--accent-blue); color: var(--accent-blue); }
         .chip.yellow { border-color: var(--accent-yellow); color: var(--accent-yellow); }
     </style>
@@ -158,7 +181,7 @@
 
 <div class="modal-overlay" id="modal">
     <div class="modal-sheet">
-        <h2 style="color:white; font-size:1.2rem; font-weight:800;">Label Measurement</h2>
+        <h2 style="color:var(--text-main); font-size:1.2rem; font-weight:800;">Label Measurement</h2>
         <div class="chip-grid">
             <div class="chip blue" onclick="applyLabel('STUD')">STUD</div>
             <div class="chip blue" onclick="applyLabel('HEADER')">HEADER</div>
@@ -172,21 +195,172 @@
 </div>
 
 <script>
+    /* --- SHARED THEME LOGIC --- */
+    const theme = localStorage.getItem('nofnway-theme') || 'light';
+    document.documentElement.setAttribute('data-theme', theme);
+
     const state = { activeField: 'inches', vals: { feet: '', inches: '' }, multiplier: 1, qtyMode: false, precision: 16, items: [], view: 'cut', editingId: null };
-    window.onload = () => { generateTicks(); renderFields(); renderList(); if(navigator.wakeLock) navigator.wakeLock.request('screen').catch(e=>{}); };
+    
+    window.onload = () => { 
+        generateTicks(); 
+        renderFields(); 
+        renderList(); 
+        if(navigator.wakeLock) navigator.wakeLock.request('screen').catch(e=>{}); 
+    };
+
     function setActive(f) { state.activeField = f; state.qtyMode = false; renderFields(); vibrate(10); }
     function vibrate(ms) { if(navigator.vibrate) navigator.vibrate(ms); }
-    function press(key) { vibrate(10); if (key === 'x') { state.qtyMode = true; state.multiplier = 0; renderFields(); return; } if (state.qtyMode) { if (key === 'clr') { state.multiplier = 1; state.qtyMode = false; } else if (key === 'back') { let s = state.multiplier.toString(); state.multiplier = parseInt(s.slice(0, -1)) || 0; } else if (/[0-9]/.test(key)) { let s = state.multiplier === 0 ? '' : state.multiplier.toString(); state.multiplier = parseInt(s + key); } renderFields(); return; } let val = state.vals[state.activeField]; if (key === 'clr') val = ''; else if (key === 'back') val = val.slice(0, -1); else if (key === '.') { if(!val.includes('.')) val += '.'; } else val += key; state.vals[state.activeField] = val; calculate(); renderFields(); }
+    
+    function press(key) { 
+        vibrate(10); 
+        if (key === 'x') { state.qtyMode = true; state.multiplier = 0; renderFields(); return; } 
+        if (state.qtyMode) { 
+            if (key === 'clr') { state.multiplier = 1; state.qtyMode = false; } 
+            else if (key === 'back') { let s = state.multiplier.toString(); state.multiplier = parseInt(s.slice(0, -1)) || 0; } 
+            else if (/[0-9]/.test(key)) { let s = state.multiplier === 0 ? '' : state.multiplier.toString(); state.multiplier = parseInt(s + key); } 
+            renderFields(); return; 
+        } 
+        let val = state.vals[state.activeField]; 
+        if (key === 'clr') val = ''; 
+        else if (key === 'back') val = val.slice(0, -1); 
+        else if (key === '.') { if(!val.includes('.')) val += '.'; } 
+        else val += key; 
+        state.vals[state.activeField] = val; 
+        calculate(); 
+        renderFields(); 
+    }
+
     function calculate() { const f = parseFloat(state.vals.feet) || 0; const i = parseFloat(state.vals.inches) || 0; const totalInches = (f * 12) + i; updateVisuals(totalInches); return totalInches; }
-    function renderFields() { document.querySelectorAll('.field').forEach(el => el.classList.remove('active')); document.getElementById('field-'+state.activeField).classList.add('active'); document.getElementById('val-feet').innerHTML = state.vals.feet + (state.activeField==='feet'?'<span class="cursor"></span>':''); document.getElementById('val-inches').innerHTML = state.vals.inches + (state.activeField==='inches'?'<span class="cursor"></span>':''); const badge = document.getElementById('qty-badge'); if (state.multiplier > 1 || state.qtyMode) { badge.classList.remove('hidden'); badge.innerText = `QTY: ${state.multiplier}`; badge.style.color = state.qtyMode ? '#fff' : ''; } else { badge.classList.add('hidden'); } }
-    function updateVisuals(total) { const abs = Math.abs(total); const whole = Math.floor(abs); const fract = abs - whole; document.getElementById('lbl-start').innerText = whole + '"'; document.getElementById('lbl-end').innerText = (whole+1) + '"'; const lcd = state.precision; let snapped = Math.round(fract * lcd) / lcd; const bPct = fract * 100; const yPct = snapped * 100; const bLaser = document.getElementById('laser-blue'); const yLaser = document.getElementById('laser-yellow'); const card = document.getElementById('readout-card'); bLaser.style.left = bPct + '%'; yLaser.style.left = yPct + '%'; if (Math.abs(bPct - yPct) < 0.5) { bLaser.className = 'laser green'; yLaser.style.opacity = 0; card.style.borderLeftColor = 'var(--accent-green)'; card.classList.add('dead-on'); } else { bLaser.className = 'laser blue'; yLaser.style.opacity = 0.5; card.style.borderLeftColor = 'var(--accent-blue)'; card.classList.remove('dead-on'); } let dFeet = Math.floor(abs/12); let dInch = whole % 12; if (snapped >= 1) { snapped = 0; dInch++; if(dInch>=12){dInch=0; dFeet++;} } const num = Math.round(snapped*lcd); let str = ""; if(dFeet>0) str += `${dFeet}' `; if(dInch>0 || (dFeet===0 && num===0)) str += `${dInch}`; if(num>0) str += ` <span class="fraction-hl">${num}/${lcd}</span>`; str += '"'; document.getElementById('main-disp').innerHTML = str; document.getElementById('sub-disp').innerText = total.toFixed(4) + '"'; }
-    function markMeasurement() { const inches = calculate(); if (inches === 0) return; const newItem = { id: Date.now(), label: 'ITEM', qty: state.multiplier || 1, len: inches, display: document.getElementById('main-disp').innerText }; state.items.unshift(newItem); state.multiplier = 1; state.qtyMode = false; renderList(); vibrate([20, 50]); if(state.view === 'buy') switchTab('cut'); }
-    function renderList() { const container = document.getElementById('list-container'); container.innerHTML = ''; if (state.view === 'cut') { state.items.forEach(item => { const el = document.createElement('div'); el.className = 'item-card'; el.onclick = () => openLabelModal(item.id); el.innerHTML = `<div><span class="label-pill">${item.label}</span><span class="item-main">${item.qty}x ${item.display}</span></div><div class="item-sub">${(item.len).toFixed(3)}" ea</div>`; container.appendChild(el); }); } else { const boards = calculateMaterials(); boards.forEach(b => { const el = document.createElement('div'); el.className = 'item-card buy-card'; el.innerHTML = `<div><span class="label-pill" style="background:#431407; color:#fb923c;">BUY</span><span class="item-main">${b.count}x ${b.name}</span></div><div class="item-sub">Covers items</div>`; container.appendChild(el); }); } }
-    function calculateMaterials() { let shopping = []; let pool = []; state.items.forEach(i => { for(let x=0; x<i.qty; x++) pool.push(i.len); }); pool.sort((a,b) => b-a); let boards8 = 0, boards10 = 0, boards12 = 0; while(pool.length > 0) { let piece = pool.shift(); if (piece > 144) {} else if (piece > 120) { boards12++; } else if (piece > 96) { boards10++; } else { let remain = 96 - piece; for(let k=0; k<pool.length; k++) { if (pool[k] <= remain) { remain -= pool[k]; pool.splice(k, 1); k--; } } boards8++; } } if(boards8 > 0) shopping.push({ count: boards8, name: "8' Lumber (96\")" }); if(boards10 > 0) shopping.push({ count: boards10, name: "10' Lumber (120\")" }); if(boards12 > 0) shopping.push({ count: boards12, name: "12' Lumber (144\")" }); return shopping; }
+    
+    function renderFields() { 
+        document.querySelectorAll('.field').forEach(el => el.classList.remove('active')); 
+        document.getElementById('field-'+state.activeField).classList.add('active'); 
+        document.getElementById('val-feet').innerHTML = state.vals.feet + (state.activeField==='feet'?'<span class="cursor"></span>':''); 
+        document.getElementById('val-inches').innerHTML = state.vals.inches + (state.activeField==='inches'?'<span class="cursor"></span>':''); 
+        const badge = document.getElementById('qty-badge'); 
+        if (state.multiplier > 1 || state.qtyMode) { 
+            badge.classList.remove('hidden'); 
+            badge.innerText = `QTY: ${state.multiplier}`; 
+            badge.style.color = state.qtyMode ? (theme === 'dark' ? '#fff' : '#000') : ''; 
+        } else { badge.classList.add('hidden'); } 
+    }
+
+    function updateVisuals(total) { 
+        const abs = Math.abs(total); 
+        const whole = Math.floor(abs); 
+        const fract = abs - whole; 
+        document.getElementById('lbl-start').innerText = whole + '"'; 
+        document.getElementById('lbl-end').innerText = (whole+1) + '"'; 
+        const lcd = state.precision; 
+        let snapped = Math.round(fract * lcd) / lcd; 
+        const bPct = fract * 100; 
+        const yPct = snapped * 100; 
+        const bLaser = document.getElementById('laser-blue'); 
+        const yLaser = document.getElementById('laser-yellow'); 
+        const card = document.getElementById('readout-card'); 
+        bLaser.style.left = bPct + '%'; 
+        yLaser.style.left = yPct + '%'; 
+        if (Math.abs(bPct - yPct) < 0.5) { 
+            bLaser.className = 'laser green'; 
+            yLaser.style.opacity = 0; 
+            card.style.borderLeftColor = 'var(--accent-green)'; 
+            card.classList.add('dead-on'); 
+        } else { 
+            bLaser.className = 'laser blue'; 
+            yLaser.style.opacity = 0.5; 
+            card.style.borderLeftColor = 'var(--accent-blue)'; 
+            card.classList.remove('dead-on'); 
+        } 
+        let dFeet = Math.floor(abs/12); 
+        let dInch = whole % 12; 
+        if (snapped >= 1) { snapped = 0; dInch++; if(dInch>=12){dInch=0; dFeet++;} } 
+        const num = Math.round(snapped*lcd); 
+        let str = ""; 
+        if(dFeet>0) str += `${dFeet}' `; 
+        if(dInch>0 || (dFeet===0 && num===0)) str += `${dInch}`; 
+        if(num>0) str += ` <span class="fraction-hl">${num}/${lcd}</span>`; 
+        str += '"'; 
+        document.getElementById('main-disp').innerHTML = str; 
+        document.getElementById('sub-disp').innerText = total.toFixed(4) + '"'; 
+    }
+
+    function markMeasurement() { 
+        const inches = calculate(); 
+        if (inches === 0) return; 
+        const newItem = { id: Date.now(), label: 'ITEM', qty: state.multiplier || 1, len: inches, display: document.getElementById('main-disp').innerText }; 
+        state.items.unshift(newItem); 
+        state.multiplier = 1; 
+        state.qtyMode = false; 
+        renderList(); 
+        vibrate([20, 50]); 
+        if(state.view === 'buy') switchTab('cut'); 
+    }
+
+    function renderList() { 
+        const container = document.getElementById('list-container'); 
+        container.innerHTML = ''; 
+        if (state.view === 'cut') { 
+            state.items.forEach(item => { 
+                const el = document.createElement('div'); 
+                el.className = 'item-card'; 
+                el.onclick = () => openLabelModal(item.id); 
+                el.innerHTML = `<div><span class="label-pill">${item.label}</span><span class="item-main">${item.qty}x ${item.display}</span></div><div class="item-sub">${(item.len).toFixed(3)}" ea</div>`; 
+                container.appendChild(el); 
+            }); 
+        } else { 
+            const boards = calculateMaterials(); 
+            boards.forEach(b => { 
+                const el = document.createElement('div'); 
+                el.className = 'item-card buy-card'; 
+                el.innerHTML = `<div><span class="label-pill" style="background:var(--accent-orange); color:#000;">BUY</span><span class="item-main">${b.count}x ${b.name}</span></div><div class="item-sub">Covers items</div>`; 
+                container.appendChild(el); 
+            }); 
+        } 
+    }
+
+    function calculateMaterials() { 
+        let shopping = []; 
+        let pool = []; 
+        state.items.forEach(i => { for(let x=0; x<i.qty; x++) pool.push(i.len); }); 
+        pool.sort((a,b) => b-a); 
+        let boards8 = 0, boards10 = 0, boards12 = 0; 
+        while(pool.length > 0) { 
+            let piece = pool.shift(); 
+            if (piece > 144) {} 
+            else if (piece > 120) { boards12++; } 
+            else if (piece > 96) { boards10++; } 
+            else { 
+                let remain = 96 - piece; 
+                for(let k=0; k<pool.length; k++) { 
+                    if (pool[k] <= remain) { remain -= pool[k]; pool.splice(k, 1); k--; } 
+                } 
+                boards8++; 
+            } 
+        } 
+        if(boards8 > 0) shopping.push({ count: boards8, name: "8' Lumber (96\")" }); 
+        if(boards10 > 0) shopping.push({ count: boards10, name: "10' Lumber (120\")" }); 
+        if(boards12 > 0) shopping.push({ count: boards12, name: "12' Lumber (144\")" }); 
+        return shopping; 
+    }
+
     function switchTab(t) { state.view = t; document.querySelectorAll('.tab').forEach(el => el.classList.remove('active')); document.getElementById('tab-'+t).classList.add('active'); renderList(); }
     function openLabelModal(id) { state.editingId = id; document.getElementById('modal').classList.add('open'); }
     function applyLabel(lbl) { const item = state.items.find(i => i.id === state.editingId); if(item) item.label = lbl; document.getElementById('modal').classList.remove('open'); renderList(); }
-    function generateTicks() { const tr = document.getElementById('ruler-track'); for(let i=1; i<16; i++) { let d = document.createElement('div'); d.className = 'tick'; d.style.left = (i/16*100)+'%'; if(i%8==0) d.classList.add('half'); else if(i%4==0) d.classList.add('quarter'); else if(i%2==0) d.classList.add('eighth'); else d.classList.add('sixteenth'); tr.appendChild(d); } }
+    
+    function generateTicks() { 
+        const tr = document.getElementById('ruler-track'); 
+        for(let i=1; i<16; i++) { 
+            let d = document.createElement('div'); 
+            d.className = 'tick'; 
+            d.style.left = (i/16*100)+'%'; 
+            if(i%8==0) d.classList.add('half'); 
+            else if(i%4==0) d.classList.add('quarter'); 
+            else if(i%2==0) d.classList.add('eighth'); 
+            else d.classList.add('sixteenth'); 
+            tr.appendChild(d); 
+        } 
+    }
+
     function resetAll() { if(confirm('Clear all data?')) { state.items = []; state.vals = {feet:'', inches:''}; state.multiplier = 1; renderFields(); calculate(); renderList(); } }
     document.getElementById('modal').onclick = (e) => { if(e.target.id === 'modal') e.target.classList.remove('open'); };
 </script>

@@ -5,100 +5,95 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NOFNWAY | Command Center</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@900&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="theme.css">
     <style>
-        :root { --brand: #3498db; --dark: #2c3e50; --bg: #f0f2f5; }
-        body { margin: 0; font-family: 'Roboto', sans-serif; background: var(--bg); color: var(--dark); overflow-x: hidden; }
-        
-        /* Navbar */
-        .navbar { background: var(--dark); padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; color: white; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
-        .brand { font-family: 'Montserrat', sans-serif; font-weight: 900; font-size: 1.8rem; letter-spacing: 1px; }
+        .navbar { background: #000; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--brand); }
+        .brand { font-family: 'Montserrat', sans-serif; font-weight: 900; font-size: 1.8rem; color: white; }
         .brand span { color: var(--brand); }
-
-        /* Dashboard Layout */
-        .container { max-width: 1000px; margin: 40px auto; padding: 20px; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
-
-        /* Scannable App Cards */
-        .card { background: white; border-radius: 8px; padding: 25px; border: 1px solid #ddd; text-decoration: none; color: inherit; transition: 0.2s; display: flex; flex-direction: column; height: 100%; }
-        .card:hover { transform: translateY(-3px); border-color: var(--brand); box-shadow: 0 10px 20px rgba(0,0,0,0.05); }
-        .card h3 { margin: 0 0 10px 0; font-family: 'Montserrat', sans-serif; font-size: 1.2rem; color: var(--dark); }
-        .card p { margin: 0; font-size: 0.9rem; color: #666; line-height: 1.5; flex-grow: 1; }
         
-        /* High-Contrast Status Bar */
-        .status { margin-top: 15px; font-size: 0.7rem; font-weight: bold; text-transform: uppercase; color: var(--brand); border-top: 1px solid #eee; padding-top: 10px; }
+        .nav-controls { display: flex; align-items: center; gap: 20px; }
+        .theme-toggle { background: var(--brand); color: white; border: none; padding: 8px 15px; border-radius: 5px; cursor: pointer; font-weight: bold; }
 
-        footer { text-align: center; padding: 40px; font-size: 0.8rem; color: #999; }
-        #clock { font-weight: bold; opacity: 0.8; font-family: monospace; font-size: 1.1rem; }
+        .container { max-width: 1100px; margin: 40px auto; padding: 20px; }
+        .category-title { font-family: 'Montserrat', sans-serif; color: var(--brand); border-bottom: 1px solid var(--border); padding-bottom: 10px; margin-top: 40px; text-transform: uppercase; }
+        
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 25px; margin-top: 20px; }
+        .card { background: var(--card-bg); border-radius: 12px; padding: 30px 25px 25px; border: 2px solid var(--border); text-decoration: none; color: inherit; position: relative; display: flex; flex-direction: column; transition: 0.2s; }
+        .card:hover { border-color: var(--brand); transform: translateY(-3px); }
+        .card h3 { margin: 10px 0; font-family: 'Montserrat', sans-serif; }
+        .card p { color: var(--text-dim); line-height: 1.6; flex-grow: 1; }
+
+        .badge { position: absolute; top: 0; right: 0; padding: 4px 15px; font-size: 0.7rem; font-weight: 900; border-bottom-left-radius: 12px; text-transform: uppercase; }
+        .status-ready { background: var(--ready); color: #000; }
+        .status-working { background: var(--working); color: #000; }
+        .status-dev { background: var(--dev); color: #fff; }
+
+        #clock { font-family: monospace; font-size: 1.2rem; color: var(--brand); }
+        footer { text-align: center; padding: 60px; color: var(--text-dim); font-size: 0.8rem; }
     </style>
 </head>
 <body>
 
     <nav class="navbar">
         <div class="brand">NO<span>FN</span>WAY</div>
-        <div id="clock">00:00:00</div>
+        <div class="nav-controls">
+            <div id="clock">00:00:00</div>
+            <button class="theme-toggle" onclick="toggleTheme()">TOGGLE MODE</button>
+        </div>
     </nav>
 
-    <div class="container">
-        <h2 style="margin-bottom:30px; border-left: 5px solid var(--brand); padding-left: 15px; font-family: 'Montserrat', sans-serif;">Things to try</h2>
-        
-        <div class="grid" id="app-grid">
-            </div>
-    </div>
+    <div class="container" id="main-content"></div>
 
     <footer>NOFNWAY &copy; 2026 | We give an F, especially when you've run out.</footer>
 
     <script>
-    /* --- NOFNWAY MANIFEST --- */
-const apps = [
-    { 
-        name: "[FN] MAGNET STUDIO", 
-        desc: "Create and print custom 1-inch visual schedule magnets instantly.", 
-        link: "magnet.html", 
-        status: "Under Construction" 
-    },
-    { 
-        name: "[FN] GET LOST", 
-        desc: "The running route generator that enables you to explore safely.", 
-        link: "get_lost.html", 
-        status: "I'm working on it'" 
-    },
-    { 
-    name: "[FN] HOW LONG?", 
-    desc: "A high-precision visual measurement controller for construction projects.", 
-    link: "how_long.html", 
-    status: "Pretty good, almost ready" 
-    },
-    { 
-    name: "[FN] JPEGer", 
-    desc: "Direct-fill and precision stamping for PDFs. Saves locally so you never lose progress.", 
-    link: "jpeger.html", 
-    status: "Not sure yet" 
-    },
-    { 
-    name: "[FN] PDFer", 
-    desc: "Mobile document scanner and editor. Crop, redact, and compile multi-page PDF files locally.", 
-    link: "pdfer.html", 
-    status: "Testing" 
-    }
-];
-        // Render the grid
-        const grid = document.getElementById('app-grid');
-        apps.forEach(app => {
-            grid.innerHTML += `
-                <a href="${app.link}" class="card">
-                    <h3>${app.name}</h3>
-                    <p>${app.desc}</p>
-                    <div class="status">${app.status}</div>
-                </a>`;
-        });
-
-        // System Clock logic
-        function updateClock() { 
-            const now = new Date();
-            document.getElementById('clock').textContent = now.toLocaleTimeString([], {hour12:false}); 
+        /* --- THEME LOGIC --- */
+        function applyTheme() {
+            const theme = localStorage.getItem('nofnway-theme') || 'light';
+            document.documentElement.setAttribute('data-theme', theme);
         }
-        setInterval(updateClock, 1000); 
+
+        function toggleTheme() {
+            const current = document.documentElement.getAttribute('data-theme');
+            const next = current === 'dark' ? 'light' : 'dark';
+            localStorage.setItem('nofnway-theme', next);
+            document.documentElement.setAttribute('data-theme', next);
+        }
+        applyTheme();
+
+        /* --- APP DATA --- */
+        const apps = [
+            { name: "[FN] HOW LONG?", desc: "Visual measurement controller for construction projects.", link: "how_long.html", status: "Ready", type: "ready", cat: "Production Tools" },
+            { name: "[FN] PDFer", desc: "Local mobile document scanner and editor.", link: "pdfer.html", status: "Testing", type: "working", cat: "Production Tools" },
+            { name: "[FN] GET LOST", desc: "The running route generator that enables you to explore safely.", link: "get_lost.html", status: "In Progress", type: "working", cat: "Active Projects" },
+            { name: "[FN] MAGNET STUDIO", desc: "Create and print custom 1-inch visual schedule magnets.", link: "magnet.html", status: "Under Construction", type: "dev", cat: "Active Projects" },
+            { name: "[FN] JPEGer", desc: "Direct-fill and precision stamping for PDFs.", link: "jpeger.html", status: "Reviewing", type: "dev", cat: "Active Projects" }
+        ];
+
+        function render() {
+            const container = document.getElementById('main-content');
+            const categories = [...new Set(apps.map(a => a.cat))];
+            container.innerHTML = '';
+            categories.forEach(cat => {
+                const section = document.createElement('div');
+                section.innerHTML = `<h2 class="category-title">${cat}</h2><div class="grid"></div>`;
+                const grid = section.querySelector('.grid');
+                apps.filter(a => a.cat === cat).forEach(app => {
+                    grid.innerHTML += `
+                        <a href="${app.link}" class="card">
+                            <div class="badge status-${app.type}">${app.status}</div>
+                            <h3>${app.name}</h3>
+                            <p>${app.desc}</p>
+                        </a>`;
+                });
+                container.appendChild(section);
+            });
+        }
+
+        function updateClock() { document.getElementById('clock').textContent = new Date().toLocaleTimeString([], {hour12:false}); }
+        setInterval(updateClock, 1000);
         updateClock();
+        render();
     </script>
 </body>
 </html>
