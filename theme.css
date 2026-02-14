@@ -6,12 +6,13 @@
     --text-main: #2c3e50;
     --text-dim: #666666;
     --border: #dddddd;
+    
+    /* Status Colors */
     --ready: #2ecc71;
     --working: #f1c40f;
     --dev: #95a5a6;
 }
 
-/* Dark Mode Overrides */
 [data-theme="dark"] {
     --bg: #121212;
     --card-bg: #1e1e1e;
@@ -27,3 +28,20 @@ body {
     margin: 0; 
     transition: background 0.2s ease;
 }
+
+/* Standardized Status Tags */
+.status-badge {
+    position: absolute;
+    top: 0;
+    right: 0;
+    padding: 4px 15px;
+    font-size: 0.7rem;
+    font-weight: 900;
+    border-bottom-left-radius: 12px;
+    text-transform: uppercase;
+    color: #000;
+}
+
+.ready { background-color: var(--ready); }
+.working { background-color: var(--working); }
+.dev { background-color: var(--dev); color: #fff; }

@@ -23,11 +23,6 @@
         .card h3 { margin: 10px 0; font-family: 'Montserrat', sans-serif; }
         .card p { color: var(--text-dim); line-height: 1.6; flex-grow: 1; }
 
-        .badge { position: absolute; top: 0; right: 0; padding: 4px 15px; font-size: 0.7rem; font-weight: 900; border-bottom-left-radius: 12px; text-transform: uppercase; }
-        .status-ready { background: var(--ready); color: #000; }
-        .status-working { background: var(--working); color: #000; }
-        .status-dev { background: var(--dev); color: #fff; }
-
         /* Terminal Effect Styles */
         .terminal-container { font-family: monospace; font-size: 1.1rem; color: var(--brand); min-height: 1.5em; margin-bottom: 10px; }
         .cursor { display: inline-block; width: 8px; background-color: var(--brand); margin-left: 4px; animation: blink 1s infinite; }
@@ -51,7 +46,7 @@
         <div class="terminal-container">
             <span id="terminal-text"></span><span class="cursor">&nbsp;</span>
         </div>
-        <div>NOFNWAY &copy; 2026</div>
+        <div>NOFNWAY &copy; 2026 | We give an F, especially when you've run out.</div>
     </footer>
 
     <script>
@@ -69,7 +64,9 @@
         }
         applyTheme();
 
-        /* --- APP DATA --- */
+        /* --- APP DATA --- 
+           To add apps, just match 'type' to the CSS classes: ready, working, dev 
+        */
         const apps = [
             { name: "[FN] HOW LONG?", desc: "Visual measurement controller for construction projects.", link: "how_long.html", status: "Ready", type: "ready", cat: "Production Tools" },
             { name: "[FN] PDFer", desc: "Local mobile document scanner and editor.", link: "pdfer.html", status: "Testing", type: "working", cat: "Production Tools" },
@@ -93,7 +90,6 @@
 
         function typeSlogan() {
             const current = slogans[sloganIdx];
-            
             if (isDeleting) {
                 terminalEl.textContent = current.substring(0, charIdx - 1);
                 charIdx--;
@@ -106,28 +102,30 @@
 
             if (!isDeleting && charIdx === current.length) {
                 isDeleting = true;
-                speed = 30000; // Hold for 30 seconds
+                speed = 30000; // 30 second delay at end of slogan
             } else if (isDeleting && charIdx === 0) {
                 isDeleting = false;
                 sloganIdx = (sloganIdx + 1) % slogans.length;
                 speed = 500;
             }
-
             setTimeout(typeSlogan, speed);
         }
 
+        /* --- RENDER ENGINE --- */
         function render() {
             const container = document.getElementById('main-content');
             const categories = [...new Set(apps.map(a => a.cat))];
             container.innerHTML = '';
+            
             categories.forEach(cat => {
                 const section = document.createElement('div');
                 section.innerHTML = `<h2 class="category-title">${cat}</h2><div class="grid"></div>`;
                 const grid = section.querySelector('.grid');
+                
                 apps.filter(a => a.cat === cat).forEach(app => {
                     grid.innerHTML += `
                         <a href="${app.link}" class="card">
-                            <div class="badge status-${app.type}">${app.status}</div>
+                            <div class="status-badge ${app.type}">${app.status}</div>
                             <h3>${app.name}</h3>
                             <p>${app.desc}</p>
                         </a>`;
