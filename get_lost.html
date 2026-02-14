@@ -57,13 +57,16 @@
             transition: all 0.3s ease;
         }
 
-        .chip-row { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 5px; }
+        .label { font-size: 0.7rem; font-weight: 900; color: var(--text-dim); text-transform: uppercase; margin-bottom: -5px; }
+        .chip-row { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 5px; scrollbar-width: none; }
+        .chip-row::-webkit-scrollbar { display: none; }
+        
         .chip { 
             background: var(--bg); 
             color: var(--text-dim);
-            padding: 12px 18px; 
+            padding: 10px 14px; 
             border-radius: 8px; 
-            font-size: 0.9rem; 
+            font-size: 0.85rem; 
             cursor: pointer; 
             border: 2px solid var(--border); 
             font-weight: bold; 
@@ -71,15 +74,28 @@
         }
         .chip.active { border-color: var(--brand); color: var(--brand); background: rgba(52, 152, 219, 0.1); }
         
-        .btn-go { background: var(--brand); color: white; border: none; padding: 18px; border-radius: 8px; font-weight: 900; font-size: 1.1rem; cursor: pointer; text-transform: uppercase; }
+        .btn-go { background: var(--brand); color: white; border: none; padding: 18px; border-radius: 8px; font-weight: 900; font-size: 1.1rem; cursor: pointer; text-transform: uppercase; margin-top: 5px; }
         
         .btn-home { background: var(--emergency); color: white; border: none; padding: 8px 12px; border-radius: 4px; font-size: 0.8rem; font-weight: bold; cursor: pointer; }
         .btn-reset { background: var(--bg); color: var(--text-dim); border: 1px solid var(--border); padding: 8px 12px; border-radius: 4px; font-size: 0.8rem; cursor: pointer; }
 
-        .leaflet-routing-container { display: none !important; }
-        [data-theme="dark"] .leaflet-tile { filter: brightness(0.6) invert(100%) contrast(3) hue-rotate(180deg) saturate(0.3); }
-        
-        /* Compass Indicator */
+        /* HUD Tracker */
+        #tracker-hud {
+            position: absolute;
+            top: 80px;
+            left: 20px;
+            background: rgba(0,0,0,0.7);
+            color: white;
+            padding: 10px 15px;
+            border-radius: 8px;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.8rem;
+            z-index: 1500;
+            display: none;
+            border: 1px solid var(--brand);
+        }
+        #tracker-hud b { color: var(--brand); }
+
         #compass {
             position: absolute;
             top: 80px;
@@ -95,9 +111,11 @@
             border: 2px solid var(--brand);
             color: white;
             font-weight: bold;
-            font-size: 1.2rem;
             pointer-events: none;
         }
+
+        .leaflet-routing-container { display: none !important; }
+        [data-theme="dark"] .leaflet-tile { filter: brightness(0.6) invert(100%) contrast(3) hue-rotate(180deg) saturate(0.3); }
     </style>
 </head>
 <body data-theme="dark">
@@ -110,17 +128,29 @@
     </div>
 </nav>
 
+<div id="tracker-hud">
+    TIME: <b id="track-time">0:00</b><br>
+    DIST: <b id="track-dist">0.0</b> km
+</div>
 <div id="compass">↑</div>
 <div id="map"></div>
 
 <div id="ui-overlay">
     <div id="status" class="status-badge working">INITIALIZING GPS...</div>
     
+    <div class="label">Choose Vibe</div>
     <div class="chip-row" id="vibe-select">
         <div class="chip active" data-vibe="nature" onclick="selectChip(this, 'vibe')">SCENIC</div>
         <div class="chip" data-vibe="lit" onclick="selectChip(this, 'vibe')">WELL-LIT</div>
         <div class="chip" data-vibe="urban" onclick="selectChip(this, 'vibe')">URBAN</div>
         <div class="chip" data-vibe="trail" onclick="selectChip(this, 'vibe')">TRAILS</div>
+    </div>
+
+    <div class="label">Scale (Approx)</div>
+    <div class="chip-row" id="scale-select">
+        <div class="chip active" data-radius="1000" onclick="selectChip(this, 'scale')">15m / 1km</div>
+        <div class="chip" data-radius="2500" onclick="selectChip(this, 'scale')">30m / 2.5km</div>
+        <div class="chip" data-radius="5000" onclick="selectChip(this, 'scale')">1h / 5km</div>
     </div>
     
     <button class="btn-go" onclick="startAdventure()">GO GET LOST</button>
@@ -132,7 +162,13 @@
 <script>
     let map, userMarker, routingControl, currentPos, startPin = null, endPin = null;
     let selectedVibe = 'nature';
-    const theme = localStorage.getItem('nofnway-theme') || 'dark';
+    let selectedRadius = 1000;
+    
+    // Tracker variables
+    let isTracking = false;
+    let startTime = null;
+    let totalDistance = 0;
+    let lastTrackPos = null;
 
     function updateStatus(text, state) {
         const s = document.getElementById('status');
@@ -146,7 +182,16 @@
 
         if (navigator.geolocation) {
             navigator.geolocation.watchPosition(pos => {
-                currentPos = L.latLng(pos.coords.latitude, pos.coords.longitude);
+                const newPos = L.latLng(pos.coords.latitude, pos.coords.longitude);
+                
+                // Distance tracking logic
+                if (isTracking && lastTrackPos) {
+                    totalDistance += newPos.distanceTo(lastTrackPos);
+                    document.getElementById('track-dist').innerText = (totalDistance / 1000).toFixed(2);
+                }
+                lastTrackPos = newPos;
+                currentPos = newPos;
+
                 if (!userMarker) {
                     map.setView(currentPos, 16);
                     userMarker = L.circleMarker(currentPos, { color: 'var(--brand)', radius: 10, weight: 4, fillColor: 'white', fillOpacity: 1 }).addTo(map);
@@ -155,13 +200,8 @@
             }, null, { enableHighAccuracy: true });
         }
 
-        // Handle Compass / Orientation
         window.addEventListener('deviceorientationabsolute', (e) => {
-            if (e.alpha !== null) {
-                const heading = 360 - e.alpha;
-                document.getElementById('compass').style.transform = `rotate(${e.alpha}deg)`;
-                // Optionally rotate map: map.getContainer().style.transform = `rotate(${-e.alpha}deg)`;
-            }
+            if (e.alpha !== null) { document.getElementById('compass').style.transform = `rotate(${e.alpha}deg)`; }
         }, true);
 
         map.on('contextmenu', (e) => {
@@ -173,16 +213,26 @@
                 updateStatus("END PIN SET. READY.", "ready");
             }
         });
+
+        // Background Timer
+        setInterval(() => {
+            if (isTracking && startTime) {
+                const elapsed = Math.floor((Date.now() - startTime) / 1000);
+                const m = Math.floor(elapsed / 60);
+                const s = elapsed % 60;
+                document.getElementById('track-time').innerText = `${m}:${s.toString().padStart(2, '0')}`;
+            }
+        }, 1000);
     }
 
-    async function findInterestingPoint(center, vibe) {
-        updateStatus(`SCANNING FOR ${vibe.toUpperCase()}...`, "working");
+    async function findInterestingPoint(center, vibe, radius) {
+        updateStatus(`SCANNING ${radius}m RADIUS...`, "working");
         
         const queries = {
-            nature: 'nwr[tourism=viewpoint](around:1500,${center.lat},${center.lng});nwr[leisure=park](around:1500,${center.lat},${center.lng});',
-            lit: 'way[highway][lit=yes](around:1000,${center.lat},${center.lng});',
-            urban: 'nwr[amenity=cafe](around:1200,${center.lat},${center.lng});nwr[shop=mall](around:1200,${center.lat},${center.lng});',
-            trail: 'way[highway=path](around:2000,${center.lat},${center.lng});way[highway=footway][foot=yes](around:2000,${center.lat},${center.lng});'
+            nature: `nwr[tourism=viewpoint](around:${radius},${center.lat},${center.lng});nwr[leisure=park](around:${radius},${center.lat},${center.lng});`,
+            lit: `way[highway][lit=yes](around:${radius},${center.lat},${center.lng});`,
+            urban: `nwr[amenity=cafe](around:${radius},${center.lat},${center.lng});nwr[shop=mall](around:${radius},${center.lat},${center.lng});`,
+            trail: `way[highway=path](around:${radius},${center.lat},${center.lng});way[highway=footway][foot=yes](around:${radius},${center.lat},${center.lng});`
         };
 
         const query = `[out:json][timeout:15];(${queries[vibe]});out center;`;
@@ -197,9 +247,9 @@
             }
         } catch (e) { console.error("API Fail", e); }
 
-        // Fallback to random math
-        const r = 0.015; const theta = Math.random() * 2 * Math.PI;
-        return L.latLng(center.lat + r * Math.cos(theta), center.lng + r * Math.sin(theta));
+        // Fallback to random offset based on selected radius
+        const offset = (radius / 111320); // rough conversion meters to deg
+        return L.latLng(center.lat + (Math.random()-0.5)*offset, center.lng + (Math.random()-0.5)*offset);
     }
 
     async function startAdventure() {
@@ -207,7 +257,7 @@
         if (routingControl) map.removeControl(routingControl);
         
         let origin = startPin ? startPin.getLatLng() : currentPos;
-        let dest = endPin ? endPin.getLatLng() : await findInterestingPoint(origin, selectedVibe);
+        let dest = endPin ? endPin.getLatLng() : await findInterestingPoint(origin, selectedVibe, selectedRadius);
         
         updateStatus("LOCKING ROUTE...", "working");
         routingControl = L.Routing.control({
@@ -218,6 +268,12 @@
             addWaypoints: false,
             show: false
         }).addTo(map);
+
+        // Start Tracking
+        isTracking = true;
+        startTime = Date.now();
+        totalDistance = 0;
+        document.getElementById('tracker-hud').style.display = 'block';
         updateStatus("ADVENTURE LOCKED.", "ready");
     }
 
@@ -228,13 +284,16 @@
     function selectChip(el, type) {
         document.querySelectorAll(`#${type}-select .chip`).forEach(c => c.classList.remove('active'));
         el.classList.add('active');
-        selectedVibe = el.dataset.vibe;
+        if(type === 'vibe') selectedVibe = el.dataset.vibe;
+        if(type === 'scale') selectedRadius = parseInt(el.dataset.radius);
     }
 
     function resetMarkers() {
         if (startPin) map.removeLayer(startPin); if (endPin) map.removeLayer(endPin);
         if (routingControl) map.removeControl(routingControl);
         startPin = null; endPin = null;
+        isTracking = false;
+        document.getElementById('tracker-hud').style.display = 'none';
         updateStatus("SYSTEM RESET.", "dev");
     }
 

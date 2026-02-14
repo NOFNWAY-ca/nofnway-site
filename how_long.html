@@ -7,80 +7,64 @@
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@900&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg: #0f172a;
-            --card-bg: #1e293b;
-            --text-main: #f8fafc;
-            --text-dim: #94a3b8;
-            --border: #334155;
-            --brand: #3b82f6;
-            --accent-blue: #3b82f6; 
-            --accent-yellow: #facc15;
-            --accent-green: #4ade80; 
-            --accent-orange: #f97316; 
-            --danger: #ef4444;
+            --bg: #0f172a; --card-bg: #1e293b; --text-main: #f8fafc; --text-dim: #94a3b8;
+            --border: #334155; --brand: #3b82f6; --accent-blue: #3b82f6; 
+            --accent-yellow: #facc15; --accent-green: #4ade80; --accent-orange: #f97316; --danger: #ef4444;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
         body { font-family: 'Roboto', sans-serif; background: var(--bg); color: var(--text-main); height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
 
-        .navbar { background: #000; padding: 10px 30px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--brand); flex-shrink: 0; z-index: 100; }
+        .navbar { background: #000; padding: 10px 30px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--brand); flex-shrink: 0; }
         .brand { font-family: 'Montserrat', sans-serif; font-weight: 900; font-size: 1.5rem; text-decoration: none; color: white; }
         .brand span { color: var(--brand); }
-        .back-link { color: #aaa; text-decoration: none; font-size: 0.8rem; border: 1px solid #555; padding: 5px 10px; border-radius: 4px; }
 
         .workspace { flex: 1; overflow-y: auto; padding: 1rem; display: flex; flex-direction: column; gap: 0.75rem; max-width: 600px; margin: 0 auto; width: 100%; }
 
-        .visual-stage { background: #000; border: 1px solid var(--border); border-radius: 0.75rem; height: 70px; position: relative; flex-shrink: 0; overflow: hidden; }
-        .ruler-track { position: absolute; top: 15px; bottom: 0; left: 15px; right: 15px; border-bottom: 2px solid var(--border); }
-        .tick { position: absolute; bottom: 0; width: 1px; background: #52525b; transform: translateX(-50%); }
-        .tick.half { height: 60%; width: 2px; background: #a1a1aa; }
-        .tick.quarter { height: 40%; }
-        
-        .laser { position: absolute; top: 0; bottom: 0; width: 2px; transform: translateX(-50%); transition: left 0.1s linear; z-index: 10; }
-        .laser.blue { background: var(--accent-blue); box-shadow: 0 0 10px var(--accent-blue); }
-        .laser.green { background: var(--accent-green); box-shadow: 0 0 15px var(--accent-green); width: 3px; }
-        
-        .readout-card { background: var(--card-bg); border: 1px solid var(--border); border-left: 4px solid var(--accent-blue); border-radius: 0.75rem; padding: 0.75rem 1rem; display: flex; justify-content: space-between; align-items: center; }
-        .readout-val { font-size: 2rem; font-weight: 800; color: var(--text-main); line-height: 1; }
-        .readout-sub { font-family: monospace; color: var(--text-dim); font-size: 0.8rem; margin-top: 2px; }
-        .fraction-hl { color: var(--accent-blue); }
+        /* Interactive Tape Styling */
+        .tape-container { background: #facc15; border: 2px solid #000; border-radius: 0.5rem; height: 110px; position: relative; overflow: hidden; touch-action: none; cursor: grab; flex-shrink: 0; }
+        .center-wire { position: absolute; left: 50%; top: 0; bottom: 0; width: 3px; background: #ef4444; z-index: 50; pointer-events: none; }
+        .tape-strip { position: absolute; height: 100%; display: flex; align-items: flex-end; will-change: transform; }
+        .tape-tick { position: absolute; bottom: 0; width: 1px; background: #000; }
+        .tick-inch { height: 65%; width: 2px; }
+        .tick-half { height: 50%; width: 2px; }
+        .tick-quarter { height: 35%; }
+        .tick-eighth { height: 25%; }
+        .tick-sixteenth { height: 15%; }
+        .tick-thirtysecond { height: 8%; opacity: 0.5; }
+        .tape-label { position: absolute; top: 12px; font-weight: 900; color: #000; transform: translateX(-50%); font-size: 1.4rem; font-family: 'Montserrat'; }
 
-        .drawer-container { border: 1px solid var(--border); border-radius: 0.75rem; background: var(--bg); overflow: hidden; display: flex; flex-direction: column; flex: 1; min-height: 150px; }
-        .drawer-tabs { display: flex; border-bottom: 1px solid var(--border); }
-        .tab { flex: 1; padding: 0.75rem; text-align: center; font-size: 0.75rem; font-weight: 800; color: var(--text-dim); background: var(--card-bg); cursor: pointer; }
+        .readout-card { background: var(--card-bg); border-left: 4px solid var(--accent-blue); border-radius: 0.75rem; padding: 1rem; display: flex; justify-content: space-between; align-items: center; }
+        .readout-val { font-size: 2.2rem; font-weight: 800; }
+        
+        .input-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; }
+        .field { background: var(--card-bg); border: 1px solid var(--border); border-radius: 0.5rem; padding: 0.5rem; }
+        .field.active { border-color: var(--accent-blue); background: rgba(59, 130, 246, 0.1); }
+        .field-lbl { font-size: 0.6rem; font-weight: 700; color: var(--text-dim); }
+        .field-val { font-family: monospace; font-size: 1.2rem; min-height: 1.5rem; }
+
+        .chip { padding: 8px; background: var(--card-bg); border: 1px solid var(--border); color: var(--text-main); border-radius: 6px; font-weight: 700; cursor: pointer; flex: 1; font-size: 0.7rem; }
+        
+        .drawer-container { border: 1px solid var(--border); border-radius: 0.75rem; background: var(--bg); overflow: hidden; display: flex; flex-direction: column; flex: 1; }
+        .tab { flex: 1; padding: 0.75rem; text-align: center; font-size: 0.75rem; font-weight: 800; background: var(--card-bg); cursor: pointer; color: var(--text-dim); }
         .tab.active { background: var(--bg); color: var(--text-main); border-bottom: 2px solid var(--accent-blue); }
 
         .list-view { padding: 0.5rem; overflow-y: auto; flex: 1; }
-        .item-card { display: flex; justify-content: space-between; align-items: center; background: var(--card-bg); padding: 0.75rem; border-radius: 6px; margin-bottom: 6px; border-left: 3px solid var(--border); }
+        .item-card { background: var(--card-bg); padding: 0.75rem; border-radius: 6px; margin-bottom: 6px; border-left: 3px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
 
-        .input-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; }
-        .field { background: var(--card-bg); border: 1px solid var(--border); border-radius: 0.5rem; padding: 0.5rem 0.75rem; position: relative; }
-        .field.active { border-color: var(--accent-blue); background: rgba(59, 130, 246, 0.1); }
-        .field-lbl { font-size: 0.6rem; font-weight: 700; color: var(--text-dim); display: block; }
-        .field-val { font-family: monospace; font-size: 1.1rem; color: var(--text-main); min-height: 1.4rem; }
-        
-        .chip { padding: 8px; background: var(--card-bg); border: 1px solid var(--border); color: var(--text-main); border-radius: 6px; font-weight: 700; cursor: pointer; flex: 1; }
-
-        .keypad { background: var(--card-bg); border-top: 1px solid var(--border); padding: 0.5rem; display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; height: 240px; }
-        .key { background: var(--bg); border: 1px solid var(--border); border-radius: 6px; color: var(--text-main); font-size: 1.4rem; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+        .keypad { background: var(--card-bg); padding: 0.5rem; display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; height: 220px; }
+        .key { background: var(--bg); border: 1px solid var(--border); border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; cursor: pointer; }
         .key-mark { background: var(--accent-green); color: black; font-weight: 900; grid-column: span 2; }
-
-        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.8); z-index: 200; display: none; align-items: flex-end; }
-        .modal-overlay.open { display: flex; }
-        .modal-sheet { background: var(--card-bg); width: 100%; border-radius: 1rem 1rem 0 0; padding: 1.5rem; }
         
-        .cursor { display: inline-block; width: 2px; height: 1em; background: var(--accent-blue); animation: blink 1s infinite; margin-left: 2px; }
+        .cursor { display: inline-block; width: 2px; height: 1em; background: var(--accent-blue); animation: blink 1s infinite; vertical-align: middle; }
         @keyframes blink { 50% { opacity: 0; } }
     </style>
 </head>
 <body>
 
 <nav class="navbar">
-    <a href="index.html" class="brand">NO<span>FN</span>WAY</a>
-    <div style="display:flex; gap:10px;">
-        <span onclick="resetAll()" style="color:var(--danger); font-size:0.7rem; font-weight:bold; cursor:pointer; align-self:center;">RESET</span>
-        <a href="index.html" class="back-link">EXIT</a>
-    </div>
+    <a href="#" class="brand">NO<span>FN</span>WAY</a>
+    <span onclick="resetAll()" style="color:var(--danger); font-size:0.7rem; font-weight:bold; cursor:pointer;">RESET</span>
 </nav>
 
 <main class="workspace">
@@ -89,23 +73,21 @@
         <button id="toggle-mode" class="chip" onclick="toggleMode()">MODE: FRACTION</button>
     </div>
 
-    <div class="visual-stage">
-        <div class="ruler-track" id="ruler-track">
-            <div id="laser-blue" class="laser blue"></div>
-            <div id="laser-yellow" class="laser yellow" style="opacity:0.5;"></div>
-        </div>
+    <div class="tape-container" id="tape-viewport">
+        <div class="center-wire"></div>
+        <div class="tape-strip" id="tape-strip"></div>
     </div>
 
-    <div class="readout-card" id="readout-card">
+    <div class="readout-card">
         <div>
             <div id="qty-badge" style="color:var(--accent-blue); font-size:0.7rem; font-weight:bold;">QTY: 1</div>
             <div id="main-disp" class="readout-val">0"</div>
-            <div id="sub-disp" class="readout-sub">0.0000"</div>
+            <div id="sub-disp" style="font-family:monospace; color:var(--text-dim); font-size:0.8rem;">0.0000"</div>
         </div>
     </div>
 
     <div class="drawer-container">
-        <div class="drawer-tabs">
+        <div style="display:flex; border-bottom:1px solid var(--border);">
             <div class="tab active" id="tab-cut" onclick="switchTab('cut')">CUT LIST</div>
             <div class="tab" id="tab-buy" onclick="switchTab('buy')">BUY LIST</div>
         </div>
@@ -142,42 +124,30 @@
     <div class="key key-mark" onclick="markMeasurement()">MARK</div>
 </div>
 
-<div class="modal-overlay" id="modal">
-    <div class="modal-sheet">
-        <h2 style="color:white; margin-bottom:1rem;">Label Item</h2>
-        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
-            <button class="chip" onclick="applyLabel('STUD')">STUD</button>
-            <button class="chip" onclick="applyLabel('HEADER')">HEADER</button>
-            <button class="chip" onclick="applyLabel('PLATE')">PLATE</button>
-            <button class="chip" onclick="applyLabel('CUT')">CUT</button>
-        </div>
-    </div>
-</div>
-
 <script>
     const state = {
         activeField: 'secondary',
-        vals: { primary: '', secondary: '' },
+        vals: { primary: '', secondary: '0' },
         multiplier: 1,
         qtyMode: false,
         unit: 'imperial',
         displayMode: 'fraction',
-        precision: 16,
         items: JSON.parse(localStorage.getItem('nofnway-cutlist')) || [],
         view: 'cut',
-        editingId: null
+        tapeInches: 13,
+        pixelsPerInch: 200
     };
 
-    window.onload = () => { generateTicks(); renderFields(); renderList(); calculate(); };
+    window.onload = () => { initTape(); renderFields(); renderList(); calculate(); };
 
     function saveToDisk() { localStorage.setItem('nofnway-cutlist', JSON.stringify(state.items)); }
 
     function toggleUnit() {
         state.unit = state.unit === 'imperial' ? 'metric' : 'imperial';
-        const pLbl = document.getElementById('lbl-primary'), sLbl = document.getElementById('lbl-secondary'), uBtn = document.getElementById('toggle-unit');
-        if (state.unit === 'metric') { pLbl.innerText = 'METERS'; sLbl.innerText = 'MM'; uBtn.innerText = 'UNIT: METRIC'; }
-        else { pLbl.innerText = 'FEET'; sLbl.innerText = 'INCHES'; uBtn.innerText = 'UNIT: IMPERIAL'; }
-        renderFields(); calculate(); renderList();
+        document.getElementById('lbl-primary').innerText = state.unit === 'metric' ? 'METERS' : 'FEET';
+        document.getElementById('lbl-secondary').innerText = state.unit === 'metric' ? 'MM' : 'INCHES';
+        document.getElementById('toggle-unit').innerText = `UNIT: ${state.unit.toUpperCase()}`;
+        initTape(); calculate(); renderFields(); renderList();
     }
 
     function toggleMode() {
@@ -186,92 +156,124 @@
         calculate();
     }
 
-    function setActive(f) { state.activeField = f; state.qtyMode = false; renderFields(); }
+    /* TAPE MEASURE LOGIC */
+    function initTape() {
+        const strip = document.getElementById('tape-strip');
+        strip.innerHTML = '';
+        const step = state.unit === 'imperial' ? 32 : 10; // 32nds or MM
+        const totalUnits = 13; 
+
+        for (let i = 0; i <= totalUnits * step; i++) {
+            const tick = document.createElement('div');
+            tick.className = 'tape-tick';
+            const pos = (i / step) * state.pixelsPerInch;
+            tick.style.left = pos + 'px';
+
+            if (i % step === 0) {
+                tick.classList.add('tick-inch');
+                const lbl = document.createElement('div');
+                lbl.className = 'tape-label';
+                lbl.innerText = i / step;
+                lbl.style.left = pos + 'px';
+                strip.appendChild(lbl);
+            } else if (state.unit === 'imperial') {
+                if (i % 16 === 0) tick.classList.add('tick-half');
+                else if (i % 8 === 0) tick.classList.add('tick-quarter');
+                else if (i % 4 === 0) tick.classList.add('tick-eighth');
+                else if (i % 2 === 0) tick.classList.add('tick-sixteenth');
+                else tick.classList.add('tick-thirtysecond');
+            }
+            strip.appendChild(tick);
+        }
+        updateTapePosition();
+    }
+
+    function updateTapePosition() {
+        const strip = document.getElementById('tape-strip');
+        const view = document.getElementById('tape-viewport');
+        const val = parseFloat(state.vals.secondary) || 0;
+        const offset = (val * state.pixelsPerInch) - (view.offsetWidth / 2);
+        strip.style.transform = `translateX(${-offset}px)`;
+    }
+
+    /* INTERACTION LOGIC */
+    let isDragging = false, startX, startVal;
+    const view = document.getElementById('tape-viewport');
+
+    const handleStart = (e) => {
+        isDragging = true;
+        startX = (e.pageX || e.touches[0].pageX);
+        startVal = parseFloat(state.vals.secondary) || 0;
+        view.style.cursor = 'grabbing';
+    };
+
+    const handleMove = (e) => {
+        if (!isDragging) return;
+        const x = (e.pageX || e.touches[0].pageX);
+        const diff = (startX - x) / state.pixelsPerInch;
+        let newVal = startVal + diff;
+        
+        // Snap logic
+        const snap = state.unit === 'imperial' ? 32 : 1;
+        newVal = Math.max(0, Math.min(12, Math.round(newVal * snap) / snap));
+        
+        state.vals.secondary = newVal.toString();
+        state.activeField = 'secondary';
+        updateTapePosition();
+        calculate();
+        renderFields();
+    };
+
+    view.addEventListener('mousedown', handleStart);
+    view.addEventListener('touchstart', handleStart);
+    window.addEventListener('mousemove', handleMove);
+    window.addEventListener('touchmove', handleMove);
+    window.addEventListener('mouseup', () => { isDragging = false; view.style.cursor = 'grab'; });
+    window.addEventListener('touchend', () => { isDragging = false; });
 
     function press(key) {
         if (key === 'x') { state.qtyMode = true; state.multiplier = 0; renderFields(); return; }
         if (state.qtyMode) {
             if (key === 'clr') { state.multiplier = 1; state.qtyMode = false; }
-            else if (key === 'back') { let s = state.multiplier.toString(); state.multiplier = parseInt(s.slice(0, -1)) || 0; }
-            else if (/[0-9]/.test(key)) { state.multiplier = parseInt(state.multiplier.toString() + key); }
+            else if (/[0-9]/.test(key)) state.multiplier = parseInt(state.multiplier.toString() + key);
             renderFields(); return;
         }
-        let val = state.vals[state.activeField];
-        if (key === 'clr') val = '';
-        else if (key === 'back') val = val.slice(0, -1);
-        else if (key === '.') { if(!val.includes('.')) val += '.'; }
-        else val += key;
-        state.vals[state.activeField] = val;
+        let v = state.vals[state.activeField];
+        if (key === 'clr') v = '';
+        else if (key === 'back') v = v.slice(0, -1);
+        else v += key;
+        state.vals[state.activeField] = v;
+        if(state.activeField === 'secondary') updateTapePosition();
         calculate(); renderFields();
     }
 
     function calculate() {
-        const p = parseFloat(state.vals.primary) || 0;
-        const s = parseFloat(state.vals.secondary) || 0;
-        let totalInches = (state.unit === 'metric') ? ((p * 1000) + s) / 25.4 : (p * 12) + s;
-        updateVisuals(totalInches);
-        return totalInches;
-    }
-
-    function updateVisuals(total) {
-        const mainDisp = document.getElementById('main-disp'), subDisp = document.getElementById('sub-disp');
-        const bLaser = document.getElementById('laser-blue'), yLaser = document.getElementById('laser-yellow');
+        const p = parseFloat(state.vals.primary) || 0, s = parseFloat(state.vals.secondary) || 0;
+        let inches = state.unit === 'metric' ? ((p * 1000) + s) / 25.4 : (p * 12) + s;
         
+        const main = document.getElementById('main-disp'), sub = document.getElementById('sub-disp');
         if (state.unit === 'metric') {
-            const mm = total * 25.4;
-            mainDisp.innerHTML = `${mm.toFixed(1)} mm`;
-            subDisp.innerText = `${(mm/10).toFixed(2)} cm`;
-            bLaser.style.left = '50%'; yLaser.style.opacity = 0;
-            return;
-        }
-
-        const abs = Math.abs(total), whole = Math.floor(abs), fract = abs - whole;
-        const lcd = state.precision, snapped = Math.round(fract * lcd) / lcd;
-        bLaser.style.left = (fract * 100) + '%'; yLaser.style.left = (snapped * 100) + '%';
-        yLaser.style.opacity = Math.abs(fract - snapped) < 0.01 ? 0 : 0.5;
-
-        if (state.displayMode === 'decimal') {
-            mainDisp.innerHTML = `${total.toFixed(3)}"`;
-            subDisp.innerText = "Decimal Inches";
+            main.innerText = `${(inches * 25.4).toFixed(1)} mm`;
+            sub.innerText = `${(inches * 2.54).toFixed(2)} cm`;
+        } else if (state.displayMode === 'decimal') {
+            main.innerText = `${inches.toFixed(3)}"`;
+            sub.innerText = "Decimal Inches";
         } else {
-            let dFeet = Math.floor(abs/12), dInch = whole % 12, num = Math.round(snapped*lcd);
-            if (num === lcd) { num = 0; dInch++; if(dInch === 12) { dInch = 0; dFeet++; } }
-            let str = dFeet > 0 ? `${dFeet}' ` : "";
-            str += `${dInch}`;
-            if (num > 0) str += ` <span class="fraction-hl">${num}/${lcd}</span>`;
-            mainDisp.innerHTML = str + '"';
-            subDisp.innerText = total.toFixed(4) + '"';
+            let f = Math.floor(inches / 12), i = Math.floor(inches % 12), frac = inches % 1;
+            let num = Math.round(frac * 32);
+            if(num === 32) { num = 0; i++; if(i === 12) { i = 0; f++; } }
+            main.innerHTML = `${f > 0 ? f + "' " : ""}${i}${num > 0 ? ` <span style="color:var(--accent-blue)">${num}/32</span>` : ""}"`;
+            sub.innerText = inches.toFixed(4) + '"';
         }
+        return inches;
     }
 
     function markMeasurement() {
-        const inches = calculate();
-        if (inches === 0) return;
-        state.items.unshift({ id: Date.now(), label: 'ITEM', qty: state.multiplier || 1, len: inches, display: document.getElementById('main-disp').innerText });
+        const len = calculate();
+        if (len <= 0) return;
+        state.items.unshift({ id: Date.now(), label: 'CUT', qty: state.multiplier || 1, len, display: document.getElementById('main-disp').innerText });
         state.multiplier = 1; state.qtyMode = false;
         saveToDisk(); renderList(); renderFields();
-    }
-
-    function calculateMaterials() {
-        const KERF = 0.125;
-        let shopping = [], pool = [];
-        state.items.forEach(i => { for(let x=0; x<i.qty; x++) pool.push(i.len + KERF); });
-        pool.sort((a,b) => b-a);
-        const stocks = [96, 120, 144];
-        let counts = { 96: 0, 120: 0, 144: 0 };
-
-        while(pool.length > 0) {
-            let piece = pool.shift();
-            let len = stocks.find(s => s >= piece);
-            if(!len) continue;
-            counts[len]++;
-            let remain = len - piece;
-            for(let k=0; k<pool.length; k++) { if(pool[k] <= remain) { remain -= pool[k]; pool.splice(k, 1); k--; } }
-        }
-        if(counts[96]) shopping.push({ count: counts[96], name: "8' (96\")" });
-        if(counts[120]) shopping.push({ count: counts[120], name: "10' (120\")" });
-        if(counts[144]) shopping.push({ count: counts[144], name: "12' (144\")" });
-        return shopping;
     }
 
     function renderList() {
@@ -279,31 +281,36 @@
         if (state.view === 'cut') {
             state.items.forEach(item => {
                 const el = document.createElement('div'); el.className = 'item-card';
-                el.onclick = () => { state.editingId = item.id; document.getElementById('modal').classList.add('open'); };
                 el.innerHTML = `<div><small>${item.label}</small><br><b>${item.qty}x ${item.display}</b></div><div style="font-size:0.7rem">${item.len.toFixed(2)}"</div>`;
                 container.appendChild(el);
             });
         } else {
-            calculateMaterials().forEach(b => {
-                const el = document.createElement('div'); el.className = 'item-card'; el.style.borderLeftColor = 'var(--accent-orange)';
-                el.innerHTML = `<b>${b.count}x ${b.name}</b>`; container.appendChild(el);
-            });
+            const KERF = 0.125; let pool = [];
+            state.items.forEach(i => { for(let x=0; x<i.qty; x++) pool.push(i.len + KERF); });
+            pool.sort((a,b) => b-a);
+            let counts = { 96: 0, 120: 0, 144: 0 };
+            while(pool.length > 0) {
+                let p = pool.shift(); let len = [96, 120, 144].find(s => s >= p);
+                if(!len) continue; counts[len]++; let rem = len - p;
+                for(let k=0; k<pool.length; k++) { if(pool[k] <= rem) { rem -= pool[k]; pool.splice(k, 1); k--; } }
+            }
+            if(counts[96]) container.innerHTML += `<div class="item-card" style="border-left-color:var(--accent-orange)"><b>${counts[96]}x 8' (96")</b></div>`;
+            if(counts[120]) container.innerHTML += `<div class="item-card" style="border-left-color:var(--accent-orange)"><b>${counts[120]}x 10' (120")</b></div>`;
+            if(counts[144]) container.innerHTML += `<div class="item-card" style="border-left-color:var(--accent-orange)"><b>${counts[144]}x 12' (144")</b></div>`;
         }
     }
 
     function renderFields() {
-        document.getElementById('field-primary').classList.toggle('active', state.activeField === 'primary');
-        document.getElementById('field-secondary').classList.toggle('active', state.activeField === 'secondary');
+        document.getElementById('field-primary').className = 'field' + (state.activeField === 'primary' ? ' active' : '');
+        document.getElementById('field-secondary').className = 'field' + (state.activeField === 'secondary' ? ' active' : '');
         document.getElementById('val-primary').innerHTML = state.vals.primary + (state.activeField === 'primary' ? '<span class="cursor"></span>' : '');
         document.getElementById('val-secondary').innerHTML = state.vals.secondary + (state.activeField === 'secondary' ? '<span class="cursor"></span>' : '');
         document.getElementById('qty-badge').innerText = `QTY: ${state.multiplier}`;
     }
 
-    function applyLabel(l) { const i = state.items.find(x => x.id === state.editingId); if(i) i.label = l; saveToDisk(); document.getElementById('modal').classList.remove('open'); renderList(); }
-    function switchTab(t) { state.view = t; document.getElementById('tab-cut').classList.toggle('active', t==='cut'); document.getElementById('tab-buy').classList.toggle('active', t==='buy'); renderList(); }
-    function resetAll() { if(confirm('Clear data?')) { state.items = []; localStorage.removeItem('nofnway-cutlist'); renderList(); } }
-    function generateTicks() { const tr = document.getElementById('ruler-track'); for(let i=1; i<16; i++) { let d = document.createElement('div'); d.className = 'tick' + (i%8==0?' half':''); d.style.left = (i/16*100)+'%'; tr.appendChild(d); } }
-    document.getElementById('modal').onclick = (e) => { if(e.target.id === 'modal') e.target.classList.remove('open'); };
+    function setActive(f) { state.activeField = f; renderFields(); }
+    function switchTab(t) { state.view = t; document.getElementById('tab-cut').className = 'tab' + (t==='cut'?' active':''); document.getElementById('tab-buy').className = 'tab' + (t==='buy'?' active':''); renderList(); }
+    function resetAll() { if(confirm('Wipe data?')) { state.items = []; saveToDisk(); renderList(); } }
 </script>
 </body>
 </html>
