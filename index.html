@@ -23,7 +23,7 @@
         .card h3 { margin: 10px 0; font-family: 'Montserrat', sans-serif; }
         .card p { color: var(--text-dim); line-height: 1.6; flex-grow: 1; }
 
-        /* Terminal Effect Styles */
+        /* Terminal Component */
         .terminal-container { font-family: monospace; font-size: 1.1rem; color: var(--brand); min-height: 1.5em; margin-bottom: 10px; }
         .cursor { display: inline-block; width: 8px; background-color: var(--brand); margin-left: 4px; animation: blink 1s infinite; }
         @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
@@ -50,7 +50,7 @@
     </footer>
 
     <script>
-        /* --- THEME LOGIC --- */
+        /* --- THEME CONTROLLER --- */
         function applyTheme() {
             const theme = localStorage.getItem('nofnway-theme') || 'light';
             document.documentElement.setAttribute('data-theme', theme);
@@ -64,9 +64,7 @@
         }
         applyTheme();
 
-        /* --- APP DATA --- 
-           To add apps, just match 'type' to the CSS classes: ready, working, dev 
-        */
+        /* --- DATA MODEL --- */
         const apps = [
             { name: "[FN] HOW LONG?", desc: "Visual measurement controller for construction projects.", link: "how_long.html", status: "Ready", type: "ready", cat: "Production Tools" },
             { name: "[FN] PDFer", desc: "Local mobile document scanner and editor.", link: "pdfer.html", status: "Testing", type: "working", cat: "Production Tools" },
@@ -75,7 +73,7 @@
             { name: "[FN] JPEGer", desc: "Direct-fill and precision stamping for PDFs.", link: "jpeger.html", status: "Reviewing", type: "dev", cat: "Active Projects" }
         ];
 
-        /* --- TERMINAL SLOGAN LOGIC --- */
+        /* --- TERMINAL EFFECT ENGINE --- */
         const slogans = [
             "We give an F, especially when you've run out.",
             "Frictionless tools for brains that work differently.",
@@ -102,7 +100,7 @@
 
             if (!isDeleting && charIdx === current.length) {
                 isDeleting = true;
-                speed = 30000; // 30 second delay at end of slogan
+                speed = 30000; // Delay cycle for 30s
             } else if (isDeleting && charIdx === 0) {
                 isDeleting = false;
                 sloganIdx = (sloganIdx + 1) % slogans.length;
@@ -111,7 +109,7 @@
             setTimeout(typeSlogan, speed);
         }
 
-        /* --- RENDER ENGINE --- */
+        /* --- CORE RENDERER --- */
         function render() {
             const container = document.getElementById('main-content');
             const categories = [...new Set(apps.map(a => a.cat))];
