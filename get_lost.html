@@ -21,10 +21,9 @@
             color: var(--text-main);
         }
         
-        /* Navbar matching Command Center */
         .navbar { 
             background: #000; 
-            padding: 10px 30px; 
+            padding: 10px 20px; 
             display: flex; 
             justify-content: space-between; 
             align-items: center; 
@@ -33,10 +32,8 @@
         }
         .brand { font-family: 'Montserrat', sans-serif; font-weight: 900; font-size: 1.5rem; text-decoration: none; color: white; }
         .brand span { color: var(--brand); }
-        .back-link { color: #aaa; text-decoration: none; font-size: 0.8rem; border: 1px solid #555; padding: 5px 10px; border-radius: 4px; }
-
-        /* Map & UI */
-        #map { flex: 1; width: 100%; background: var(--bg); }
+        
+        #map { flex: 1; width: 100%; background: var(--bg); z-index: 1; }
         
         #ui-overlay { 
             background: var(--card-bg); 
@@ -45,17 +42,28 @@
             z-index: 1000; 
             display: flex; 
             flex-direction: column; 
-            gap: 10px; 
+            gap: 12px; 
             padding-bottom: calc(15px + env(safe-area-inset-bottom)); 
         }
         
-        .chip-row { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 5px; }
+        .status-badge {
+            position: relative;
+            display: block;
+            text-align: center;
+            width: 100%;
+            border-radius: 4px;
+            margin-bottom: 5px;
+            font-family: 'Roboto', sans-serif;
+            transition: all 0.3s ease;
+        }
+
+        .chip-row { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 5px; }
         .chip { 
             background: var(--bg); 
             color: var(--text-dim);
-            padding: 8px 12px; 
-            border-radius: 6px; 
-            font-size: 0.8rem; 
+            padding: 12px 18px; 
+            border-radius: 8px; 
+            font-size: 0.9rem; 
             cursor: pointer; 
             border: 2px solid var(--border); 
             font-weight: bold; 
@@ -63,96 +71,158 @@
         }
         .chip.active { border-color: var(--brand); color: var(--brand); background: rgba(52, 152, 219, 0.1); }
         
-        .btn-go { background: var(--brand); color: white; border: none; padding: 15px; border-radius: 8px; font-weight: 900; font-size: 1rem; cursor: pointer; text-transform: uppercase; }
-        .btn-home { background: var(--emergency); color: white; border: none; padding: 5px 10px; border-radius: 4px; font-size: 0.7rem; font-weight: bold; cursor: pointer; }
-        .btn-reset { background: var(--bg); color: var(--text-dim); border: 1px solid var(--border); padding: 5px 10px; border-radius: 4px; font-size: 0.7rem; cursor: pointer; }
-
-        #status { font-size: 0.7rem; text-align: center; color: var(--text-dim); font-weight: bold; }
+        .btn-go { background: var(--brand); color: white; border: none; padding: 18px; border-radius: 8px; font-weight: 900; font-size: 1.1rem; cursor: pointer; text-transform: uppercase; }
         
-        /* Hide Leaflet default directions pane */
+        .btn-home { background: var(--emergency); color: white; border: none; padding: 8px 12px; border-radius: 4px; font-size: 0.8rem; font-weight: bold; cursor: pointer; }
+        .btn-reset { background: var(--bg); color: var(--text-dim); border: 1px solid var(--border); padding: 8px 12px; border-radius: 4px; font-size: 0.8rem; cursor: pointer; }
+
         .leaflet-routing-container { display: none !important; }
+        [data-theme="dark"] .leaflet-tile { filter: brightness(0.6) invert(100%) contrast(3) hue-rotate(180deg) saturate(0.3); }
+        
+        /* Compass Indicator */
+        #compass {
+            position: absolute;
+            top: 80px;
+            right: 20px;
+            width: 40px;
+            height: 40px;
+            background: rgba(0,0,0,0.6);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1500;
+            border: 2px solid var(--brand);
+            color: white;
+            font-weight: bold;
+            font-size: 1.2rem;
+            pointer-events: none;
+        }
     </style>
 </head>
-<body>
+<body data-theme="dark">
 
 <nav class="navbar">
     <a href="index.html" class="brand">NO<span>FN</span>WAY</a>
     <div style="display:flex; gap:10px; align-items:center;">
         <button class="btn-reset" onclick="resetMarkers()">RESET</button>
         <button class="btn-home" onclick="emergencyReturn()">HOME</button>
-        <a href="index.html" class="back-link">EXIT</a>
     </div>
 </nav>
 
+<div id="compass">↑</div>
 <div id="map"></div>
 
 <div id="ui-overlay">
+    <div id="status" class="status-badge working">INITIALIZING GPS...</div>
+    
     <div class="chip-row" id="vibe-select">
         <div class="chip active" data-vibe="nature" onclick="selectChip(this, 'vibe')">SCENIC</div>
         <div class="chip" data-vibe="lit" onclick="selectChip(this, 'vibe')">WELL-LIT</div>
         <div class="chip" data-vibe="urban" onclick="selectChip(this, 'vibe')">URBAN</div>
         <div class="chip" data-vibe="trail" onclick="selectChip(this, 'vibe')">TRAILS</div>
     </div>
+    
     <button class="btn-go" onclick="startAdventure()">GO GET LOST</button>
-    <div id="status">Syncing GPS...</div>
 </div>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.js"></script>
 
 <script>
-    /* --- SHARED THEME LOGIC --- */
-    const theme = localStorage.getItem('nofnway-theme') || 'light';
-    document.documentElement.setAttribute('data-theme', theme);
-
-    /* --- MAP LOGIC --- */
     let map, userMarker, routingControl, currentPos, startPin = null, endPin = null;
     let selectedVibe = 'nature';
+    const theme = localStorage.getItem('nofnway-theme') || 'dark';
+
+    function updateStatus(text, state) {
+        const s = document.getElementById('status');
+        s.innerText = text;
+        s.className = `status-badge ${state}`;
+    }
 
     function initApp() {
         map = L.map('map', { zoomControl: false, tap: false }).setView([0, 0], 2);
-        
-        // Choose Tile Layer based on Theme
-        const tileUrl = (theme === 'dark') 
-            ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png' 
-            : 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png';
-
-        L.tileLayer(tileUrl, { attribution: '© OSM' }).addTo(map);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 
         if (navigator.geolocation) {
             navigator.geolocation.watchPosition(pos => {
                 currentPos = L.latLng(pos.coords.latitude, pos.coords.longitude);
                 if (!userMarker) {
                     map.setView(currentPos, 16);
-                    userMarker = L.circleMarker(currentPos, { 
-                        color: '#3498db', 
-                        radius: 8, 
-                        fillOpacity: 1, 
-                        weight: 3, 
-                        fillColor: 'white' 
-                    }).addTo(map);
-                    document.getElementById('status').innerText = "GPS ACTIVE. READY.";
+                    userMarker = L.circleMarker(currentPos, { color: 'var(--brand)', radius: 10, weight: 4, fillColor: 'white', fillOpacity: 1 }).addTo(map);
+                    updateStatus("GPS ACTIVE. READY.", "ready");
                 } else { userMarker.setLatLng(currentPos); }
             }, null, { enableHighAccuracy: true });
         }
 
+        // Handle Compass / Orientation
+        window.addEventListener('deviceorientationabsolute', (e) => {
+            if (e.alpha !== null) {
+                const heading = 360 - e.alpha;
+                document.getElementById('compass').style.transform = `rotate(${e.alpha}deg)`;
+                // Optionally rotate map: map.getContainer().style.transform = `rotate(${-e.alpha}deg)`;
+            }
+        }, true);
+
         map.on('contextmenu', (e) => {
             if (!startPin) {
-                startPin = L.marker(e.latlng, { draggable: true, icon: createIcon('#3498db') }).addTo(map);
-                document.getElementById('status').innerText = "START SET. LONG-PRESS FOR FINISH.";
+                startPin = L.marker(e.latlng, { draggable: true, icon: createIcon('var(--brand)') }).addTo(map);
+                updateStatus("START PIN SET.", "working");
             } else if (!endPin) {
-                endPin = L.marker(e.latlng, { draggable: true, icon: createIcon('#f1c40f') }).addTo(map);
-                document.getElementById('status').innerText = "FINISH SET. READY TO RUN.";
+                endPin = L.marker(e.latlng, { draggable: true, icon: createIcon('var(--working)') }).addTo(map);
+                updateStatus("END PIN SET. READY.", "ready");
             }
         });
     }
 
+    async function findInterestingPoint(center, vibe) {
+        updateStatus(`SCANNING FOR ${vibe.toUpperCase()}...`, "working");
+        
+        const queries = {
+            nature: 'nwr[tourism=viewpoint](around:1500,${center.lat},${center.lng});nwr[leisure=park](around:1500,${center.lat},${center.lng});',
+            lit: 'way[highway][lit=yes](around:1000,${center.lat},${center.lng});',
+            urban: 'nwr[amenity=cafe](around:1200,${center.lat},${center.lng});nwr[shop=mall](around:1200,${center.lat},${center.lng});',
+            trail: 'way[highway=path](around:2000,${center.lat},${center.lng});way[highway=footway][foot=yes](around:2000,${center.lat},${center.lng});'
+        };
+
+        const query = `[out:json][timeout:15];(${queries[vibe]});out center;`;
+        const url = `https://overpass-api.de/api/interpreter?data=${encodeURIComponent(query)}`;
+
+        try {
+            const response = await fetch(url);
+            const data = await response.json();
+            if (data.elements.length > 0) {
+                const target = data.elements[Math.floor(Math.random() * data.elements.length)];
+                return L.latLng(target.lat || target.center.lat, target.lon || target.center.lon);
+            }
+        } catch (e) { console.error("API Fail", e); }
+
+        // Fallback to random math
+        const r = 0.015; const theta = Math.random() * 2 * Math.PI;
+        return L.latLng(center.lat + r * Math.cos(theta), center.lng + r * Math.sin(theta));
+    }
+
+    async function startAdventure() {
+        if (!currentPos && !startPin) return updateStatus("WAITING FOR GPS...", "dev");
+        if (routingControl) map.removeControl(routingControl);
+        
+        let origin = startPin ? startPin.getLatLng() : currentPos;
+        let dest = endPin ? endPin.getLatLng() : await findInterestingPoint(origin, selectedVibe);
+        
+        updateStatus("LOCKING ROUTE...", "working");
+        routingControl = L.Routing.control({
+            waypoints: [origin, dest, (endPin ? null : origin)].filter(w => w !== null),
+            router: L.Routing.osrmv1({ serviceUrl: 'https://router.project-osrm.org/route/v1', profile: 'foot' }),
+            lineOptions: { styles: [{ color: '#000', opacity: 0.3, weight: 12 }, { color: 'white', weight: 8 }, { color: 'var(--brand)', weight: 4 }] },
+            createMarker: () => null,
+            addWaypoints: false,
+            show: false
+        }).addTo(map);
+        updateStatus("ADVENTURE LOCKED.", "ready");
+    }
+
     function createIcon(color) {
-        return L.divIcon({
-            className: 'custom-icon',
-            html: `<div style="background-color:${color}; width:15px; height:15px; border-radius:50%; border:2px solid white; box-shadow: 0 0 5px rgba(0,0,0,0.5);"></div>`,
-            iconSize: [15, 15]
-        });
+        return L.divIcon({ className: 'custom-icon', html: `<div style="background-color:${color}; width:20px; height:20px; border-radius:50%; border:3px solid white; box-shadow: 0 2px 10px rgba(0,0,0,0.4);"></div>`, iconSize: [20, 20] });
     }
 
     function selectChip(el, type) {
@@ -161,30 +231,11 @@
         selectedVibe = el.dataset.vibe;
     }
 
-    async function startAdventure() {
-        if (routingControl) map.removeControl(routingControl);
-        let origin = startPin ? startPin.getLatLng() : currentPos;
-        let destination = endPin ? endPin.getLatLng() : await findInterestingPoint(origin, selectedVibe);
-        
-        routingControl = L.Routing.control({
-            waypoints: [origin, destination, (startPin && endPin ? null : origin)].filter(w => w !== null),
-            router: L.Routing.osrmv1({ serviceUrl: 'https://router.project-osrm.org/route/v1', profile: 'foot' }),
-            lineOptions: { styles: [{ color: '#3498db', opacity: 0.8, weight: 6 }] },
-            createMarker: () => null,
-            addWaypoints: false
-        }).addTo(map);
-        document.getElementById('status').innerText = "ADVENTURE LOCKED.";
-    }
-
-    async function findInterestingPoint(center, vibe) {
-        return L.latLng(center.lat + (Math.random() - 0.5) * 0.02, center.lng + (Math.random() - 0.5) * 0.02);
-    }
-
     function resetMarkers() {
-        if (startPin) { map.removeLayer(startPin); startPin = null; }
-        if (endPin) { map.removeLayer(endPin); endPin = null; }
+        if (startPin) map.removeLayer(startPin); if (endPin) map.removeLayer(endPin);
         if (routingControl) map.removeControl(routingControl);
-        document.getElementById('status').innerText = "RESET COMPLETE.";
+        startPin = null; endPin = null;
+        updateStatus("SYSTEM RESET.", "dev");
     }
 
     function emergencyReturn() {
@@ -192,11 +243,11 @@
         if (routingControl) map.removeControl(routingControl);
         routingControl = L.Routing.control({
             waypoints: [currentPos, startPin ? startPin.getLatLng() : currentPos],
-            router: L.Routing.osrmv1({ serviceUrl: 'https://router.project-osrm.org/route/v1', profile: 'foot' }),
-            lineOptions: { styles: [{ color: '#c0392b', weight: 8, dashArray: '5, 10' }] },
-            createMarker: () => null
+            lineOptions: { styles: [{ color: 'var(--emergency)', weight: 10, dashArray: '5, 10' }] },
+            createMarker: () => null,
+            show: false
         }).addTo(map);
-        document.getElementById('status').innerText = "HEADING HOME...";
+        updateStatus("HEADING HOME.", "working");
     }
 
     window.onload = initApp;
