@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>NOFNWAY | PDFer</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@900&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        :root {
+            --brand: #3498db; --dark: #2c3e50; --bg: #f4f7f6;
+            --brand-red: #e74c3c; --font-ui: 'Roboto', sans-serif;
+        }
+        body { margin: 0; font-family: var(--font-ui); background-color: var(--bg); height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+        /* Unified Navbar */
+        .navbar { background: var(--dark); padding: 10px 30px; display: flex; justify-content: space-between; align-items: center; color: white; flex-shrink: 0; z-index: 2000; }
+        .brand { font-family: 'Montserrat', sans-serif; font-weight: 900; font-size: 1.5rem; text-decoration: none; color: white; }
+        .brand span { color: var(--brand); }
+        .nav-tools { display: flex; gap: 10px; align-items: center; }
+        .back-link { color: #aaa; text-decoration: none; font-size: 0.8rem; border: 1px solid #555; padding: 5px 10px; border-radius: 4px; }
+
+        .file-bar { background: #e0e6ed; padding: 8px 15px; border-bottom: 1px solid #ccc; display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+        .file-input-group { flex: 1; display: flex; align-items: center; background: white; border: 1px solid #bbb; border-radius: 4px; padding: 0 8px; }
+        .filename-input { flex: 1; border: none; padding: 8px 0; font-size: 0.9rem; outline: none; font-weight: bold; }
+        
+        .workspace { flex: 1; overflow-y: auto; padding: 15px; display: flex; flex-direction: column; gap: 12px; align-items: center; padding-bottom: 80px; }
+        .doc-card { background: white; width: 100%; max-width: 600px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); display: flex; overflow: hidden; height: 90px; position: relative; cursor: pointer; }
+        .doc-thumb { width: 90px; height: 90px; background: #eee; object-fit: cover; flex-shrink: 0; }
+        .doc-info { flex: 1; padding: 8px 12px; display: flex; flex-direction: column; justify-content: center; }
+        .doc-title { font-weight: bold; font-size: 1rem; color: #333; }
+        .doc-actions { width: 45px; display: flex; flex-direction: column; border-left: 1px solid #eee; }
+        .btn-list-action.delete { flex: 1; border: none; background: #fff0f0; color: var(--brand-red); font-size: 1.2rem; cursor: pointer; }
+
+        .bottom-bar { position: fixed; bottom: 0; left: 0; width: 100%; background: white; border-top: 1px solid #ddd; padding: 12px; display: flex; gap: 10px; box-shadow: 0 -4px 20px rgba(0,0,0,0.1); z-index: 100; }
+        .btn-main { flex: 1; height: 48px; border: none; border-radius: 8px; font-weight: bold; font-size: 0.95rem; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; }
+        .btn-add { background-color: var(--brand); color: white; flex: 1.5; }
+        .btn-compile { background-color: var(--dark); color: white; }
+
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 2100; display: none; flex-direction: column; align-items: center; justify-content: center; padding: 10px; }
+        .modal-card { background: white; width: 100%; max-width: 450px; border-radius: 12px; display: flex; flex-direction: column; overflow: hidden; height: 95vh; position: relative; }
+        .editor-header { padding: 10px; border-bottom: 1px solid #eee; }
+        .chip-scroll { display: flex; overflow-x: auto; gap: 8px; padding-bottom: 8px; }
+        .chip { background: #f0f4f8; padding: 5px 12px; border-radius: 15px; font-size: 0.75rem; font-weight: bold; cursor: pointer; border: 1px solid #ddd; white-space: nowrap; }
+        .editor-stage-wrapper { flex: 1; position: relative; background: #222; overflow: hidden; display: flex; align-items: center; justify-content: center; touch-action: none; }
+        .crop-box { position: absolute; border: 2px dashed rgba(255,255,255,0.9); box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.7); }
+    </style>
+</head>
+<body>
+
+<nav class="navbar">
+    <a href="index.html" class="brand">NO<span>FN</span>WAY</a>
+    <div class="nav-tools">
+        <button class="back-link" onclick="triggerImport()">IMPORT</button>
+        <button class="back-link" style="color:var(--brand-red)" onclick="clearAll()">RESET</button>
+        <a href="index.html" class="back-link">EXIT</a>
+    </div>
+</nav>
+
+<div class="file-bar">
+    <div class="file-input-group">
+        <input type="text" id="docName" class="filename-input" placeholder="Scan_Export" oninput="saveData()">
+        <span style="color:#888; font-weight:bold;">.pdf</span>
+    </div>
+</div>
+
+<div class="workspace" id="stream">
+    <div id="emptyState" style="text-align:center; color:#999; margin-top:40px;">
+        <h3>No Documents Yet</h3>
+        <p>Tap <strong>ADD PAGE</strong> to start.</p>
+    </div>
+</div>
+
+<div class="bottom-bar">
+    <button class="btn-main btn-add" onclick="triggerCamera()">📷 ADD PAGE</button>
+    <button class="btn-main btn-compile" onclick="compilePDF()">MAKE PDF</button>
+</div>
+
+<div class="modal-overlay" id="editModal">
+    <div class="modal-card">
+        <div class="editor-header">
+            <div class="chip-scroll">
+                <div class="chip" onclick="quickTag('Receipt')">Receipt</div>
+                <div class="chip" onclick="quickTag('Invoice')">Invoice</div>
+                <div class="chip" onclick="quickTag('Document')">Document</div>
+                <div class="chip" onclick="quickTag('ID')">ID</div>
+            </div>
+            <input type="text" id="pageTitleInput" style="width:100%; padding:10px; border:1px solid #ddd; border-radius:6px;" placeholder="Page Title">
+        </div>
+        <div style="display:flex; background:#f8f9fa;">
+            <div class="tab" id="tabCrop" style="flex:1; padding:10px; text-align:center; font-weight:bold; cursor:pointer;" onclick="switchTab('crop')">CROP</div>
+            <div class="tab" id="tabRedact" style="flex:1; padding:10px; text-align:center; font-weight:bold; cursor:pointer;" onclick="switchTab('redact')">REDACT</div>
+        </div>
+        <div class="editor-stage-wrapper" id="stageWrapper">
+            <img id="editorImg" style="max-width:100%; max-height:100%;">
+            <div id="cropOverlay" style="position:absolute; width:100%; height:100%; display:none;">
+                <div id="cropBox" class="crop-box" style="top:10%; left:10%; width:80%; height:80%;">
+                    <div style="position:absolute; bottom:-10px; right:-10px; width:30px; height:30px; background:var(--brand); border-radius:50%;" class="crop-handle handle-br"></div>
+                </div>
+            </div>
+            <div id="maskLayer" style="position:absolute; width:100%; height:100%; display:none;"></div>
+        </div>
+        <div style="padding:10px; display:flex; gap:10px;">
+            <button style="flex:1; padding:10px; border:none; border-radius:6px;" onclick="closeModal()">Cancel</button>
+            <button style="flex:1; padding:10px; border:none; border-radius:6px; background:var(--brand); color:white; font-weight:bold;" onclick="confirmPage()">SAVE PAGE</button>
+        </div>
+    </div>
+</div>
+
+<div id="successModal" class="modal-overlay">
+    <div class="modal-card" style="height:auto; padding:20px; text-align:center;">
+        <h2 style="margin-top:0;">PDF Ready!</h2>
+        <p id="successMsg" style="color:#666;"></p>
+        <button class="btn-main btn-add" style="width:100%; margin-bottom:10px;" onclick="downloadPDF()">DOWNLOAD PDF</button>
+        <button class="btn-main" style="width:100%; background:#eee;" onclick="closeSuccess()">Close</button>
+    </div>
+</div>
+
+<div id="loader" style="position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); background:rgba(0,0,0,0.8); color:white; padding:20px; border-radius:8px; display:none; z-index:4000;">Processing...</div>
+
+<input type="file" id="cameraInput" accept="image/*" style="display:none">
+<input type="file" id="importInput" accept=".nofn,.json" style="display:none">
+<canvas id="compressor" style="display:none"></canvas>
+
+<script>
+    let appData = { pages: [], filename: 'Scan_Export' };
+    let editingId = null, originalImage = null, currentMode = 'crop', generatedPdfBlob = null;
+
+    window.onload = () => {
+        const saved = localStorage.getItem('nofn_pdfer');
+        if(saved) { appData = JSON.parse(saved); document.getElementById('docName').value = appData.filename; }
+        render(); initCropDrag();
+    };
+
+    function triggerCamera() { document.getElementById('cameraInput').click(); }
+    document.getElementById('cameraInput').onchange = (e) => {
+        const file = e.target.files[0]; if(!file) return; showLoader(true);
+        const reader = new FileReader();
+        reader.onload = (evt) => {
+            const img = new Image();
+            img.onload = () => {
+                const canvas = document.getElementById('compressor'); const ctx = canvas.getContext('2d');
+                const MAX = 1600; let w = img.width, h = img.height;
+                if(w > MAX) { h = h * (MAX / w); w = MAX; }
+                canvas.width = w; canvas.height = h; ctx.drawImage(img, 0, 0, w, h);
+                originalImage = canvas.toDataURL('image/jpeg', 0.8);
+                showLoader(false); openEditModal(null);
+            };
+            img.src = evt.target.result;
+        };
+        reader.readAsDataURL(file);
+    };
+
+    function openEditModal(id) {
+        editingId = id; document.getElementById('maskLayer').innerHTML = '';
+        if(id) { const p = appData.pages.find(pg => pg.id === id); originalImage = p.img; document.getElementById('pageTitleInput').value = p.title; }
+        else { document.getElementById('pageTitleInput').value = ''; }
+        document.getElementById('editorImg').src = originalImage;
+        document.getElementById('editModal').style.display = 'flex';
+        switchTab('crop');
+    }
+
+    function switchTab(mode) {
+        currentMode = mode;
+        const crop = document.getElementById('cropOverlay'); const masks = document.getElementById('maskLayer');
+        if(mode === 'crop') { crop.style.display = 'block'; masks.style.display = 'none'; }
+        else { crop.style.display = 'none'; masks.style.display = 'block'; applyCropToView(); }
+    }
+
+    function applyCropToView() {
+        const img = document.getElementById('editorImg'); const box = document.getElementById('cropBox');
+        const imgRect = img.getBoundingClientRect(); const boxRect = box.getBoundingClientRect();
+        const scale = img.naturalWidth / img.width;
+        const canvas = document.getElementById('compressor'); const ctx = canvas.getContext('2d');
+        canvas.width = boxRect.width * scale; canvas.height = boxRect.height * scale;
+        ctx.drawImage(img, (boxRect.left - imgRect.left) * scale, (boxRect.top - imgRect.top) * scale, canvas.width, canvas.height, 0, 0, canvas.width, canvas.height);
+        img.src = canvas.toDataURL('image/jpeg', 0.8);
+    }
+
+    function confirmPage() {
+        showLoader(true);
+        setTimeout(() => {
+            const title = document.getElementById('pageTitleInput').value || "Untitled";
+            const img = document.getElementById('editorImg').src;
+            if(editingId) { const p = appData.pages.find(pg => pg.id === editingId); p.title = title; p.img = img; }
+            else { appData.pages.push({ id: Date.now(), title, img, date: new Date().toLocaleDateString() }); }
+            saveData(); render(); closeModal(); showLoader(false);
+        }, 100);
+    }
+
+    async function compilePDF() {
+        if(!appData.pages.length) return; showLoader(true);
+        const { jsPDF } = window.jspdf; const doc = new jsPDF();
+        appData.pages.forEach((p, i) => {
+            if(i > 0) doc.addPage();
+            doc.addImage(p.img, 'JPEG', 10, 10, 190, 240);
+            doc.text(p.title, 10, 260);
+        });
+        generatedPdfBlob = doc.output('blob');
+        document.getElementById('successMsg').innerText = appData.filename + ".pdf ready";
+        document.getElementById('successModal').style.display = 'flex';
+        showLoader(false);
+    }
+
+    function render() {
+        const stream = document.getElementById('stream'); document.getElementById('emptyState').style.display = appData.pages.length ? 'none' : 'block';
+        stream.querySelectorAll('.doc-card').forEach(c => c.remove());
+        appData.pages.forEach((p, i) => {
+            const card = document.createElement('div'); card.className = 'doc-card';
+            card.innerHTML = `<img src="${p.img}" class="doc-thumb"><div class="doc-info"><div class="doc-title">${i+1}. ${p.title}</div></div><div class="doc-actions"><button class="btn-list-action delete" onclick="deletePage(${i})">✖</button></div>`;
+            card.onclick = (e) => { if(!e.target.closest('.doc-actions')) openEditModal(p.id); };
+            stream.appendChild(card);
+        });
+    }
+
+    function deletePage(i) { appData.pages.splice(i,1); saveData(); render(); }
+    function saveData() { appData.filename = document.getElementById('docName').value; localStorage.setItem('nofn_pdfer', JSON.stringify(appData)); }
+    function closeModal() { document.getElementById('editModal').style.display = 'none'; }
+    function downloadPDF() { const a = document.createElement('a'); a.href = URL.createObjectURL(generatedPdfBlob); a.download = appData.filename + ".pdf"; a.click(); }
+    function clearAll() { if(confirm("Clear all?")) { appData.pages = []; saveData(); render(); } }
+    function showLoader(s) { document.getElementById('loader').style.display = s ? 'block' : 'none'; }
+    function closeSuccess() { document.getElementById('successModal').style.display = 'none'; }
+    function quickTag(t) { document.getElementById('pageTitleInput').value = t + " " + new Date().toLocaleDateString(); }
+    function triggerImport() { document.getElementById('importInput').click(); }
+
+    function initCropDrag() {
+        const box = document.getElementById('cropBox'); let isDrag = false;
+        box.onmousedown = () => isDrag = true;
+        window.onmouseup = () => isDrag = false;
+        window.onmousemove = (e) => { if(!isDrag || currentMode !== 'crop') return; box.style.width = e.movementX + box.offsetWidth + 'px'; box.style.height = e.movementY + box.offsetHeight + 'px'; };
+    }
+</script>
+</body>
+</html>
