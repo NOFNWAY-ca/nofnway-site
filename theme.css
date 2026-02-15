@@ -39,9 +39,19 @@ body {
     font-weight: 900;
     border-bottom-left-radius: 12px;
     text-transform: uppercase;
-    color: #000; /* High contrast for yellow/green */
+    color: #000;
 }
 
 .ready { background-color: var(--ready); }
 .working { background-color: var(--working); }
 .dev { background-color: var(--dev); color: #fff; }
+
+/* Disclaimer Styling */
+.disclaimer {
+    max-width: 600px;
+    margin: 20px auto;
+    font-size: 0.85rem;
+    font-style: italic;
+    line-height: 1.5;
+    color: var(--text-dim);
+}

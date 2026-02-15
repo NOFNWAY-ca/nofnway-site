@@ -62,7 +62,12 @@
         <div class="terminal-container">
             <span id="terminal-text"></span><span class="cursor">&nbsp;</span>
         </div>
-        <div>NOFNWAY &copy; 2026 | We give an F, especially when you've run out.</div>
+        
+        <div class="disclaimer">
+            I know a lot of stuff on this site is still broken, but I'm fixing as fast as my brain vs. medication will allow. Keep checking back in, I'll be making regular improvements until I get bored/the drugs stop working. Thanks for checking it out!
+        </div>
+
+        <div style="margin-top: 20px;">NOFNWAY &copy; 2026</div>
     </footer>
 
     <script>
@@ -116,7 +121,7 @@
 
             if (!isDeleting && charIdx === current.length) {
                 isDeleting = true;
-                speed = 30000; // Delay for 30s
+                speed = 30000; // Hold for 30s
             } else if (isDeleting && charIdx === 0) {
                 isDeleting = false;
                 sloganIdx = (sloganIdx + 1) % slogans.length;
