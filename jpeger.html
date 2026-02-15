@@ -3,37 +3,45 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NOFNWAY | JPEGer (Lite)</title>
+    <title>NOFNWAY | JPEGer</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@900&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
     <style>
-        :root { --brand: #3b82f6; --bg: #0f172a; }
-        body { background: var(--bg); color: #f1f5f9; font-family: sans-serif; height: 100vh; display: flex; flex-direction: column; overflow: hidden; margin: 0; }
-        .drop-zone { border: 4px dashed #334155; transition: 0.2s; cursor: pointer; }
-        .drop-zone:hover { border-color: var(--brand); background: #1e293b; }
+        :root { --brand: #3b82f6; --bg: #000000; --card: #0f172a; --border: #334155; }
+        body { background: var(--bg); color: #f1f5f9; font-family: 'Roboto', sans-serif; overflow: hidden; height: 100vh; display: flex; flex-direction: column; margin: 0; }
+        .brand { font-family: 'Montserrat', sans-serif; font-weight: 900; }
+        .drop-zone { border: 2px dashed var(--border); transition: 0.2s; cursor: pointer; }
+        .drop-zone:hover { border-color: var(--brand); background: #0f172a; }
         .loading-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.9); display: none; place-items: center; z-index: 3000; }
+        .custom-scroll::-webkit-scrollbar { width: 6px; }
+        .custom-scroll::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
     </style>
 </head>
 <body class="p-4 md:p-8">
 
     <div id="loader" class="loading-overlay">
         <div class="text-center">
-            <p id="loadText" class="font-black text-blue-400 animate-pulse text-xl uppercase">Reading PDF...</p>
+            <p id="loadText" class="brand text-blue-500 animate-pulse text-2xl uppercase">Converting...</p>
         </div>
     </div>
 
-    <header class="flex justify-between items-center mb-8 bg-black p-4 rounded-lg border-b-2 border-blue-500">
-        <h1 class="font-black text-2xl tracking-tighter">NOFNWAY // <span class="text-blue-500">JPEGER LITE</span></h1>
-        <button id="downloadBtn" onclick="downloadAll()" class="hidden bg-blue-600 hover:bg-blue-500 px-6 py-2 rounded font-bold uppercase text-xs transition-colors">Download JPEGs</button>
+    <header class="flex justify-between items-center mb-8 bg-black p-4 rounded-lg border-b-2 border-blue-600 shadow-2xl">
+        <h1 class="brand text-2xl tracking-tighter">NO<span class="text-blue-500">FN</span>WAY // JPEGer</h1>
+        <div class="flex gap-4">
+            <button onclick="location.reload()" id="resetBtn" class="hidden text-slate-500 hover:text-white text-[10px] font-bold uppercase tracking-widest">Reset</button>
+            <button id="dlBtn" onclick="downloadQueue()" class="hidden bg-blue-600 hover:bg-blue-500 px-6 py-2 rounded font-bold uppercase text-xs tracking-widest transition-all">Download JPEGs</button>
+        </div>
     </header>
 
-    <main class="flex-1 overflow-y-auto flex flex-col items-center">
-        <div id="setup" class="drop-zone w-full max-w-2xl p-12 md:p-20 rounded-2xl text-center">
-            <p class="text-xl font-bold text-slate-400 uppercase">Drop Filled PDF Here</p>
+    <main class="flex-1 overflow-y-auto flex flex-col items-center custom-scroll">
+        <div id="setup" class="drop-zone w-full max-w-2xl p-16 rounded-2xl text-center">
+            <p class="brand text-xl text-slate-400 uppercase tracking-tighter">Drop Filled PDF Here</p>
+            <p class="text-[10px] text-slate-600 mt-2 uppercase tracking-widest">Private Local Conversion</p>
             <input type="file" id="fileInput" class="hidden" accept="application/pdf">
         </div>
 
-        <div id="preview-grid" class="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mt-8 px-4"></div>
+        <div id="previewGrid" class="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mt-8"></div>
     </main>
 
     <script>
@@ -42,79 +50,77 @@
 
         const setup = document.getElementById('setup'),
               fileInput = document.getElementById('fileInput'),
-              grid = document.getElementById('preview-grid'),
-              downloadBtn = document.getElementById('downloadBtn'),
+              grid = document.getElementById('previewGrid'),
+              dlBtn = document.getElementById('dlBtn'),
+              resetBtn = document.getElementById('resetBtn'),
               loader = document.getElementById('loader'),
               loadText = document.getElementById('loadText');
 
-        let exportItems = [];
+        let exportList = [];
 
         setup.onclick = () => fileInput.click();
-        fileInput.onchange = (e) => processFile(e.target.files[0]);
+        fileInput.onchange = (e) => processPdf(e.target.files[0]);
 
-        async function processFile(file) {
+        async function processPdf(file) {
             if (!file) return;
             loader.style.display = 'grid';
             grid.innerHTML = "";
             
-            // Revoke old URLs to free memory
-            exportItems.forEach(item => URL.revokeObjectURL(item.url));
-            exportItems = [];
+            // Clean memory
+            exportList.forEach(item => URL.revokeObjectURL(item.url));
+            exportList = [];
 
             try {
                 const arrayBuffer = await file.arrayBuffer();
                 const pdf = await pdfjsLib.getDocument({data: arrayBuffer}).promise;
+                const baseName = file.name.substring(0, file.name.lastIndexOf('.'));
 
                 for (let i = 1; i <= pdf.numPages; i++) {
-                    loadText.innerText = `Rendering Page ${i} / ${pdf.numPages}`;
+                    loadText.innerText = `CONVERTING ${i} / ${pdf.numPages}`;
                     const page = await pdf.getPage(i);
-                    const viewport = page.getViewport({ scale: 2.5 }); 
+                    
+                    // Fixed rotation and high-res rendering
+                    const viewport = page.getViewport({ scale: 2.5, rotation: page.rotate });
                     const canvas = document.createElement('canvas');
-                    canvas.width = viewport.width;
-                    canvas.height = viewport.height;
+                    canvas.width = viewport.width; canvas.height = viewport.height;
                     
                     await page.render({canvasContext: canvas.getContext('2d'), viewport}).promise;
                     
-                    // Convert to Blob for ultra-low memory usage
                     const blob = await new Promise(res => canvas.toBlob(res, 'image/jpeg', 0.95));
                     const url = URL.createObjectURL(blob);
                     
-                    // Visual Preview
-                    const thumb = document.createElement('img');
-                    thumb.src = url;
-                    thumb.className = "w-full rounded shadow-lg border border-slate-700";
-                    grid.appendChild(thumb);
+                    const img = document.createElement('img');
+                    img.src = url;
+                    img.className = "w-full rounded border border-slate-800 shadow-xl hover:border-blue-500 transition-colors";
+                    grid.appendChild(img);
                     
-                    exportItems.push({
-                        url: url,
-                        name: `${file.name.split('.').slice(0, -1).join('.')}_P${i}.jpg`
-                    });
-
-                    // Cleanup Canvas immediately
-                    canvas.width = 0; canvas.height = 0;
+                    exportList.push({ url, name: `${baseName}_P${i}.jpg` });
+                    canvas.width = 0; canvas.height = 0; // Trigger Garbage Collection
                 }
                 
                 setup.classList.add('hidden');
-                downloadBtn.classList.remove('hidden');
+                dlBtn.classList.remove('hidden');
+                resetBtn.classList.remove('hidden');
             } catch (err) {
-                alert("Error: PDF could not be processed.");
+                alert("Error: Invalid or protected PDF.");
+                console.error(err);
             } finally {
                 loader.style.display = 'none';
             }
         }
 
-        async function downloadAll() {
-            downloadBtn.disabled = true;
-            for (let i = 0; i < exportItems.length; i++) {
-                downloadBtn.innerText = `Saving ${i + 1}/${exportItems.length}`;
-                const link = document.createElement('a');
-                link.download = exportItems[i].name;
-                link.href = exportItems[i].url;
-                link.click();
-                await new Promise(r => setTimeout(r, 450));
+        async function downloadQueue() {
+            dlBtn.disabled = true;
+            for (let i = 0; i < exportList.length; i++) {
+                dlBtn.innerText = `SAVING ${i + 1}/${exportList.length}`;
+                const a = document.createElement('a');
+                a.download = exportList[i].name;
+                a.href = exportList[i].url;
+                a.click();
+                await new Promise(r => setTimeout(r, 650));
             }
-            downloadBtn.disabled = false;
-            downloadBtn.innerText = "Download JPEGs";
+            dlBtn.disabled = false;
+            dlBtn.innerText = "Download JPEGs";
         }
     </script>
 </body>
