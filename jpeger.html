@@ -2,232 +2,120 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>NOFNWAY | JPEGer</title>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@900&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NOFNWAY | JPEGer (Lite)</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
     <style>
-        :root { --brand: #3b82f6; --bg: #0f172a; --card-bg: #1e293b; --text-main: #f1f5f9; --border: #334155; }
-        body { font-family: 'Roboto', sans-serif; background: var(--bg); color: var(--text-main); height: 100vh; display: flex; flex-direction: column; overflow: hidden; margin: 0; }
-        .navbar { background: #000; padding: 10px 30px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--brand); flex-shrink: 0; z-index: 2000; }
-        .brand { font-family: 'Montserrat', sans-serif; font-weight: 900; font-size: 1.5rem; text-decoration: none; color: white; }
-        .brand span { color: var(--brand); }
-        .toolbar { background: var(--card-bg); border-bottom: 1px solid var(--border); padding: 0.75rem; display: flex; flex-wrap: wrap; gap: 1rem; align-items: center; justify-content: center; z-index: 1500; }
-        .workspace { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; align-items: center; }
-        canvas { border: 1px solid var(--border); background: white; width: 100%; cursor: crosshair; }
-        .canvas-container { position: relative; margin-bottom: 2rem; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); }
-        #ghostContainer { position: absolute; pointer-events: none; z-index: 1000; display: none; line-height: 1; }
-        #reticle { position: absolute; width: 8px; height: 8px; background: var(--brand); border-radius: 50%; border: 1px solid white; transform: translate(-50%, -50%); }
-        #actualGhostText { position: absolute; color: black; font-family: Arial; white-space: pre; left: 10px; bottom: 5px; }
-        .stamp-input { background: #000; border: 1px solid var(--border); color: var(--text-main); padding: 8px; border-radius: 4px; font-size: 14px; outline: none; }
-        .btn-active { background-color: var(--brand) !important; }
-        .loading-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); display: none; place-items: center; z-index: 3000; }
+        :root { --brand: #3b82f6; --bg: #0f172a; }
+        body { background: var(--bg); color: #f1f5f9; font-family: sans-serif; height: 100vh; display: flex; flex-direction: column; overflow: hidden; margin: 0; }
+        .drop-zone { border: 4px dashed #334155; transition: 0.2s; cursor: pointer; }
+        .drop-zone:hover { border-color: var(--brand); background: #1e293b; }
+        .loading-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.9); display: none; place-items: center; z-index: 3000; }
     </style>
 </head>
-<body>
+<body class="p-4 md:p-8">
 
-<div id="loader" class="loading-overlay"><p class="font-black text-blue-400 animate-pulse uppercase text-xl">Syncing Form Data...</p></div>
-
-<nav class="navbar">
-    <a href="#" class="brand">NO<span>FN</span>WAY</a>
-    <div class="flex gap-4">
-        <button onclick="undoLastStamp()" class="text-[10px] font-bold border border-gray-600 px-2 py-1 rounded text-white hover:bg-gray-800">UNDO (Ctrl+Z)</button>
-        <button id="saveBtn" onclick="downloadAll()" class="bg-blue-600 px-4 py-1 rounded text-xs font-bold uppercase text-white hover:bg-blue-500 shadow-lg">Save JPEGs</button>
-    </div>
-</nav>
-
-<div class="toolbar">
-    <input type="text" id="filePrefix" placeholder="Filename Prefix..." class="stamp-input w-32 border-blue-900">
-    <input type="text" id="liveInput" placeholder="Stamp Text..." class="stamp-input w-40">
-    
-    <div class="flex bg-black rounded p-1 border border-slate-700">
-        <button onclick="setMode('text')" id="btnText" class="px-3 py-1 rounded font-bold text-xs text-white btn-active">TXT</button>
-        <button onclick="setMode('check')" id="btnCheck" class="px-3 py-1 rounded font-bold text-xs text-white hover:bg-slate-800">✓</button>
-        <button onclick="setMode('x')" id="btnX" class="px-3 py-1 rounded font-bold text-xs text-white hover:bg-slate-800">X</button>
+    <div id="loader" class="loading-overlay">
+        <div class="text-center">
+            <p id="loadText" class="font-black text-blue-400 animate-pulse text-xl uppercase">Reading PDF...</p>
+        </div>
     </div>
 
-    <div class="flex items-center gap-2">
-        <span class="text-[10px] uppercase font-bold text-slate-500">Font</span>
-        <input type="range" id="fontSize" min="10" max="100" value="30" class="w-16">
-    </div>
+    <header class="flex justify-between items-center mb-8 bg-black p-4 rounded-lg border-b-2 border-blue-500">
+        <h1 class="font-black text-2xl tracking-tighter">NOFNWAY // <span class="text-blue-500">JPEGER LITE</span></h1>
+        <button id="downloadBtn" onclick="downloadAll()" class="hidden bg-blue-600 hover:bg-blue-500 px-6 py-2 rounded font-bold uppercase text-xs transition-colors">Download JPEGs</button>
+    </header>
 
-    <div class="flex items-center gap-2">
-        <span class="text-[10px] uppercase font-bold text-slate-500">Zoom</span>
-        <input type="range" id="viewZoom" min="30" max="100" value="70" class="w-16">
-    </div>
+    <main class="flex-1 overflow-y-auto flex flex-col items-center">
+        <div id="setup" class="drop-zone w-full max-w-2xl p-12 md:p-20 rounded-2xl text-center">
+            <p class="text-xl font-bold text-slate-400 uppercase">Drop Filled PDF Here</p>
+            <input type="file" id="fileInput" class="hidden" accept="application/pdf">
+        </div>
 
-    <button onclick="clearSession()" class="text-red-400 text-[10px] uppercase font-bold underline ml-4">Wipe Session</button>
-</div>
+        <div id="preview-grid" class="w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mt-8 px-4"></div>
+    </main>
 
-<main class="workspace" id="main-ws">
-    <div id="setup" class="w-full max-w-xl p-20 border-4 border-dashed border-slate-700 rounded-2xl text-center cursor-pointer hover:border-blue-500 transition-all">
-        <p class="font-black text-slate-500 uppercase tracking-tighter text-xl">Drag PDF Here</p>
-        <p class="text-xs text-slate-600 mt-2">Data persists in local storage</p>
-        <input type="file" id="fileInput" class="hidden" accept="application/pdf">
-    </div>
-    <div id="pdf-view" class="w-full flex flex-col items-center"></div>
-</main>
+    <script>
+        const pdfjsLib = window['pdfjs-dist/build/pdf'];
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
-<div id="ghostContainer"><div id="reticle"></div><span id="actualGhostText"></span></div>
+        const setup = document.getElementById('setup'),
+              fileInput = document.getElementById('fileInput'),
+              grid = document.getElementById('preview-grid'),
+              downloadBtn = document.getElementById('downloadBtn'),
+              loader = document.getElementById('loader'),
+              loadText = document.getElementById('loadText');
 
-<script>
-    const pdfjsLib = window['pdfjs-dist/build/pdf'];
-    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-    
-    const fileInput = document.getElementById('fileInput'), 
-          setup = document.getElementById('setup'), 
-          liveInput = document.getElementById('liveInput'), 
-          filePrefix = document.getElementById('filePrefix'),
-          fontSizeSlider = document.getElementById('fontSize'), 
-          viewZoomSlider = document.getElementById('viewZoom'), 
-          ghostContainer = document.getElementById('ghostContainer'), 
-          ghostTextSpan = document.getElementById('actualGhostText'), 
-          pdfView = document.getElementById('pdf-view'),
-          saveBtn = document.getElementById('saveBtn'),
-          loader = document.getElementById('loader');
-          
-    let pageCanvases = [], history = [], currentMode = 'text', currentFileId = "", pdfDoc = null;
-    const RENDER_SCALE = 2.5;
+        let exportItems = [];
 
-    setup.onclick = () => fileInput.click();
-    fileInput.onchange = (e) => loadPdf(e.target.files[0]);
-    
-    window.addEventListener('keydown', (e) => { 
-        if ((e.ctrlKey || e.metaKey) && e.key === 'z') { e.preventDefault(); undoLastStamp(); } 
-        if (document.activeElement.tagName === 'INPUT') return;
-        if (e.key === '1') setMode('text'); 
-        if (e.key === '2') setMode('check'); 
-        if (e.key === '3') setMode('x'); 
-    });
+        setup.onclick = () => fileInput.click();
+        fileInput.onchange = (e) => processFile(e.target.files[0]);
 
-    viewZoomSlider.oninput = () => { 
-        document.querySelectorAll('.canvas-container').forEach(c => c.style.width = `${viewZoomSlider.value}%`); 
-    };
-
-    liveInput.oninput = () => { if(currentMode === 'text') ghostTextSpan.innerText = liveInput.value; };
-
-    function setMode(mode) {
-        currentMode = mode;
-        document.querySelectorAll('button[id^="btn"]').forEach(b => b.classList.remove('btn-active'));
-        const activeBtn = mode === 'text' ? 'btnText' : (mode === 'check' ? 'btnCheck' : 'btnX');
-        document.getElementById(activeBtn).classList.add('btn-active');
-        ghostTextSpan.innerText = (mode === 'text') ? liveInput.value : (mode === 'check' ? "✓" : "X");
-        liveInput.focus();
-    }
-
-    async function loadPdf(file) {
-        if (!file) return;
-        loader.style.display = 'grid';
-        try {
-            pdfView.innerHTML = "";
-            pageCanvases = [];
-            history = [];
-            currentFileId = btoa(file.name + file.size).substring(0, 16);
+        async function processFile(file) {
+            if (!file) return;
+            loader.style.display = 'grid';
+            grid.innerHTML = "";
             
-            const arrayBuffer = await file.arrayBuffer();
-            pdfDoc = await pdfjsLib.getDocument({data: arrayBuffer}).promise;
-            
-            // Loop through pages sequentially for render stability
-            for (let i = 1; i <= pdfDoc.numPages; i++) {
-                const canvas = document.createElement('canvas');
-                canvas.id = `page-${i}`;
-                await redrawPage(canvas, i);
+            // Revoke old URLs to free memory
+            exportItems.forEach(item => URL.revokeObjectURL(item.url));
+            exportItems = [];
 
-                canvas.onmouseenter = () => ghostContainer.style.display = 'block';
-                canvas.onmouseleave = () => ghostContainer.style.display = 'none';
-                canvas.onmousemove = (e) => { 
-                    ghostContainer.style.left = `${e.pageX}px`; 
-                    ghostContainer.style.top = `${e.pageY}px`; 
-                    ghostTextSpan.style.fontSize = `${fontSizeSlider.value * (viewZoomSlider.value / 100)}px`; 
-                };
-                canvas.onclick = (e) => { 
-                    const rect = canvas.getBoundingClientRect(); 
-                    const x = (e.clientX - rect.left) * (canvas.width / rect.width); 
-                    const y = (e.clientY - rect.top) * (canvas.height / rect.height); 
-                    addStamp(canvas, i, x, y);
-                };
+            try {
+                const arrayBuffer = await file.arrayBuffer();
+                const pdf = await pdfjsLib.getDocument({data: arrayBuffer}).promise;
+
+                for (let i = 1; i <= pdf.numPages; i++) {
+                    loadText.innerText = `Rendering Page ${i} / ${pdf.numPages}`;
+                    const page = await pdf.getPage(i);
+                    const viewport = page.getViewport({ scale: 2.5 }); 
+                    const canvas = document.createElement('canvas');
+                    canvas.width = viewport.width;
+                    canvas.height = viewport.height;
+                    
+                    await page.render({canvasContext: canvas.getContext('2d'), viewport}).promise;
+                    
+                    // Convert to Blob for ultra-low memory usage
+                    const blob = await new Promise(res => canvas.toBlob(res, 'image/jpeg', 0.95));
+                    const url = URL.createObjectURL(blob);
+                    
+                    // Visual Preview
+                    const thumb = document.createElement('img');
+                    thumb.src = url;
+                    thumb.className = "w-full rounded shadow-lg border border-slate-700";
+                    grid.appendChild(thumb);
+                    
+                    exportItems.push({
+                        url: url,
+                        name: `${file.name.split('.').slice(0, -1).join('.')}_P${i}.jpg`
+                    });
+
+                    // Cleanup Canvas immediately
+                    canvas.width = 0; canvas.height = 0;
+                }
                 
-                const container = document.createElement('div');
-                container.className = "canvas-container"; 
-                container.style.width = `${viewZoomSlider.value}%`;
-                container.appendChild(canvas); 
-                pdfView.appendChild(container); 
-                pageCanvases.push(canvas);
+                setup.classList.add('hidden');
+                downloadBtn.classList.remove('hidden');
+            } catch (err) {
+                alert("Error: PDF could not be processed.");
+            } finally {
+                loader.style.display = 'none';
             }
-            setup.classList.add('hidden');
-            liveInput.focus();
-        } catch (err) { alert("Error rendering PDF."); console.error(err); }
-        finally { loader.style.display = 'none'; }
-    }
-
-    async function redrawPage(canvas, pageNum) {
-        const page = await pdfDoc.getPage(pageNum);
-        const viewport = page.getViewport({ scale: RENDER_SCALE });
-        canvas.width = viewport.width; canvas.height = viewport.height;
-        const ctx = canvas.getContext('2d');
-        await page.render({canvasContext: ctx, viewport}).promise;
-        
-        const stamps = JSON.parse(localStorage.getItem(`stamps-${currentFileId}-p${pageNum}`) || "[]");
-        stamps.forEach(s => {
-            ctx.font = `${s.size}px Arial`;
-            ctx.fillStyle = "black";
-            ctx.fillText(s.val, s.x, s.y);
-        });
-    }
-
-    function addStamp(canvas, pageNum, x, y) {
-        const val = (currentMode === 'text') ? liveInput.value : (currentMode === 'check' ? "✓" : "X");
-        if (!val) return;
-        
-        const stampObj = { x, y, val, size: fontSizeSlider.value * RENDER_SCALE };
-        const stamps = JSON.parse(localStorage.getItem(`stamps-${currentFileId}-p${pageNum}`) || "[]");
-        stamps.push(stampObj);
-        localStorage.setItem(`stamps-${currentFileId}-p${pageNum}`, JSON.stringify(stamps));
-        
-        const ctx = canvas.getContext('2d');
-        ctx.font = `${stampObj.size}px Arial`;
-        ctx.fillStyle = "black";
-        ctx.fillText(stampObj.val, stampObj.x, stampObj.y);
-        history.push({ pageNum, canvas });
-        liveInput.focus();
-    }
-
-    async function undoLastStamp() {
-        const last = history.pop();
-        if (!last) return;
-        
-        const stamps = JSON.parse(localStorage.getItem(`stamps-${currentFileId}-p${last.pageNum}`) || "[]");
-        stamps.pop();
-        localStorage.setItem(`stamps-${currentFileId}-p${last.pageNum}`, JSON.stringify(stamps));
-        
-        await redrawPage(last.canvas, last.pageNum);
-        liveInput.focus();
-    }
-
-    function clearSession() { 
-        if(confirm("Wipe all stamps for this document?")) { 
-            Object.keys(localStorage).forEach(k => { if(k.includes(currentFileId)) localStorage.removeItem(k); });
-            location.reload(); 
-        } 
-    }
-
-    async function downloadAll() {
-        if (pageCanvases.length === 0) return;
-        saveBtn.disabled = true;
-        saveBtn.innerText = "EXPORTING...";
-        const prefix = filePrefix.value.trim() || "Form";
-
-        for (let i = 0; i < pageCanvases.length; i++) {
-            const link = document.createElement('a');
-            link.download = `${prefix}_Page_${i + 1}.jpg`;
-            link.href = pageCanvases[i].toDataURL('image/jpeg', 0.95);
-            link.click();
-            await new Promise(r => setTimeout(r, 700)); // Sequential delay to bypass blocks
         }
-        saveBtn.disabled = false;
-        saveBtn.innerText = "SAVE JPEGs";
-    }
-</script>
+
+        async function downloadAll() {
+            downloadBtn.disabled = true;
+            for (let i = 0; i < exportItems.length; i++) {
+                downloadBtn.innerText = `Saving ${i + 1}/${exportItems.length}`;
+                const link = document.createElement('a');
+                link.download = exportItems[i].name;
+                link.href = exportItems[i].url;
+                link.click();
+                await new Promise(r => setTimeout(r, 450));
+            }
+            downloadBtn.disabled = false;
+            downloadBtn.innerText = "Download JPEGs";
+        }
+    </script>
 </body>
 </html>
