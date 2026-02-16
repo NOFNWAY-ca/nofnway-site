@@ -1,43 +1,91 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NOFNWAY | JPEGer</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@900&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="theme.css">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
     <style>
-        :root { --brand: #3b82f6; --bg: #000000; --card: #0f172a; --border: #334155; }
-        body { background: var(--bg); color: #f1f5f9; font-family: 'Roboto', sans-serif; overflow: hidden; height: 100vh; display: flex; flex-direction: column; margin: 0; }
+        body { 
+            background-color: var(--bg); 
+            color: var(--text-main); 
+            font-family: 'Roboto', sans-serif; 
+            overflow: hidden; 
+            height: 100vh; 
+            display: flex; 
+            flex-direction: column; 
+            margin: 0; 
+            transition: background 0.2s ease;
+        }
         .brand { font-family: 'Montserrat', sans-serif; font-weight: 900; }
-        .drop-zone { border: 2px dashed var(--border); transition: 0.2s; cursor: pointer; }
-        .drop-zone:hover { border-color: var(--brand); background: #0f172a; }
-        .loading-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.9); display: none; place-items: center; z-index: 3000; }
+        .brand span { color: var(--brand); }
+
+        /* Drop Zone Theming */
+        .drop-zone { 
+            border: 2px dashed var(--border); 
+            background: var(--card-bg);
+            transition: 0.2s; 
+            cursor: pointer; 
+        }
+        .drop-zone:hover { 
+            border-color: var(--brand); 
+            background: rgba(52, 152, 219, 0.05); 
+        }
+
+        /* Loading State */
+        .loading-overlay { 
+            position: fixed; 
+            inset: 0; 
+            background: var(--bg); 
+            opacity: 0.95;
+            display: none; 
+            place-items: center; 
+            z-index: 3000; 
+        }
+
+        /* Scrollbar */
         .custom-scroll::-webkit-scrollbar { width: 6px; }
         .custom-scroll::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
+
+        /* Button Styling */
+        .btn-primary {
+            background: var(--brand);
+            color: white;
+            padding: 8px 24px;
+            border-radius: 4px;
+            font-weight: bold;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 1px;
+            transition: 0.2s;
+        }
+        .btn-primary:hover { opacity: 0.9; transform: scale(1.02); }
+        .btn-primary:disabled { background: var(--dev); cursor: not-allowed; }
     </style>
 </head>
 <body class="p-4 md:p-8">
 
     <div id="loader" class="loading-overlay">
         <div class="text-center">
-            <p id="loadText" class="brand text-blue-500 animate-pulse text-2xl uppercase">Converting...</p>
+            <p id="loadText" class="brand text-2xl uppercase animate-pulse" style="color: var(--brand)">Converting...</p>
         </div>
     </div>
 
-    <header class="flex justify-between items-center mb-8 bg-black p-4 rounded-lg border-b-2 border-blue-600 shadow-2xl">
-        <h1 class="brand text-2xl tracking-tighter">NO<span class="text-blue-500">FN</span>WAY // JPEGer</h1>
-        <div class="flex gap-4">
-            <button onclick="location.reload()" id="resetBtn" class="hidden text-slate-500 hover:text-white text-[10px] font-bold uppercase tracking-widest">Reset</button>
-            <button id="dlBtn" onclick="downloadQueue()" class="hidden bg-blue-600 hover:bg-blue-500 px-6 py-2 rounded font-bold uppercase text-xs tracking-widest transition-all">Download JPEGs</button>
+    <header class="flex justify-between items-center mb-8 p-4 border-b-2" style="border-color: var(--brand); background: var(--card-bg)">
+        <h1 class="brand text-2xl tracking-tighter">NO<span>FN</span>WAY // JPEGer</h1>
+        <div class="flex gap-4 items-center">
+            <button onclick="location.reload()" id="resetBtn" class="hidden text-slate-500 hover:text-blue-500 text-[10px] font-bold uppercase tracking-widest transition-colors">Reset</button>
+            <button id="dlBtn" onclick="downloadQueue()" class="hidden btn-primary">Download JPEGs</button>
         </div>
     </header>
 
     <main class="flex-1 overflow-y-auto flex flex-col items-center custom-scroll">
-        <div id="setup" class="drop-zone w-full max-w-2xl p-16 rounded-2xl text-center">
-            <p class="brand text-xl text-slate-400 uppercase tracking-tighter">Drop Filled PDF Here</p>
-            <p class="text-[10px] text-slate-600 mt-2 uppercase tracking-widest">Private Local Conversion</p>
+        <div id="setup" class="drop-zone w-full max-w-2xl p-16 rounded-2xl text-center shadow-sm">
+            <p class="brand text-xl uppercase tracking-tighter" style="color: var(--text-dim)">Drop Filled PDF Here</p>
+            <p class="text-[10px] uppercase tracking-widest mt-2" style="color: var(--text-dim)">Private Local Conversion</p>
             <input type="file" id="fileInput" class="hidden" accept="application/pdf">
         </div>
 
@@ -45,6 +93,15 @@
     </main>
 
     <script>
+        /* --- THEME SYNC --- */
+        function applyTheme() {
+            const theme = localStorage.getItem('nofnway-theme') || 'light';
+            document.documentElement.setAttribute('data-theme', theme);
+        }
+        applyTheme();
+        window.addEventListener('storage', (e) => { if (e.key === 'nofnway-theme') applyTheme(); });
+
+        /* --- PDF LOGIC --- */
         const pdfjsLib = window['pdfjs-dist/build/pdf'];
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
@@ -66,7 +123,6 @@
             loader.style.display = 'grid';
             grid.innerHTML = "";
             
-            // Clean memory
             exportList.forEach(item => URL.revokeObjectURL(item.url));
             exportList = [];
 
@@ -79,7 +135,6 @@
                     loadText.innerText = `CONVERTING ${i} / ${pdf.numPages}`;
                     const page = await pdf.getPage(i);
                     
-                    // Fixed rotation and high-res rendering
                     const viewport = page.getViewport({ scale: 2.5, rotation: page.rotate });
                     const canvas = document.createElement('canvas');
                     canvas.width = viewport.width; canvas.height = viewport.height;
@@ -91,11 +146,12 @@
                     
                     const img = document.createElement('img');
                     img.src = url;
-                    img.className = "w-full rounded border border-slate-800 shadow-xl hover:border-blue-500 transition-colors";
+                    img.className = "w-full rounded border shadow-md hover:border-blue-500 transition-colors";
+                    img.style.borderColor = "var(--border)";
                     grid.appendChild(img);
                     
                     exportList.push({ url, name: `${baseName}_P${i}.jpg` });
-                    canvas.width = 0; canvas.height = 0; // Trigger Garbage Collection
+                    canvas.width = 0; canvas.height = 0; 
                 }
                 
                 setup.classList.add('hidden');
