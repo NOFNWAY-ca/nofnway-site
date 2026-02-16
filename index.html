@@ -76,8 +76,7 @@
             { name: "[FN] PDFer", desc: "They need a PDF but you've got a bunch of photos.", link: "pdfer.html", status: "In Progress", type: "working", cat: "Tools" },
             { name: "[FN] GET LOST", desc: "When you want to run away, but just for a little while.", link: "get_lost.html", status: "In Progress", type: "working", cat: "Active Projects" },
             { name: "[FN] MAGNET STUDIO", desc: "When you need custom-printed picture tiles for schedules, labels, etc.", link: "magnet.html", status: "In Progress", type: "working", cat: "Active Projects" },
-            { name: "[FN] JPEGer", desc: "You filled the PDF, but they want a JPEG.", link: "jpeger.html", status: "In Progress", type: "working", cat: "Active Projects" },
-            { name: "[FN] TILER", desc: "Offline-capable HTML tool for organizing your workspace.", link: "tiler.html", status: "Planning", type: "working", cat: "Tools" }
+            { name: "[FN] JPEGer", desc: "You filled the PDF, but they want a JPEG.", link: "jpeger.html", status: "In Progress", type: "working", cat: "Active Projects" }
         ];
 
         /* --- TERMINAL EFFECT ENGINE --- */
@@ -88,6 +87,7 @@
             "Hi Kelly!",
             "Dulling the edges of normal society since some time in the 80s",
             "Yes, I actually write these myself.",
+            "Yes, I get bored easily. Also often.",
             "No, I'm not actually typing this right now.",
             "This is a message from the past. Time travel is real."
         ];
@@ -111,7 +111,7 @@
 
             if (!isDeleting && charIdx === current.length) {
                 isDeleting = true;
-                speed = 30000; // Hold for 30s
+                speed = 30000; 
             } else if (isDeleting && charIdx === 0) {
                 isDeleting = false;
                 sloganIdx = (sloganIdx + 1) % slogans.length;
@@ -143,7 +143,6 @@
             });
         }
 
-        // Initialize
         render();
         typeSlogan();
     </script>

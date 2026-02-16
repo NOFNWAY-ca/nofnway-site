@@ -30,23 +30,13 @@ body {
 }
 
 /* Navbar & Brand */
-.navbar { 
-    background: #000; 
-    padding: 15px 30px; 
-    display: flex; 
-    justify-content: space-between; 
-    align-items: center; 
-    border-bottom: 2px solid var(--brand); 
-}
+.navbar { background: #000; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--brand); }
 .brand { font-family: 'Montserrat', sans-serif; font-weight: 900; font-size: 1.8rem; color: white; }
 .brand span { color: var(--brand); }
 .nav-controls { display: flex; align-items: center; gap: 15px; }
 
 /* Buttons */
-.theme-toggle { 
-    background: linear-gradient(135deg, #3498db 0%, #2c3e50 100%); 
-    color: white; 
-    border: none; 
+.theme-toggle, .share-btn { 
     padding: 10px 20px; 
     border-radius: 5px; 
     cursor: pointer; 
@@ -54,22 +44,19 @@ body {
     text-transform: uppercase;
     font-size: 0.8rem;
     letter-spacing: 1px;
-    border: 1px solid rgba(255,255,255,0.1);
     transition: 0.2s;
+}
+
+.theme-toggle { 
+    background: linear-gradient(135deg, #3498db 0%, #2c3e50 100%); 
+    color: white; 
+    border: 1px solid rgba(255,255,255,0.1);
 }
 
 .share-btn {
     background: transparent;
     color: var(--brand);
     border: 2px solid var(--brand);
-    padding: 10px 20px;
-    border-radius: 5px;
-    cursor: pointer;
-    font-weight: bold;
-    text-transform: uppercase;
-    font-size: 0.8rem;
-    letter-spacing: 1px;
-    transition: 0.2s;
 }
 
 .theme-toggle:hover, .share-btn:hover { opacity: 0.9; transform: scale(1.02); }
@@ -91,15 +78,8 @@ body {
 
 /* Status Badges */
 .status-badge {
-    position: absolute;
-    top: 0;
-    right: 0;
-    padding: 4px 15px;
-    font-size: 0.7rem;
-    font-weight: 900;
-    border-bottom-left-radius: 12px;
-    text-transform: uppercase;
-    color: #000;
+    position: absolute; top: 0; right: 0; padding: 4px 15px; font-size: 0.7rem; font-weight: 900;
+    border-bottom-left-radius: 12px; text-transform: uppercase; color: #000;
 }
 .ready { background-color: var(--ready); }
 .working { background-color: var(--working); }
@@ -107,27 +87,19 @@ body {
 
 /* Footer & Terminal */
 footer { text-align: center; padding: 60px; color: var(--text-dim); font-size: 0.8rem; border-top: 1px solid var(--border); margin-top: 40px; }
-.terminal-container { 
-    font-family: monospace; 
-    font-size: 1.1rem; 
-    color: var(--brand); 
-    min-height: 1.5em; 
-    margin-bottom: 10px;
-    overflow: hidden;
-    white-space: nowrap;
-}
+.terminal-container { font-family: monospace; font-size: 1.1rem; color: var(--brand); min-height: 1.5em; margin-bottom: 10px; overflow: hidden; white-space: nowrap; }
 .cursor { display: inline-block; width: 8px; background-color: var(--brand); margin-left: 4px; animation: blink 1s infinite; }
 @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
 
 .disclaimer { max-width: 600px; margin: 20px auto; font-size: 0.85rem; font-style: italic; line-height: 1.5; color: var(--text-dim); }
 
-/* Ko-fi Call to Action */
+/* Ko-fi Call to Action Fix */
 .kofi-link {
     display: inline-flex;
     align-items: center;
     gap: 8px;
     margin: 25px 0;
-    background-color: #29abe0; /* Ko-fi Blue */
+    background-color: #29abe0;
     color: #ffffff !important;
     text-decoration: none;
     font-weight: bold;
@@ -137,20 +109,13 @@ footer { text-align: center; padding: 60px; color: var(--text-dim); font-size: 0
     font-family: 'Montserrat', sans-serif;
     text-transform: uppercase;
     letter-spacing: 1px;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
 }
 
-.kofi-link:hover {
-    background-color: #2499c9;
-    transform: translateY(-2px);
-    box-shadow: 0 6px 12px rgba(0,0,0,0.15);
-}
-
-[data-theme="dark"] .kofi-link {
-    background-color: #1e8cb8;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.5);
-}
-
+/* Fix for the "washed out" emoji */
 .kofi-link span {
-    font-size: 1.2rem;
+    font-size: 1.3rem;
+    filter: brightness(1.1) drop-shadow(0px 1px 2px rgba(0,0,0,0.4));
 }
+
+.kofi-link:hover { background-color: #2499c9; transform: translateY(-2px); }
+[data-theme="dark"] .kofi-link { background-color: #1e8cb8; }
