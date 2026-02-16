@@ -6,55 +6,23 @@
     <title>NOFNWAY | Command Center</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@900&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="theme.css">
-    <style>
-        .navbar { background: #000; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--brand); }
-        .brand { font-family: 'Montserrat', sans-serif; font-weight: 900; font-size: 1.8rem; color: white; }
-        .brand span { color: var(--brand); }
-        
-        .nav-controls { display: flex; align-items: center; gap: 20px; }
-
-        /* Gradient Light/Dark Toggle */
-        .theme-toggle { 
-            background: linear-gradient(135deg, #3498db 0%, #2c3e50 100%); 
-            color: white; 
-            border: none; 
-            padding: 10px 20px; 
-            border-radius: 5px; 
-            cursor: pointer; 
-            font-weight: bold; 
-            font-family: 'Roboto', sans-serif;
-            transition: 0.2s;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            border: 1px solid rgba(255,255,255,0.1);
-        }
-        .theme-toggle:hover { opacity: 0.9; transform: scale(1.02); }
-
-        .container { max-width: 1100px; margin: 40px auto; padding: 20px; }
-        .category-title { font-family: 'Montserrat', sans-serif; color: var(--brand); border-bottom: 1px solid var(--border); padding-bottom: 10px; margin-top: 40px; text-transform: uppercase; }
-        
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 25px; margin-top: 20px; }
-        .card { background: var(--card-bg); border-radius: 12px; padding: 30px 25px 25px; border: 2px solid var(--border); text-decoration: none; color: inherit; position: relative; display: flex; flex-direction: column; transition: 0.2s; }
-        .card:hover { border-color: var(--brand); transform: translateY(-3px); }
-        .card h3 { margin: 10px 0; font-family: 'Montserrat', sans-serif; }
-        .card p { color: var(--text-dim); line-height: 1.6; flex-grow: 1; }
-
-        /* Terminal Component */
-        .terminal-container { font-family: monospace; font-size: 1.1rem; color: var(--brand); min-height: 1.5em; margin-bottom: 10px; }
-        .cursor { display: inline-block; width: 8px; background-color: var(--brand); margin-left: 4px; animation: blink 1s infinite; }
-        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
-
-        footer { text-align: center; padding: 60px; color: var(--text-dim); font-size: 0.8rem; border-top: 1px solid var(--border); margin-top: 40px; }
-    </style>
 </head>
 <body>
 
     <nav class="navbar">
         <div class="brand">NO<span>FN</span>WAY</div>
         <div class="nav-controls">
+            <button class="share-btn" onclick="shareSite()">Tell Someone</button>
             <button class="theme-toggle" onclick="toggleTheme()">Light/Dark Mode</button>
         </div>
     </nav>
+
+    <div class="intro-box">
+        <h2>What This Is</h2>
+        <p>
+            I have severe executive dysfunction. Small annoyances - like needing to convert photos to PDF or measure something on screen - would completely derail my day. So I built simple tools to remove the friction. They're free. If they help you too, great. If you want to support the work, there's a Ko-fi link below.
+        </p>
+    </div>
 
     <div class="container" id="main-content"></div>
 
@@ -66,6 +34,8 @@
         <div class="disclaimer">
             I know a lot of stuff on this site is still broken, but I'm fixing as fast as my brain vs. medication will allow. Keep checking back in, I'll be making regular improvements until I get bored/the drugs stop working. Thanks for checking it out!
         </div>
+
+        <a href="https://ko-fi.com/nofnway" target="_blank" class="kofi-link">☕ Buy me a coffee if this helped</a>
 
         <div style="margin-top: 20px;">NOFNWAY &copy; 2026</div>
     </footer>
@@ -85,7 +55,20 @@
         }
         applyTheme();
 
-        /* --- DATA MODEL (All set to Working/Yellow) --- */
+        /* --- SHARE LOGIC --- */
+        function shareSite() {
+            if (navigator.share) {
+                navigator.share({
+                    title: 'NOFNWAY | Command Center',
+                    text: 'Check out these frictionless tools for executive dysfunction.',
+                    url: window.location.href
+                }).catch(err => console.log('Error sharing:', err));
+            } else {
+                alert("Copy this link to share: " + window.location.href);
+            }
+        }
+
+        /* --- DATA MODEL --- */
         const apps = [
             { name: "[FN] HOW LONG?", desc: "For whenever you've got something that needs measuring.", link: "how_long.html", status: "In Progress", type: "working", cat: "Tools" },
             { name: "[FN] PDFer", desc: "They need a PDF but you've got a bunch of photos.", link: "pdfer.html", status: "In Progress", type: "working", cat: "Tools" },
@@ -103,7 +86,7 @@
             "Dulling the edges of normal society since some time in the 80s",
             "Yes, I actually write these myself.",
             "No, I'm not actually typing this right now.",
-            "This is a message from the past. Time travel is real.",
+            "This is a message from the past. Time travel is real."
         ];
         
         let sloganIdx = 0;

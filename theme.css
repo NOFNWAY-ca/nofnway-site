@@ -29,7 +29,58 @@ body {
     transition: background 0.2s ease;
 }
 
-/* Standardized Status Logic */
+/* Navbar & Brand */
+.navbar { background: #000; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--brand); }
+.brand { font-family: 'Montserrat', sans-serif; font-weight: 900; font-size: 1.8rem; color: white; }
+.brand span { color: var(--brand); }
+.nav-controls { display: flex; align-items: center; gap: 15px; }
+
+/* Buttons */
+.theme-toggle { 
+    background: linear-gradient(135deg, #3498db 0%, #2c3e50 100%); 
+    color: white; 
+    border: none; 
+    padding: 10px 20px; 
+    border-radius: 5px; 
+    cursor: pointer; 
+    font-weight: bold; 
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    border: 1px solid rgba(255,255,255,0.1);
+    transition: 0.2s;
+}
+
+.share-btn {
+    background: transparent;
+    color: var(--brand);
+    border: 2px solid var(--brand);
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: 0.2s;
+}
+
+.theme-toggle:hover, .share-btn:hover { opacity: 0.9; transform: scale(1.02); }
+.share-btn:hover { background: var(--brand); color: #fff; }
+
+/* Content Containers */
+.container { max-width: 1100px; margin: 40px auto; padding: 20px; }
+.intro-box { max-width: 700px; margin: 40px auto 20px; padding: 20px; text-align: center; }
+.intro-box h2 { font-family: 'Montserrat', sans-serif; color: var(--brand); margin-bottom: 15px; }
+.intro-box p { line-height: 1.7; color: var(--text-main); }
+
+/* Grid & Cards */
+.category-title { font-family: 'Montserrat', sans-serif; color: var(--brand); border-bottom: 1px solid var(--border); padding-bottom: 10px; margin-top: 40px; text-transform: uppercase; }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 25px; margin-top: 20px; }
+.card { background: var(--card-bg); border-radius: 12px; padding: 30px 25px 25px; border: 2px solid var(--border); text-decoration: none; color: inherit; position: relative; display: flex; flex-direction: column; transition: 0.2s; }
+.card:hover { border-color: var(--brand); transform: translateY(-3px); }
+.card h3 { margin: 10px 0; font-family: 'Montserrat', sans-serif; }
+.card p { color: var(--text-dim); line-height: 1.6; flex-grow: 1; }
+
+/* Status Badges */
 .status-badge {
     position: absolute;
     top: 0;
@@ -41,17 +92,37 @@ body {
     text-transform: uppercase;
     color: #000;
 }
-
 .ready { background-color: var(--ready); }
 .working { background-color: var(--working); }
 .dev { background-color: var(--dev); color: #fff; }
 
-/* Disclaimer Styling */
-.disclaimer {
-    max-width: 600px;
-    margin: 20px auto;
-    font-size: 0.85rem;
-    font-style: italic;
-    line-height: 1.5;
-    color: var(--text-dim);
+/* Footer & Terminal */
+footer { text-align: center; padding: 60px; color: var(--text-dim); font-size: 0.8rem; border-top: 1px solid var(--border); margin-top: 40px; }
+.terminal-container { font-family: monospace; font-size: 1.1rem; color: var(--brand); min-height: 1.5em; margin-bottom: 10px; }
+.cursor { display: inline-block; width: 8px; background-color: var(--brand); margin-left: 4px; animation: blink 1s infinite; }
+@keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+
+.disclaimer { max-width: 600px; margin: 20px auto; font-size: 0.85rem; font-style: italic; line-height: 1.5; color: var(--text-dim); }
+
+/* Ko-fi Call to Action */
+.kofi-link {
+    display: inline-block;
+    margin: 25px 0;
+    background-color: #29abe0; /* Ko-fi Blue */
+    color: #ffffff !important;
+    text-decoration: none;
+    font-weight: bold;
+    padding: 12px 24px;
+    border-radius: 8px;
+    transition: 0.3s;
+    font-family: 'Montserrat', sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+.kofi-link:hover {
+    background-color: #2499c9;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+    text-decoration: none;
 }
