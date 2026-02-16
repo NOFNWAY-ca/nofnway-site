@@ -1,107 +1,50 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="light">
+<html lang="en" data-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NOFNWAY | JPEGer</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@900&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="theme.css">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
     <style>
-        body { 
-            background-color: var(--bg); 
-            color: var(--text-main); 
-            font-family: 'Roboto', sans-serif; 
-            overflow: hidden; 
-            height: 100vh; 
-            display: flex; 
-            flex-direction: column; 
-            margin: 0; 
-            transition: background 0.2s ease;
-        }
+        :root { --brand: #3b82f6; --bg: #000000; --card: #0f172a; --border: #1e293b; }
+        body { background: var(--bg); color: #f1f5f9; font-family: 'Roboto', sans-serif; overflow: hidden; height: 100vh; display: flex; flex-direction: column; margin: 0; }
         .brand { font-family: 'Montserrat', sans-serif; font-weight: 900; }
-        .brand span { color: var(--brand); }
-
-        /* Drop Zone Theming */
-        .drop-zone { 
-            border: 2px dashed var(--border); 
-            background: var(--card-bg);
-            transition: 0.2s; 
-            cursor: pointer; 
-        }
-        .drop-zone:hover { 
-            border-color: var(--brand); 
-            background: rgba(52, 152, 219, 0.05); 
-        }
-
-        /* Loading State */
-        .loading-overlay { 
-            position: fixed; 
-            inset: 0; 
-            background: var(--bg); 
-            opacity: 0.95;
-            display: none; 
-            place-items: center; 
-            z-index: 3000; 
-        }
-
-        /* Scrollbar */
-        .custom-scroll::-webkit-scrollbar { width: 6px; }
-        .custom-scroll::-webkit-scrollbar-thumb { background: var(--border); border-radius: 10px; }
-
-        /* Button Styling */
-        .btn-primary {
-            background: var(--brand);
-            color: white;
-            padding: 8px 24px;
-            border-radius: 4px;
-            font-weight: bold;
-            text-transform: uppercase;
-            font-size: 0.75rem;
-            letter-spacing: 1px;
-            transition: 0.2s;
-        }
-        .btn-primary:hover { opacity: 0.9; transform: scale(1.02); }
-        .btn-primary:disabled { background: var(--dev); cursor: not-allowed; }
+        .drop-zone { border: 2px dashed var(--border); transition: 0.1s; cursor: pointer; }
+        .drop-zone:hover { border-color: var(--brand); background: #020617; }
+        .loading-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.95); display: none; place-items: center; z-index: 3000; }
+        .custom-scroll::-webkit-scrollbar { width: 4px; }
+        .custom-scroll::-webkit-scrollbar-thumb { background: var(--brand); }
     </style>
 </head>
 <body class="p-4 md:p-8">
 
     <div id="loader" class="loading-overlay">
         <div class="text-center">
-            <p id="loadText" class="brand text-2xl uppercase animate-pulse" style="color: var(--brand)">Converting...</p>
+            <p id="loadText" class="brand text-blue-500 animate-pulse text-2xl uppercase">Rendering...</p>
         </div>
     </div>
 
-    <header class="flex justify-between items-center mb-8 p-4 border-b-2" style="border-color: var(--brand); background: var(--card-bg)">
-        <h1 class="brand text-2xl tracking-tighter">NO<span>FN</span>WAY // JPEGer</h1>
-        <div class="flex gap-4 items-center">
-            <button onclick="location.reload()" id="resetBtn" class="hidden text-slate-500 hover:text-blue-500 text-[10px] font-bold uppercase tracking-widest transition-colors">Reset</button>
-            <button id="dlBtn" onclick="downloadQueue()" class="hidden btn-primary">Download JPEGs</button>
+    <header class="flex justify-between items-center mb-8 bg-black p-4 border-b-2 border-blue-600">
+        <h1 class="brand text-2xl tracking-tighter">NO<span class="text-blue-500">FN</span>WAY // JPEGer</h1>
+        <div class="flex gap-4">
+            <button onclick="location.reload()" id="resetBtn" class="hidden text-slate-500 hover:text-white text-[10px] font-bold uppercase tracking-widest">Reset</button>
+            <button id="dlBtn" onclick="downloadQueue()" class="hidden bg-blue-600 hover:bg-blue-500 px-6 py-2 rounded font-bold uppercase text-xs tracking-widest transition-all">Save All JPEGs</button>
         </div>
     </header>
 
     <main class="flex-1 overflow-y-auto flex flex-col items-center custom-scroll">
-        <div id="setup" class="drop-zone w-full max-w-2xl p-16 rounded-2xl text-center shadow-sm">
-            <p class="brand text-xl uppercase tracking-tighter" style="color: var(--text-dim)">Drop Filled PDF Here</p>
-            <p class="text-[10px] uppercase tracking-widest mt-2" style="color: var(--text-dim)">Private Local Conversion</p>
+        <div id="setup" class="drop-zone w-full max-w-2xl p-20 rounded-lg text-center">
+            <p class="brand text-xl text-slate-400 uppercase tracking-tighter">Drop Filled PDF</p>
+            <p class="text-[10px] text-slate-600 mt-2 uppercase tracking-widest">2.5x Scale • Sequential Export</p>
             <input type="file" id="fileInput" class="hidden" accept="application/pdf">
         </div>
 
-        <div id="previewGrid" class="w-full grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mt-8"></div>
+        <div id="previewGrid" class="w-full grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 mt-8"></div>
     </main>
 
     <script>
-        /* --- THEME SYNC --- */
-        function applyTheme() {
-            const theme = localStorage.getItem('nofnway-theme') || 'light';
-            document.documentElement.setAttribute('data-theme', theme);
-        }
-        applyTheme();
-        window.addEventListener('storage', (e) => { if (e.key === 'nofnway-theme') applyTheme(); });
-
-        /* --- PDF LOGIC --- */
         const pdfjsLib = window['pdfjs-dist/build/pdf'];
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
@@ -122,7 +65,6 @@
             if (!file) return;
             loader.style.display = 'grid';
             grid.innerHTML = "";
-            
             exportList.forEach(item => URL.revokeObjectURL(item.url));
             exportList = [];
 
@@ -132,22 +74,26 @@
                 const baseName = file.name.substring(0, file.name.lastIndexOf('.'));
 
                 for (let i = 1; i <= pdf.numPages; i++) {
-                    loadText.innerText = `CONVERTING ${i} / ${pdf.numPages}`;
+                    loadText.innerText = `Baking P${i} / ${pdf.numPages}`;
                     const page = await pdf.getPage(i);
-                    
                     const viewport = page.getViewport({ scale: 2.5, rotation: page.rotate });
                     const canvas = document.createElement('canvas');
                     canvas.width = viewport.width; canvas.height = viewport.height;
                     
                     await page.render({canvasContext: canvas.getContext('2d'), viewport}).promise;
                     
-                    const blob = await new Promise(res => canvas.toBlob(res, 'image/jpeg', 0.95));
+                    const blob = await new Promise(res => canvas.toBlob(res, 'image/jpeg', 0.92));
                     const url = URL.createObjectURL(blob);
                     
                     const img = document.createElement('img');
                     img.src = url;
-                    img.className = "w-full rounded border shadow-md hover:border-blue-500 transition-colors";
-                    img.style.borderColor = "var(--border)";
+                    img.className = "w-full rounded border border-slate-800 shadow-lg hover:border-blue-500 transition-colors cursor-pointer";
+                    img.onclick = () => {
+                        const a = document.createElement('a');
+                        a.download = `${baseName}_P${i}.jpg`;
+                        a.href = url;
+                        a.click();
+                    };
                     grid.appendChild(img);
                     
                     exportList.push({ url, name: `${baseName}_P${i}.jpg` });
@@ -158,8 +104,7 @@
                 dlBtn.classList.remove('hidden');
                 resetBtn.classList.remove('hidden');
             } catch (err) {
-                alert("Error: Invalid or protected PDF.");
-                console.error(err);
+                alert("Fail: PDF is encrypted or invalid.");
             } finally {
                 loader.style.display = 'none';
             }
@@ -176,7 +121,7 @@
                 await new Promise(r => setTimeout(r, 650));
             }
             dlBtn.disabled = false;
-            dlBtn.innerText = "Download JPEGs";
+            dlBtn.innerText = "Save All JPEGs";
         }
     </script>
 </body>
