@@ -6,8 +6,6 @@
 let game = null;
 const selectedConditions = new Set();
 
-// --- REMOVED: The CONDITION_DETAILS object is in js/data/rules.js ---
-
 // Generate the setup/welcome screen
 function setupScreen() {
     
@@ -28,7 +26,7 @@ function setupScreen() {
         <div class="setup-screen">
             ${themeSelector} 
             
-            <h2>🎮 No Fs Left to Give</h2>
+            <h2 style="color: var(--brand);">🎮 No Fs TO GIVE</h2>
 
             <p>Select a Game Mode:</p>
             <div class="mode-select">
@@ -46,7 +44,7 @@ function setupScreen() {
                 </button>
             </div>
 
-            <p>Select conditions to play with (or none for neurotypical mode):</p>
+            <p>Select conditions (Willpower vs. Wiring):</p>
             
             <div class="condition-select">
                 <div class="condition-option" onclick="toggleCondition('depression')" id="cond-depression">
@@ -85,20 +83,13 @@ function setupScreen() {
             <div class="agreement">
                 <input type="checkbox" id="agreementCheckbox" onclick="checkAgreement()">
                 <label for="agreementCheckbox">
-                    I acknowledge that "The Daily Challenge," "No Fs Left to Give," and all NOFNWAY branding, game mechanics, rules, artwork, and code are proprietary intellectual property protected by copyright law. I agree not to copy, distribute, modify, reproduce, or create derivative works based on this game without express written permission.
+                    I acknowledge that "No Fs TO GIVE" and all NOFNWAY branding are proprietary intellectual property. 
                 </label>
             </div>
 
             <div class="buttons">
                 <button onclick="startGame()" id="startButton" disabled>START GAME</button>
             </div>
-            
-            <p class="footer-note">
-                &copy; 2025 NOFNWAY. All Rights Reserved.<br>
-                "No Fs Left to Give," "The Daily Challenge," all game mechanics, rules, text, artwork, and code expression are protected by U.S. and international copyright laws.<br>
-                Unauthorized reproduction, distribution, or derivative works are strictly prohibited.<br>
-                This is a playtest version for feedback purposes only.
-            </p>
         </div>
     `;
 }
@@ -120,7 +111,7 @@ function gameOverScreen() {
             
             <div class="buttons" style="justify-content: center; margin-top: 30px;">
                 <button onclick="resetGame()">🔄 Play Again</button>
-                <button class="secondary" onclick="game = null; render();">⚙️ Change Settings</button>
+                <button class="secondary" onclick="game = null; render();">⚙️ Settings</button>
             </div>
         </div>
     `;
@@ -128,124 +119,37 @@ function gameOverScreen() {
 
 // Generate the main game screen
 function gameScreen() {
-    
-    let dayText = "ERROR";
-    if (game.mode === 'day') {
-        dayText = `Day 1/1`;
-    } else if (game.mode === 'week') {
-        dayText = `Day ${game.day}/7`;
-    } else if (game.mode === 'life') {
-        dayText = `Day ${game.day}`;
-    }
-    
-    let targetText = "<strong>Goal:</strong> Complete as many tasks as you can.";
-    if (game.mode === 'life') {
-        targetText = "<strong>Goal:</strong> Survive as long as you can.";
-    }
-    
-    const completedText = `${game.completedTasks.length}`;
-    
-    let turnName = "Morning";
-    if (game.turn === 2) turnName = "Midday";
-    else if (game.turn === 3) turnName = "Afternoon";
-    else if (game.turn === 4) turnName = "Evening";
+    let dayText = game.mode === 'day' ? "Day 1/1" : game.mode === 'week' ? `Day ${game.day}/7` : `Day ${game.day}`;
+    let turnName = ["Morning", "Midday", "Afternoon", "Evening"][game.turn - 1];
     
     const allTasksAttempted = game.currentTasks.length === 0;
-
-    let stressState = 'normal';
-    let completedIcon = '✅';
-    let headerStressClass = '';
-
-    if (game.burntOut) {
-        stressState = 'danger';
-        completedIcon = '😡';
-        headerStressClass = 'stress-danger burnt-out'; 
-    } else if (game.stress >= 5) {
-        stressState = 'danger';
-        completedIcon = '😡'; 
-        headerStressClass = 'stress-danger';
-    } else if (game.stress >= 3) {
-        stressState = 'warning';
-        completedIcon = '⚠️';
-        headerStressClass = 'stress-warning';
-    }
+    let headerStressClass = game.burntOut || game.stress >= 5 ? 'stress-danger' : game.stress >= 3 ? 'stress-warning' : '';
 
     const buildCostHtml = (cost, modifiedCost) => {
-        const p = cost.physical || 0;
-        const s = cost.social || 0;
-        const m = cost.mental || 0;
-        
-        const mod_p = modifiedCost.physical || 0;
-        const mod_s = modifiedCost.social || 0;
-        const mod_m = modifiedCost.mental || 0;
+        const p = cost.physical || 0, s = cost.social || 0, m = cost.mental || 0;
+        const mp = modifiedCost.physical || 0, ms = modifiedCost.social || 0, mm = modifiedCost.mental || 0;
+        const isModified = (p !== mp) || (s !== ms) || (m !== mm);
 
-        const isModified = (p !== mod_p) || (s !== mod_s) || (m !== mod_m);
+        let base = `${p > 0 ? '⚡'.repeat(p) : ''}${s > 0 ? '👥'.repeat(s) : ''}${m > 0 ? '🧠'.repeat(m) : ''}`;
+        if (base === '') base = '0'; 
 
-        let baseHtml = `
-            ${p > 0 ? '⚡'.repeat(p) : ''}
-            ${s > 0 ? '👥'.repeat(s) : ''}
-            ${m > 0 ? '🧠'.repeat(m) : ''}
-        `;
-        if (baseHtml.trim() === '') baseHtml = '0'; 
+        let mod = `${mp > 0 ? '⚡'.repeat(mp) : ''}${ms > 0 ? '👥'.repeat(ms) : ''}${mm > 0 ? '🧠'.repeat(mm) : ''}`;
+        if (mod === '') mod = '0';
 
-        let modifiedHtml = `
-            ${mod_p > 0 ? '⚡'.repeat(mod_p) : ''}
-            ${mod_s > 0 ? '👥'.repeat(mod_s) : ''}
-            ${mod_m > 0 ? '🧠'.repeat(mod_m) : ''}
-        `;
-        if (modifiedHtml.trim() === '') modifiedHtml = '0';
-
-        if (isModified) {
-            return `<span class="base-cost">${baseHtml}</span> <span class="mod-arrow">→</span> <span class="mod-cost">${modifiedHtml}</span>`;
-        } else {
-            return `<span>${baseHtml}</span>`;
-        }
+        return isModified ? `<span class="base-cost">${base}</span> → <span class="mod-cost">${mod}</span>` : `<span>${base}</span>`;
     };
 
     return `
         <div class="header ${game.burntOut ? 'burnt-out' : ''}">
             <h1>${dayText} - ${turnName}</h1>
-
-            <div class="lingering-tasks-area">
-                <div class="lingering-deck">
-                    <div class="lingering-label">Morning Backlog</div>
-                    <div class="mini-card-pile">
-                        ${game.lingeringMorningTasks.map(() => `<div class="mini-task-card morning"></div>`).join('')}
-                    </div>
-                </div>
-                <div class="lingering-deck">
-                    <div class="lingering-label">Midday Backlog</div>
-                    <div class="mini-card-pile">
-                        ${game.lingeringMiddayTasks.map(() => `<div class="mini-task-card midday"></div>`).join('')}
-                    </div>
-                </div>
-                <div class="lingering-deck">
-                    <div class="lingering-label">Afternoon Backlog</div>
-                    <div class="mini-card-pile">
-                        ${game.lingeringAfternoonTasks.map(() => `<div class="mini-task-card afternoon"></div>`).join('')}
-                    </div>
-                </div>
-                <div class="lingering-deck">
-                    <div class="lingering-label">Evening Backlog</div>
-                    <div class="mini-card-pile">
-                        ${game.lingeringEveningTasks.map(() => `<div class="mini-task-card evening"></div>`).join('')}
-                    </div>
-                </div>
-            </div>
-
             <div class="stats">
-                <div class="stat"><strong>Completed:</strong> ${completedText}</div>
-                <div class="stat"><strong>Hand:</strong> ${game.hand.length} cards</div>
-                <div class="stat" style="color: ${game.stress >= 5 ? '#f44336' : game.stress >= 3 ? '#ff9800' : '#4CAF50'}">
-                    <strong>Stress:</strong> ${game.stress}/7
-                </div>
-            </div>
-            <div class="stress-tokens">
-                ${Array(game.stress).fill(0).map(() => '<div class="stress-token"></div>').join('')}
+                <div class="stat"><strong>Completed:</strong> ${game.completedTasks.length}</div>
+                <div class="stat"><strong>Hand:</strong> ${game.hand.length}</div>
+                <div class="stat ${headerStressClass}"><strong>Stress:</strong> ${game.stress}/7</div>
             </div>
         </div>
         
-        ${game.message ? `<div class="message ${game.message.includes('❌') || game.message.includes('BURNOUT') ? 'error' : game.message.includes('⚠️') ? 'warning' : ''}">${game.message}</div>` : ''}
+        ${game.message ? `<div class="message">${game.message}</div>` : ''}
         
         <div class="game-area">
             <div class="section">
@@ -254,121 +158,41 @@ function gameScreen() {
                     ${game.currentTasks.map((task, i) => {
                         const isSelected = game.selectedTask === i;
                         const modCost = game.getModifiedCost(task);
-                        
                         const taskData = AppConfig.tasks.find(t => t.name === task.name);
-                        const image = taskData.image.replace('assets/', `${THEME_REGISTRY[AppConfig.currentThemeId].path}assets/`); 
-                        const flavor = taskData.flavor;
-
                         return `
-                        <div class="card task-card ${isSelected ? 'selected' : ''}" 
-                             style="background-image: url('${image}')" 
-                             onclick="selectTask(${i})">
-                            
+                        <div class="card task-card ${isSelected ? 'selected' : ''}" onclick="selectTask(${i})">
                             <div class="card-header">
                                 <div class="card-title">${task.name}</div>
                                 <div class="card-cost">${buildCostHtml(task.cost, modCost)}</div>
                             </div>
-
                             <div class="card-content-middle">
                                 <div class="card-time">${task.time}</div>
-                                ${flavor ? `<div class="card-flavor">"${flavor}"</div>` : ''}
+                                <div class="card-flavor">"${taskData.flavor}"</div>
                             </div>
-                            
                             ${task.effect ? `<div class="card-effect">${task.effect.text}</div>` : ''}
                         </div>`;
-
                     }).join('')}
                 </div>
-                ${allTasksAttempted ? '<p style="color: #4CAF50; font-size: 13px; margin-top: 10px;">✅ All tasks attempted. Click END TURN.</p>' : ''}
             </div>
             
             <div class="section">
-                <h2>🃏 Your Hand (${game.hand.length})</h2>
+                <h2>🃏 Your Hand</h2>
                 <div class="f-card-area">
                     ${game.hand.map((card, i) => {
                         const isSelected = game.selectedCards.includes(i);
-                        let symbol = card.type === 'physical' ? '⚡' : card.type === 'social' ? '👥' : '🧠';
-                        
-                        const themePath = THEME_REGISTRY[AppConfig.currentThemeId].path;
-
+                        let sym = card.type === 'physical' ? '⚡' : card.type === 'social' ? '👥' : '🧠';
                         return `
-                        <div class="card f-card ${card.type} ${isSelected ? 'selected' : ''}" 
-                             style="background-image: url('${themePath}assets/f_cards/${card.type}.png')"
-                             onclick="selectCard(${i})">
-                            
-                            <div class="f-card-symbol">${symbol}</div>
-                            <div class="f-card-label">${card.type.toUpperCase()} F</div>
+                        <div class="card f-card ${card.type} ${isSelected ? 'selected' : ''}" onclick="selectCard(${i})">
+                            <div class="f-card-symbol">${sym}</div>
+                            <div class="f-card-label">${card.type.toUpperCase()}</div>
                         </div>`;
                     }).join('')}
                 </div>
                 
                 <div class="buttons">
-                    <button onclick="attemptTask()" ${game.selectedTask === null || allTasksAttempted || game.selectedCards.length === 0 ? 'disabled' : ''}>
-                        ✅ Complete Task
-                    </button>
-                    <button class="secondary" onclick="skipTask()" ${game.selectedTask === null || allTasksAttempted ? 'disabled' : ''}>
-                        ⏭️ Skip Task
-                    </button>
-                    
-                    <button class="secondary" onclick="discardToDraw()" ${game.discardToDrawUsed || game.selectedCards.length !== 2 || game.selectedTask !== null || game.burntOut ? 'disabled' : ''}>
-                        ♻️ Discard 2, Draw 2
-                    </button>
-                    <button class="secondary" onclick="spendToRemoveStress()" ${game.selectedCards.length !== 3 || game.selectedTask !== null || game.stress === 0 || game.burntOut ? 'disabled' : ''}>
-                        🧘 Spend 3, -1 Stress
-                    </button>
-                    
-                    ${game.conditions.includes('adhd') ? `
-                        <button class="secondary" onclick="useHyperfocus()" 
-                            ${game.hyperfocusUsed || game.selectedTask === null || game.hand.length < 3 ? 'disabled' : ''}>
-                            ⚡ Hyperfocus (3)
-                        </button>
-                    ` : ''}
-                    <button class="secondary" onclick="endTurn()">
-                        ⏩ End ${turnName}
-                    </button>
-                </div>
-            </div>
-            
-            <div class="section">
-                
-                <h2>📖 How to Play</h2>
-                <div class="rules-reminder">
-                    <ul>
-                        ${AppConfig.rules.howToPlay.map(rule => `<li>${rule}</li>`).join('')}
-                        <li>${targetText}</li>
-                    </ul>
-                </div>
-
-                <h2>🧠 Active Conditions</h2>
-                <div class="condition-reminders">
-                    ${game.conditions.length > 0 ? 
-                        game.conditions.map(condId => `
-                            <div class="condition-reminder">
-                                <h3>${AppConfig.rules.conditionDetails[condId].name}</h3>
-                                <p>${AppConfig.rules.conditionDetails[condId].rule}</p>
-                                
-                                </div>
-                        `).join('') :
-                        `<div class="condition-reminder">
-                            <h3>Neurotypical Mode</h3>
-                            <p>No extra rules are in effect.</p>
-                        </div>`
-                    }
-                </div>
-            
-                <h2 class="${headerStressClass}">
-                    ${completedIcon} Completed (${game.completedTasks.length})
-                </h2>
-                <div class="completed-tasks ${stressState}">
-                    ${game.completedTasks.map(name => `
-                        <div class="completed-task">${name}</div>
-                    `).join('')}
-                </div>
-                
-                <div style="margin-top: 15px;">
-                    <button class="secondary" onclick="game = null; render();" style="width: 100%;">
-                        ⚙️ Change Settings
-                    </button>
+                    <button onclick="attemptTask()" ${game.selectedTask === null || allTasksAttempted || game.selectedCards.length === 0 ? 'disabled' : ''}>✅ Complete</button>
+                    <button class="secondary" onclick="skipTask()" ${game.selectedTask === null || allTasksAttempted ? 'disabled' : ''}>⏭️ Skip</button>
+                    <button class="secondary" onclick="endTurn()">⏩ End Turn</button>
                 </div>
             </div>
         </div>
@@ -380,29 +204,15 @@ function render() {
     const app = document.getElementById('app');
     if (!app) return; 
 
-    // Don't render if data isn't loaded yet
     if (!AppConfig.rules || !AppConfig.tasks) {
-        app.innerHTML = `<div class="setup-screen"><h2>Loading Game Data...</h2></div>`;
+        app.innerHTML = `<h2>Loading...</h2>`;
         return;
     }
 
-    if (game && game.stress >= 7 && !game.gameOver && game.mode === 'life') {
-         game.endGame();
-    }
-    
     if (!game) {
         app.innerHTML = setupScreen();
-        if (document.getElementById(`mode-${selectedMode}`)) {
-            document.getElementById(`mode-${selectedMode}`).classList.add('selected');
-        }
-        setTimeout(checkAgreement, 100);
         return;
     }
     
-    if (game.gameOver) {
-        app.innerHTML = gameOverScreen() + gameScreen(); 
-        return;
-    }
-    
-    app.innerHTML = gameScreen();
+    app.innerHTML = game.gameOver ? gameOverScreen() + gameScreen() : gameScreen();
 }
