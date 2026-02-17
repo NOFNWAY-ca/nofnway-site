@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>No Fs Left to Give - Rulebook</title>
+    
+    <link rel="stylesheet" href="css/rulebook-styles.css">
+</head>
+<body>
+    <div class="instructions">
+        <h1>Rulebook Generator</h1>
+        <p>This page automatically builds your rulebook from your game's data. To print:</p>
+        <ol>
+            <li>Press <strong>Ctrl+P</strong> (or Cmd+P) to open the print dialog.</li>
+            <li>Set the Destination to <strong>"Save as PDF"</strong>.</li>
+            <li>Set Layout to <strong>"Portrait"</strong> and Paper Size to <strong>"Letter"</strong> or <strong>"A4"</strong>.</li>
+            <li>Ensure "Background graphics" is <strong>checked</strong>.</li>
+            <li>Click <strong>Save</strong>.</li>
+        </ol>
+    </div>
+
+    <div class="print-page" id="rulebook-content">
+        <h1>🎮 No Fs Left to Give</h1>
+        
+        <section>
+            <h2>Overview</h2>
+            <p>You have no Fs left to give, but the world hasn't stopped asking. This is a solo game about managing your limited resources (Physical, Social, and Mental) to get through the day (or week) while keeping your Stress from boiling over into Burnout.</p>
+        </section>
+
+        <section>
+            <h2>Game Modes</h2>
+            <ul id="game-modes">
+                <li><strong>Single Day:</strong> A quick 4-turn game.</li>
+                <li><strong>Full Week:</strong> The standard 7-day (28-turn) challenge.</li>
+                <li><strong>Life Mode:</strong> Survive for as many days as you can.</li>
+            </ul>
+        </section>
+
+        <section>
+            <h2>Rules of Play</h2>
+            <ul id="rules-list">
+                </ul>
+        </section>
+
+        <section>
+            <h2>Player Actions</h2>
+            <ul id="actions-list">
+                </ul>
+        </section>
+
+        <section>
+            <h2>Conditions</h2>
+            <p>You may choose to play with any number of conditions to add thematic challenges. Their rules are as follows:</p>
+            <div id="conditions-list">
+                </div>
+        </section>
+        
+        <section class="footer">
+            <p>&copy; 2025 NOFNWAY. All Rights Reserved. For personal, non-commercial use only.</p>
+        </section>
+
+    </div>
+
+    <script src="js/data/rules.js"></script>
+    
+    <script src="js/rulebook-builder.js"></script>
+
+</body>
+</html>

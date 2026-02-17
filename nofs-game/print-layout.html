@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>No Fs Left to Give - Print Sheets</title>
+    
+    <link rel="stylesheet" href="css/print-styles.css">
+</head>
+<body>
+
+    <div class="instructions">
+        <h1>Print & Play Generator</h1>
+        <p>This page automatically builds your card sheets from your game's data. To print:</p>
+        <ol>
+            <li>Press <strong>Ctrl+P</strong> (or Cmd+P) to open the print dialog.</li>
+            <li>Set the Destination to <strong>"Save as PDF"</strong>.</li>
+            <li>Set Layout to <strong>"Portrait"</strong>.</li>
+            <li>Set Paper Size to <strong>"Letter"</strong> or <strong>"A4"</strong>.</li>
+            <li>Under "More settings," ensure "Background graphics" is <strong>checked</strong>.</li>
+            <li>Click <strong>Save</strong>.</li>
+        </ol>
+        <p>You can then print the saved PDF.</p>
+    </div>
+
+    <div id="print-sheets"></div>
+
+    <script src="js/data/tasks.js"></script>
+    
+    <script src="js/print-builder.js"></script>
+
+</body>
+</html>
