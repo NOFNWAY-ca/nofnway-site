@@ -37,7 +37,7 @@
     <main class="flex-1 overflow-y-auto flex flex-col items-center custom-scroll">
         <div id="setup" class="drop-zone w-full max-w-2xl p-20 rounded-lg text-center">
             <p class="brand text-xl text-slate-400 uppercase tracking-tighter">Drop Filled PDF</p>
-            <p class="text-[10px] text-slate-600 mt-2 uppercase tracking-widest">2.5x Scale • Sequential Export</p>
+            <p class="text-[10px] text-slate-600 mt-2 uppercase tracking-widest">2.5x Scale • QDoc Ready</p>
             <input type="file" id="fileInput" class="hidden" accept="application/pdf">
         </div>
 
@@ -65,7 +65,6 @@
             if (!file) return;
             loader.style.display = 'grid';
             grid.innerHTML = "";
-            exportList.forEach(item => URL.revokeObjectURL(item.url));
             exportList = [];
 
             try {
@@ -82,6 +81,7 @@
                     
                     await page.render({canvasContext: canvas.getContext('2d'), viewport}).promise;
                     
+                    // Force JPEG format at high quality
                     const blob = await new Promise(res => canvas.toBlob(res, 'image/jpeg', 0.92));
                     const url = URL.createObjectURL(blob);
                     
@@ -92,7 +92,9 @@
                         const a = document.createElement('a');
                         a.download = `${baseName}_P${i}.jpg`;
                         a.href = url;
+                        document.body.appendChild(a);
                         a.click();
+                        document.body.removeChild(a);
                     };
                     grid.appendChild(img);
                     
@@ -111,14 +113,31 @@
         }
 
         async function downloadQueue() {
+            if (exportList.length === 0) return;
+
+            // Prompt for a clean name to help with medical organization
+            const defaultName = exportList[0].name.split('_P')[0];
+            const userFileName = prompt("Name for these JPEGs:", defaultName);
+            if (userFileName === null) return;
+
             dlBtn.disabled = true;
             for (let i = 0; i < exportList.length; i++) {
                 dlBtn.innerText = `SAVING ${i + 1}/${exportList.length}`;
+                
                 const a = document.createElement('a');
-                a.download = exportList[i].name;
+                // Ensuring .jpg extension is explicitly in the filename string
+                const finalName = `${userFileName.trim()}_${i + 1}.jpg`;
+                
+                a.download = finalName;
                 a.href = exportList[i].url;
+                
+                // Append to body and then click to fix .bin saving issues
+                document.body.appendChild(a);
                 a.click();
-                await new Promise(r => setTimeout(r, 650));
+                
+                // Throttle for 800ms to ensure the browser doesn't block the stream
+                await new Promise(r => setTimeout(r, 800));
+                document.body.removeChild(a);
             }
             dlBtn.disabled = false;
             dlBtn.innerText = "Save All JPEGs";
