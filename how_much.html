@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>NOFNWAY | HOW MUCH?</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@900&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0f172a; --card-bg: #1e293b; --text-main: #f8fafc; --text-dim: #94a3b8;
+            --border: #334155; --brand: #3b82f6; --accent-blue: #3b82f6; 
+            --accent-yellow: #facc15; --accent-green: #4ade80; --accent-orange: #f97316; --danger: #ef4444;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+        body { font-family: 'Roboto', sans-serif; background: var(--bg); color: var(--text-main); height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+
+        .navbar { background: #000; padding: 10px 30px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--brand); flex-shrink: 0; }
+        .brand { font-family: 'Montserrat', sans-serif; font-weight: 900; font-size: 1.5rem; text-decoration: none; color: white; }
+        .brand span { color: var(--brand); }
+
+        .workspace { flex: 1; overflow-y: auto; padding: 1rem; display: flex; flex-direction: column; gap: 0.75rem; max-width: 600px; margin: 0 auto; width: 100%; }
+
+        .input-container { background: var(--card-bg); border: 2px solid var(--border); border-radius: 0.75rem; padding: 1rem; margin-bottom: 1rem; }
+        .input-container.active { border-color: var(--accent-yellow); }
+        .main-input { background: transparent; border: none; color: white; font-size: 2.5rem; font-weight: 800; width: 100%; outline: none; font-family: 'Montserrat'; }
+        .input-hint { font-size: 0.7rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; }
+
+        .results-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .result-card { background: var(--card-bg); padding: 1rem; border-radius: 0.75rem; border-left: 4px solid var(--accent-blue); }
+        .res-val { font-size: 1.5rem; font-weight: 800; color: var(--text-main); margin-top: 4px; }
+        .res-unit { font-size: 0.65rem; color: var(--accent-yellow); font-weight: 900; text-transform: uppercase; }
+
+        .empty-state { text-align: center; color: var(--text-dim); margin-top: 3rem; font-size: 0.9rem; line-height: 1.5; }
+        .empty-state b { color: var(--accent-yellow); }
+    </style>
+</head>
+<body>
+
+<nav class="navbar">
+    <a href="#" class="brand">NO<span>FN</span>WAY</a>
+    <span style="color:var(--text-dim); font-size:0.7rem; font-weight:bold;">HOW MUCH?</span>
+</nav>
+
+<main class="workspace">
+    <div class="input-container" id="box">
+        <div class="input-hint">Enter Value + Unit (e.g. 10kg, 5ft, 2cup)</div>
+        <input type="text" id="userInput" class="main-input" placeholder="0" autofocus oninput="convert()">
+    </div>
+
+    <div id="results" class="results-grid">
+        </div>
+
+    <div id="empty" class="empty-state">
+        Type something like <b>"180c"</b> for temperature, <br>
+        <b>"12lb"</b> for weight, or <b>"6ft"</b> for length.
+    </div>
+</main>
+
+<script>
+    const UnitData = {
+        weight: {
+            lb: { name: 'Pounds', rate: 1 },
+            kg: { name: 'Kilograms', rate: 0.453592 },
+            oz: { name: 'Ounces', rate: 16 },
+            g: { name: 'Grams', rate: 453.592 },
+            st: { name: 'Stone', rate: 0.0714286 }
+        },
+        length: {
+            in: { name: 'Inches', rate: 1 },
+            ft: { name: 'Feet', rate: 1/12 },
+            cm: { name: 'Centimeters', rate: 2.54 },
+            m: { name: 'Meters', rate: 0.0254 },
+            mm: { name: 'Millimeters', rate: 25.4 }
+        },
+        temp: { // Temp requires custom logic due to non-linear scales
+            c: { name: 'Celsius' },
+            f: { name: 'Fahrenheit' },
+            k: { name: 'Kelvin' }
+        },
+        volume: {
+            cup: { name: 'Cups', rate: 1 },
+            ml: { name: 'Milliliters', rate: 236.588 },
+            l: { name: 'Liters', rate: 0.236588 },
+            floz: { name: 'Fl. Ounces', rate: 8 },
+            tbsp: { name: 'Tablespoons', rate: 16 }
+        }
+    };
+
+    function convert() {
+        const input = document.getElementById('userInput').value.toLowerCase().replace(/\s/g, '');
+        const val = parseFloat(input);
+        const unit = input.replace(/[0-9.-]/g, '');
+        const resultsDiv = document.getElementById('results');
+        const emptyDiv = document.getElementById('empty');
+
+        if (isNaN(val) || !unit) {
+            resultsDiv.innerHTML = '';
+            emptyDiv.style.display = 'block';
+            return;
+        }
+
+        emptyDiv.style.display = 'none';
+        let foundCat = null;
+        for (const cat in UnitData) {
+            if (UnitData[cat][unit]) { foundCat = cat; break; }
+        }
+
+        if (!foundCat) return;
+
+        let html = '';
+        if (foundCat === 'temp') {
+            html = renderTemp(val, unit);
+        } else {
+            const base = val / UnitData[foundCat][unit].rate;
+            for (const u in UnitData[foundCat]) {
+                if (u === unit) continue;
+                const converted = base * UnitData[foundCat][u].rate;
+                html += createCard(UnitData[foundCat][u].name, converted);
+            }
+        }
+        resultsDiv.innerHTML = html;
+    }
+
+    function renderTemp(val, unit) {
+        let c;
+        if (unit === 'c') c = val;
+        else if (unit === 'f') c = (val - 32) * 5/9;
+        else if (unit === 'k') c = val - 273.15;
+
+        const f = (c * 9/5) + 32;
+        const k = c + 273.15;
+
+        let output = '';
+        if (unit !== 'f') output += createCard('Fahrenheit', f);
+        if (unit !== 'c') output += createCard('Celsius', c);
+        if (unit !== 'k') output += createCard('Kelvin', k);
+        return output;
+    }
+
+    function createCard(label, val) {
+        // Clean up decimals: if it's a whole number, keep it. Otherwise, 2 decimal places.
+        const displayVal = Number.isInteger(val) ? val : val.toFixed(2);
+        return `
+            <div class="result-card">
+                <div class="res-unit">${label}</div>
+                <div class="res-val">${displayVal}</div>
+            </div>`;
+    }
+</script>
+</body>
+</html>

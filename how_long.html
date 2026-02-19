@@ -21,38 +21,37 @@
 
         .workspace { flex: 1; overflow-y: auto; padding: 1rem; display: flex; flex-direction: column; gap: 0.75rem; max-width: 600px; margin: 0 auto; width: 100%; }
 
+        /* Material Chips */
+        .material-bar { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 5px; scrollbar-width: none; flex-shrink: 0; }
+        .material-chip { padding: 6px 12px; background: var(--card-bg); border: 1px solid var(--border); border-radius: 20px; font-size: 0.7rem; font-weight: 700; white-space: nowrap; cursor: pointer; }
+        .material-chip.active { border-color: var(--accent-yellow); color: var(--accent-yellow); background: rgba(250, 204, 21, 0.1); }
+
         /* Interactive Tape Styling */
         .tape-container { background: #facc15; border: 2px solid #000; border-radius: 0.5rem; height: 110px; position: relative; overflow: hidden; touch-action: none; cursor: grab; flex-shrink: 0; }
         .center-wire { position: absolute; left: 50%; top: 0; bottom: 0; width: 3px; background: #ef4444; z-index: 50; pointer-events: none; }
         .tape-strip { position: absolute; height: 100%; display: flex; align-items: flex-end; will-change: transform; }
         .tape-tick { position: absolute; bottom: 0; width: 1px; background: #000; }
         .tick-inch { height: 65%; width: 2px; }
-        .tick-half { height: 50%; width: 2px; }
-        .tick-quarter { height: 35%; }
-        .tick-eighth { height: 25%; }
-        .tick-sixteenth { height: 15%; }
-        .tick-thirtysecond { height: 8%; opacity: 0.5; }
         .tape-label { position: absolute; top: 12px; font-weight: 900; color: #000; transform: translateX(-50%); font-size: 1.4rem; font-family: 'Montserrat'; }
 
-        .readout-card { background: var(--card-bg); border-left: 4px solid var(--accent-blue); border-radius: 0.75rem; padding: 1rem; display: flex; justify-content: space-between; align-items: center; }
+        .readout-card { background: var(--card-bg); border-left: 4px solid var(--accent-blue); border-radius: 0.75rem; padding: 1rem; display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; }
         .readout-val { font-size: 2.2rem; font-weight: 800; }
         
-        .input-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; }
+        .drawer-container { border: 1px solid var(--border); border-radius: 0.75rem; background: var(--bg); overflow: hidden; display: flex; flex-direction: column; flex: 1; min-height: 150px; }
+        .tab { flex: 1; padding: 0.75rem; text-align: center; font-size: 0.75rem; font-weight: 800; background: var(--card-bg); cursor: pointer; color: var(--text-dim); }
+        .tab.active { background: var(--bg); color: var(--text-main); border-bottom: 2px solid var(--accent-blue); }
+
+        .list-view { padding: 0.5rem; overflow-y: auto; flex: 1; }
+        .group-header { font-size: 0.65rem; color: var(--accent-yellow); font-weight: 900; margin: 12px 0 6px 0; text-transform: uppercase; letter-spacing: 1px; border-bottom: 1px solid var(--border); padding-bottom: 2px; }
+        .item-card { background: var(--card-bg); padding: 0.75rem; border-radius: 6px; margin-bottom: 4px; border-left: 3px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+
+        .input-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; flex-shrink: 0; }
         .field { background: var(--card-bg); border: 1px solid var(--border); border-radius: 0.5rem; padding: 0.5rem; }
         .field.active { border-color: var(--accent-blue); background: rgba(59, 130, 246, 0.1); }
         .field-lbl { font-size: 0.6rem; font-weight: 700; color: var(--text-dim); }
         .field-val { font-family: monospace; font-size: 1.2rem; min-height: 1.5rem; }
 
-        .chip { padding: 8px; background: var(--card-bg); border: 1px solid var(--border); color: var(--text-main); border-radius: 6px; font-weight: 700; cursor: pointer; flex: 1; font-size: 0.7rem; }
-        
-        .drawer-container { border: 1px solid var(--border); border-radius: 0.75rem; background: var(--bg); overflow: hidden; display: flex; flex-direction: column; flex: 1; }
-        .tab { flex: 1; padding: 0.75rem; text-align: center; font-size: 0.75rem; font-weight: 800; background: var(--card-bg); cursor: pointer; color: var(--text-dim); }
-        .tab.active { background: var(--bg); color: var(--text-main); border-bottom: 2px solid var(--accent-blue); }
-
-        .list-view { padding: 0.5rem; overflow-y: auto; flex: 1; }
-        .item-card { background: var(--card-bg); padding: 0.75rem; border-radius: 6px; margin-bottom: 6px; border-left: 3px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
-
-        .keypad { background: var(--card-bg); padding: 0.5rem; display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; height: 220px; }
+        .keypad { background: var(--card-bg); padding: 0.5rem; display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; height: 220px; flex-shrink: 0; }
         .key { background: var(--bg); border: 1px solid var(--border); border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; cursor: pointer; }
         .key-mark { background: var(--accent-green); color: black; font-weight: 900; grid-column: span 2; }
         
@@ -68,10 +67,7 @@
 </nav>
 
 <main class="workspace">
-    <div style="display: flex; gap: 8px;">
-        <button id="toggle-unit" class="chip" onclick="toggleUnit()">UNIT: IMPERIAL</button>
-        <button id="toggle-mode" class="chip" onclick="toggleMode()">MODE: FRACTION</button>
-    </div>
+    <div class="material-bar" id="material-bar"></div>
 
     <div class="tape-container" id="tape-viewport">
         <div class="center-wire"></div>
@@ -82,7 +78,7 @@
         <div>
             <div id="qty-badge" style="color:var(--accent-blue); font-size:0.7rem; font-weight:bold;">QTY: 1</div>
             <div id="main-disp" class="readout-val">0"</div>
-            <div id="sub-disp" style="font-family:monospace; color:var(--text-dim); font-size:0.8rem;">0.0000"</div>
+            <div id="sub-disp" style="font-family:monospace; color:var(--text-dim); font-size:0.8rem;">Select Material & Length</div>
         </div>
     </div>
 
@@ -96,11 +92,11 @@
 
     <div class="input-row">
         <div class="field" id="field-primary" onclick="setActive('primary')">
-            <span class="field-lbl" id="lbl-primary">FEET</span>
+            <span class="field-lbl">FEET</span>
             <div class="field-val" id="val-primary"></div>
         </div>
         <div class="field active" id="field-secondary" onclick="setActive('secondary')">
-            <span class="field-lbl" id="lbl-secondary">INCHES</span>
+            <span class="field-lbl">INCHES</span>
             <div class="field-val" id="val-secondary"><span class="cursor"></span></div>
         </div>
     </div>
@@ -130,58 +126,47 @@
         vals: { primary: '', secondary: '0' },
         multiplier: 1,
         qtyMode: false,
-        unit: 'imperial',
-        displayMode: 'fraction',
-        items: JSON.parse(localStorage.getItem('nofnway-cutlist')) || [],
+        activeMaterial: '2x4 Lumber',
+        materials: ['2x4 Lumber', '4x4 Post', '2x6 SPF', 'PVC Pipe', 'Trim'],
+        items: JSON.parse(localStorage.getItem('nofnway-howlong-data')) || [],
         view: 'cut',
-        tapeInches: 13,
-        pixelsPerInch: 200
+        pixelsPerInch: 200,
+        kerf: 0.125 // 1/8" Blade width
     };
 
-    window.onload = () => { initTape(); renderFields(); renderList(); calculate(); };
+    window.onload = () => { renderMaterials(); initTape(); renderFields(); renderList(); calculate(); };
 
-    function saveToDisk() { localStorage.setItem('nofnway-cutlist', JSON.stringify(state.items)); }
+    function saveToDisk() { localStorage.setItem('nofnway-howlong-data', JSON.stringify(state.items)); }
 
-    function toggleUnit() {
-        state.unit = state.unit === 'imperial' ? 'metric' : 'imperial';
-        document.getElementById('lbl-primary').innerText = state.unit === 'metric' ? 'METERS' : 'FEET';
-        document.getElementById('lbl-secondary').innerText = state.unit === 'metric' ? 'MM' : 'INCHES';
-        document.getElementById('toggle-unit').innerText = `UNIT: ${state.unit.toUpperCase()}`;
-        initTape(); calculate(); renderFields(); renderList();
+    function renderMaterials() {
+        const bar = document.getElementById('material-bar');
+        bar.innerHTML = state.materials.map(m => `
+            <div class="material-chip ${state.activeMaterial === m ? 'active' : ''}" onclick="setMaterial('${m}')">${m}</div>
+        `).join('') + `<div class="material-chip" onclick="addMaterial()">+ ADD</div>`;
     }
 
-    function toggleMode() {
-        state.displayMode = state.displayMode === 'fraction' ? 'decimal' : 'fraction';
-        document.getElementById('toggle-mode').innerText = `MODE: ${state.displayMode.toUpperCase()}`;
-        calculate();
+    function setMaterial(m) { state.activeMaterial = m; renderMaterials(); renderList(); calculate(); }
+
+    function addMaterial() {
+        const name = prompt("Material Name (e.g. 1x6 Pine):");
+        if(name) { state.materials.push(name); state.activeMaterial = name; renderMaterials(); }
     }
 
-    /* TAPE MEASURE LOGIC */
     function initTape() {
         const strip = document.getElementById('tape-strip');
         strip.innerHTML = '';
-        const step = state.unit === 'imperial' ? 32 : 10; // 32nds or MM
-        const totalUnits = 13; 
-
-        for (let i = 0; i <= totalUnits * step; i++) {
+        for (let i = 0; i <= 13 * 32; i++) {
             const tick = document.createElement('div');
             tick.className = 'tape-tick';
-            const pos = (i / step) * state.pixelsPerInch;
+            const pos = (i / 32) * state.pixelsPerInch;
             tick.style.left = pos + 'px';
-
-            if (i % step === 0) {
+            if (i % 32 === 0) {
                 tick.classList.add('tick-inch');
                 const lbl = document.createElement('div');
                 lbl.className = 'tape-label';
-                lbl.innerText = i / step;
+                lbl.innerText = i / 32;
                 lbl.style.left = pos + 'px';
                 strip.appendChild(lbl);
-            } else if (state.unit === 'imperial') {
-                if (i % 16 === 0) tick.classList.add('tick-half');
-                else if (i % 8 === 0) tick.classList.add('tick-quarter');
-                else if (i % 4 === 0) tick.classList.add('tick-eighth');
-                else if (i % 2 === 0) tick.classList.add('tick-sixteenth');
-                else tick.classList.add('tick-thirtysecond');
             }
             strip.appendChild(tick);
         }
@@ -195,41 +180,6 @@
         const offset = (val * state.pixelsPerInch) - (view.offsetWidth / 2);
         strip.style.transform = `translateX(${-offset}px)`;
     }
-
-    /* INTERACTION LOGIC */
-    let isDragging = false, startX, startVal;
-    const view = document.getElementById('tape-viewport');
-
-    const handleStart = (e) => {
-        isDragging = true;
-        startX = (e.pageX || e.touches[0].pageX);
-        startVal = parseFloat(state.vals.secondary) || 0;
-        view.style.cursor = 'grabbing';
-    };
-
-    const handleMove = (e) => {
-        if (!isDragging) return;
-        const x = (e.pageX || e.touches[0].pageX);
-        const diff = (startX - x) / state.pixelsPerInch;
-        let newVal = startVal + diff;
-        
-        // Snap logic
-        const snap = state.unit === 'imperial' ? 32 : 1;
-        newVal = Math.max(0, Math.min(12, Math.round(newVal * snap) / snap));
-        
-        state.vals.secondary = newVal.toString();
-        state.activeField = 'secondary';
-        updateTapePosition();
-        calculate();
-        renderFields();
-    };
-
-    view.addEventListener('mousedown', handleStart);
-    view.addEventListener('touchstart', handleStart);
-    window.addEventListener('mousemove', handleMove);
-    window.addEventListener('touchmove', handleMove);
-    window.addEventListener('mouseup', () => { isDragging = false; view.style.cursor = 'grab'; });
-    window.addEventListener('touchend', () => { isDragging = false; });
 
     function press(key) {
         if (key === 'x') { state.qtyMode = true; state.multiplier = 0; renderFields(); return; }
@@ -249,54 +199,68 @@
 
     function calculate() {
         const p = parseFloat(state.vals.primary) || 0, s = parseFloat(state.vals.secondary) || 0;
-        let inches = state.unit === 'metric' ? ((p * 1000) + s) / 25.4 : (p * 12) + s;
-        
-        const main = document.getElementById('main-disp'), sub = document.getElementById('sub-disp');
-        if (state.unit === 'metric') {
-            main.innerText = `${(inches * 25.4).toFixed(1)} mm`;
-            sub.innerText = `${(inches * 2.54).toFixed(2)} cm`;
-        } else if (state.displayMode === 'decimal') {
-            main.innerText = `${inches.toFixed(3)}"`;
-            sub.innerText = "Decimal Inches";
-        } else {
-            let f = Math.floor(inches / 12), i = Math.floor(inches % 12), frac = inches % 1;
-            let num = Math.round(frac * 32);
-            if(num === 32) { num = 0; i++; if(i === 12) { i = 0; f++; } }
-            main.innerHTML = `${f > 0 ? f + "' " : ""}${i}${num > 0 ? ` <span style="color:var(--accent-blue)">${num}/32</span>` : ""}"`;
-            sub.innerText = inches.toFixed(4) + '"';
-        }
+        let inches = (p * 12) + s;
+        const main = document.getElementById('main-disp');
+        let f = Math.floor(inches / 12), i = Math.floor(inches % 12), frac = inches % 1;
+        let num = Math.round(frac * 32);
+        if(num === 32) { num = 0; i++; if(i === 12) { i = 0; f++; } }
+        main.innerHTML = `${f > 0 ? f + "' " : ""}${i}${num > 0 ? ` <span style="color:var(--accent-blue)">${num}/32</span>` : ""}"`;
+        document.getElementById('sub-disp').innerText = `${state.activeMaterial} | ${inches.toFixed(3)}"`;
         return inches;
     }
 
     function markMeasurement() {
         const len = calculate();
         if (len <= 0) return;
-        state.items.unshift({ id: Date.now(), label: 'CUT', qty: state.multiplier || 1, len, display: document.getElementById('main-disp').innerText });
+        state.items.unshift({ 
+            id: Date.now(), 
+            material: state.activeMaterial, 
+            qty: state.multiplier || 1, 
+            len, 
+            display: document.getElementById('main-disp').innerText 
+        });
         state.multiplier = 1; state.qtyMode = false;
         saveToDisk(); renderList(); renderFields();
     }
 
     function renderList() {
         const container = document.getElementById('list-container'); container.innerHTML = '';
+        const groups = state.items.reduce((acc, item) => {
+            if (!acc[item.material]) acc[item.material] = [];
+            acc[item.material].push(item);
+            return acc;
+        }, {});
+
         if (state.view === 'cut') {
-            state.items.forEach(item => {
-                const el = document.createElement('div'); el.className = 'item-card';
-                el.innerHTML = `<div><small>${item.label}</small><br><b>${item.qty}x ${item.display}</b></div><div style="font-size:0.7rem">${item.len.toFixed(2)}"</div>`;
-                container.appendChild(el);
+            Object.keys(groups).forEach(mat => {
+                container.innerHTML += `<div class="group-header">${mat}</div>`;
+                groups[mat].forEach(item => {
+                    container.innerHTML += `
+                        <div class="item-card" style="border-left-color:${mat === state.activeMaterial ? 'var(--accent-yellow)' : 'var(--border)'}">
+                            <div><b>${item.qty}x ${item.display}</b></div>
+                            <div style="font-size:0.7rem; opacity:0.6">${item.len.toFixed(2)}"</div>
+                        </div>`;
+                });
             });
         } else {
-            const KERF = 0.125; let pool = [];
-            state.items.forEach(i => { for(let x=0; x<i.qty; x++) pool.push(i.len + KERF); });
-            pool.sort((a,b) => b-a);
-            let counts = { 96: 0, 120: 0, 144: 0 };
-            while(pool.length > 0) {
-                let p = pool.shift(); let len = [96, 120, 144].find(s => s >= p);
-                if(!len) continue; counts[len]++; let rem = len - p;
-                for(let k=0; k<pool.length; k++) { if(pool[k] <= rem) { rem -= pool[k]; pool.splice(k, 1); k--; } }
-            }
-            if(counts[96]) container.innerHTML += `<div class="item-card" style="border-left-color:var(--accent-orange)"><b>${counts[96]}x 8' (96")</b></div>`;
-            if(counts[120]) container.innerHTML += `<div class="item-card" style="border-left-color:var(--accent-orange)"><b>${counts[120]}x 10' (120")</b></div>`;
-            if(counts[144]) container.innerHTML += `<div class="item-card" style="border-left-color:var(--accent-orange)"><b>${counts[144]}x 12' (144")</b></div>`;
+            Object.keys(groups).forEach(mat => {
+                container.innerHTML += `<div class="group-header">${mat} (Total Order)</div>`;
+                let pool = [];
+                groups[mat].forEach(i => { for(let x=0; x<i.qty; x++) pool.push(i.len + state.kerf); });
+                pool.sort((a,b) => b-a);
+                let counts = { 96: 0, 120: 0, 144: 0 };
+                while(pool.length > 0) {
+                    let p = pool.shift();
+                    let stock = [96, 120, 144].find(s => s >= p);
+                    if(!stock) { container.innerHTML += `<div class="item-card" style="color:var(--danger)">Item too long for standard stock!</div>`; break; }
+                    counts[stock]++;
+                    let rem = stock - p;
+                    for(let k=0; k<pool.length; k++) { if(pool[k] <= rem) { rem -= pool[k]; pool.splice(k, 1); k--; } }
+                }
+                [96, 120, 144].forEach(s => {
+                    if(counts[s]) container.innerHTML += `<div class="item-card" style="border-left-color:var(--accent-orange)"><b>${counts[s]}x ${s/12}' (${s}")</b></div>`;
+                });
+            });
         }
     }
 
@@ -310,7 +274,27 @@
 
     function setActive(f) { state.activeField = f; renderFields(); }
     function switchTab(t) { state.view = t; document.getElementById('tab-cut').className = 'tab' + (t==='cut'?' active':''); document.getElementById('tab-buy').className = 'tab' + (t==='buy'?' active':''); renderList(); }
-    function resetAll() { if(confirm('Wipe data?')) { state.items = []; saveToDisk(); renderList(); } }
+    function resetAll() { if(confirm('Wipe all project data?')) { state.items = []; saveToDisk(); renderList(); } }
+
+    /* Touch Drag Logic */
+    let isDragging = false, startX, startVal;
+    const vPort = document.getElementById('tape-viewport');
+    const handleStart = (e) => { isDragging = true; startX = (e.pageX || e.touches[0].pageX); startVal = parseFloat(state.vals.secondary) || 0; };
+    const handleMove = (e) => {
+        if (!isDragging) return;
+        const x = (e.pageX || e.touches[0].pageX);
+        const diff = (startX - x) / state.pixelsPerInch;
+        let newVal = Math.max(0, Math.min(12, Math.round((startVal + diff) * 32) / 32));
+        state.vals.secondary = newVal.toString();
+        state.activeField = 'secondary';
+        updateTapePosition(); calculate(); renderFields();
+    };
+    vPort.addEventListener('mousedown', handleStart);
+    vPort.addEventListener('touchstart', handleStart);
+    window.addEventListener('mousemove', handleMove);
+    window.addEventListener('touchmove', handleMove);
+    window.addEventListener('mouseup', () => isDragging = false);
+    window.addEventListener('touchend', () => isDragging = false);
 </script>
 </body>
 </html>
