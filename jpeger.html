@@ -11,11 +11,42 @@
         :root { --brand: #3b82f6; --bg: #000000; --card: #0f172a; --border: #1e293b; }
         body { background: var(--bg); color: #f1f5f9; font-family: 'Roboto', sans-serif; overflow: hidden; height: 100vh; display: flex; flex-direction: column; margin: 0; }
         .brand { font-family: 'Montserrat', sans-serif; font-weight: 900; }
-        .drop-zone { border: 2px dashed var(--border); transition: 0.1s; cursor: pointer; }
-        .drop-zone:hover { border-color: var(--brand); background: #020617; }
+
+        .drop-zone { border: 2px dashed var(--border); transition: border-color 0.15s, background 0.15s; cursor: pointer; }
+        .drop-zone:hover, .drop-zone.drag-over { border-color: var(--brand); background: #020617; }
+        .drop-zone.drag-over { border-style: solid; }
+
         .loading-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.95); display: none; place-items: center; z-index: 3000; }
         .custom-scroll::-webkit-scrollbar { width: 4px; }
         .custom-scroll::-webkit-scrollbar-thumb { background: var(--brand); }
+
+        .filename-input {
+            background: #0f172a;
+            border: 1px solid #334155;
+            color: #f1f5f9;
+            padding: 6px 10px;
+            border-radius: 4px;
+            font-family: 'Roboto', sans-serif;
+            font-size: 0.8rem;
+            width: 200px;
+            transition: border-color 0.15s;
+        }
+        .filename-input:focus { outline: none; border-color: var(--brand); }
+
+        #errorBanner {
+            display: none;
+            background: #450a0a;
+            border: 1px solid #7f1d1d;
+            color: #fca5a5;
+            padding: 10px 20px;
+            border-radius: 6px;
+            margin: 0 auto 16px;
+            max-width: 640px;
+            width: 100%;
+            text-align: center;
+            font-size: 0.85rem;
+            box-sizing: border-box;
+        }
     </style>
 </head>
 <body class="p-4 md:p-8">
@@ -26,120 +57,181 @@
         </div>
     </div>
 
-    <header class="flex justify-between items-center mb-8 bg-black p-4 border-b-2 border-blue-600">
-        <h1 class="brand text-2xl tracking-tighter">NO<span class="text-blue-500">FN</span>WAY // JPEGer</h1>
-        <div class="flex gap-4">
-            <button onclick="location.reload()" id="resetBtn" class="hidden text-slate-500 hover:text-white text-[10px] font-bold uppercase tracking-widest">Reset</button>
+    <header class="flex justify-between items-center mb-4 bg-black p-4 border-b-2 border-blue-600 gap-4 flex-wrap">
+        <div class="flex items-center gap-6">
+            <a href="index.html" class="text-slate-500 hover:text-white text-[10px] font-bold uppercase tracking-widest transition-colors whitespace-nowrap">← Hub</a>
+            <h1 class="brand text-2xl tracking-tighter">NO<span class="text-blue-500">FN</span>WAY // JPEGer</h1>
+        </div>
+        <div class="flex items-center gap-3 flex-wrap">
+            <button onclick="location.reload()" id="resetBtn" class="hidden text-slate-500 hover:text-white text-[10px] font-bold uppercase tracking-widest transition-colors">Reset</button>
+            <div id="filenameGroup" class="hidden items-center gap-2 flex">
+                <label class="text-slate-500 text-[10px] uppercase tracking-widest font-bold whitespace-nowrap">Base Name</label>
+                <input type="text" id="filenameInput" class="filename-input" placeholder="filename" />
+            </div>
             <button id="dlBtn" onclick="downloadQueue()" class="hidden bg-blue-600 hover:bg-blue-500 px-6 py-2 rounded font-bold uppercase text-xs tracking-widest transition-all">Save All JPEGs</button>
         </div>
     </header>
 
-    <main class="flex-1 overflow-y-auto flex flex-col items-center custom-scroll">
+    <main class="flex-1 overflow-y-auto flex flex-col items-center custom-scroll px-0">
+        <div id="errorBanner"></div>
+
         <div id="setup" class="drop-zone w-full max-w-2xl p-20 rounded-lg text-center">
-            <p class="brand text-xl text-slate-400 uppercase tracking-tighter">Drop Filled PDF</p>
-            <p class="text-[10px] text-slate-600 mt-2 uppercase tracking-widest">2.5x Scale • QDoc Ordered Export</p>
+            <p class="brand text-xl text-slate-400 uppercase tracking-tighter">Drop or Click to Load PDF</p>
+            <p class="text-[10px] text-slate-600 mt-2 uppercase tracking-widest">2.5x Scale &bull; QDoc Ordered Export</p>
             <input type="file" id="fileInput" class="hidden" accept="application/pdf">
         </div>
 
-        <div id="previewGrid" class="w-full grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 mt-8"></div>
+        <div id="previewGrid" class="w-full grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 mt-4"></div>
     </main>
 
     <script>
         const pdfjsLib = window['pdfjs-dist/build/pdf'];
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
-        const setup = document.getElementById('setup'),
-              fileInput = document.getElementById('fileInput'),
-              grid = document.getElementById('previewGrid'),
-              dlBtn = document.getElementById('dlBtn'),
-              resetBtn = document.getElementById('resetBtn'),
-              loader = document.getElementById('loader'),
-              loadText = document.getElementById('loadText');
+        const setup        = document.getElementById('setup'),
+              fileInput    = document.getElementById('fileInput'),
+              grid         = document.getElementById('previewGrid'),
+              dlBtn        = document.getElementById('dlBtn'),
+              resetBtn     = document.getElementById('resetBtn'),
+              loader       = document.getElementById('loader'),
+              loadText     = document.getElementById('loadText'),
+              filenameGroup = document.getElementById('filenameGroup'),
+              filenameInput = document.getElementById('filenameInput'),
+              errorBanner  = document.getElementById('errorBanner');
 
         let exportList = [];
+        let errorTimer = null;
 
-        setup.onclick = () => fileInput.click();
-        fileInput.onchange = (e) => processPdf(e.target.files[0]);
+        /* --- PREVENT BROWSER NAVIGATION ON ACCIDENTAL DROPS --- */
+        window.addEventListener('dragover', e => e.preventDefault());
+        window.addEventListener('drop',     e => e.preventDefault());
 
+        /* --- FILE INPUT --- */
+        setup.addEventListener('click', () => fileInput.click());
+        fileInput.addEventListener('change', e => processPdf(e.target.files[0]));
+
+        /* --- DRAG AND DROP --- */
+        setup.addEventListener('dragover', e => {
+            e.preventDefault();
+            setup.classList.add('drag-over');
+        });
+        setup.addEventListener('dragleave', e => {
+            if (!setup.contains(e.relatedTarget)) setup.classList.remove('drag-over');
+        });
+        setup.addEventListener('drop', e => {
+            e.preventDefault();
+            setup.classList.remove('drag-over');
+            const file = e.dataTransfer.files[0];
+            if (file?.type === 'application/pdf') {
+                processPdf(file);
+            } else {
+                showError("That doesn't look like a PDF. Drop a .pdf file and try again.");
+            }
+        });
+
+        /* --- ERROR DISPLAY --- */
+        function showError(msg) {
+            clearTimeout(errorTimer);
+            errorBanner.textContent = msg;
+            errorBanner.style.display = 'block';
+            errorTimer = setTimeout(() => { errorBanner.style.display = 'none'; }, 6000);
+        }
+
+        /* --- CORE PROCESSOR --- */
         async function processPdf(file) {
             if (!file) return;
+
+            errorBanner.style.display = 'none';
             loader.style.display = 'grid';
-            grid.innerHTML = "";
+            grid.innerHTML = '';
+
+            // Clean up any previous blob URLs
+            exportList.forEach(item => URL.revokeObjectURL(item.url));
             exportList = [];
 
             try {
                 const arrayBuffer = await file.arrayBuffer();
-                const pdf = await pdfjsLib.getDocument({data: arrayBuffer}).promise;
-                const baseName = file.name.substring(0, file.name.lastIndexOf('.'));
+                const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+                const total = pdf.numPages;
+                const baseName = file.name.substring(0, file.name.lastIndexOf('.')) || file.name;
 
-                for (let i = 1; i <= pdf.numPages; i++) {
-                    loadText.innerText = `Baking P${i} / ${pdf.numPages}`;
+                for (let i = 1; i <= total; i++) {
+                    loadText.innerText = `Baking P${i} / ${total}`;
                     const page = await pdf.getPage(i);
                     const viewport = page.getViewport({ scale: 2.5, rotation: page.rotate });
                     const canvas = document.createElement('canvas');
-                    canvas.width = viewport.width; canvas.height = viewport.height;
-                    
-                    await page.render({canvasContext: canvas.getContext('2d'), viewport}).promise;
-                    
+                    canvas.width = viewport.width;
+                    canvas.height = viewport.height;
+
+                    await page.render({ canvasContext: canvas.getContext('2d'), viewport }).promise;
+
                     const blob = await new Promise(res => canvas.toBlob(res, 'image/jpeg', 0.92));
                     const url = URL.createObjectURL(blob);
-                    
+
+                    // Free the canvas memory immediately
+                    canvas.width = 0;
+                    canvas.height = 0;
+
+                    const pageIndex = i; // capture for click handler closure
                     const img = document.createElement('img');
                     img.src = url;
-                    img.className = "w-full rounded border border-slate-800 shadow-lg hover:border-blue-500 transition-colors cursor-pointer";
-                    img.onclick = () => {
-                        const a = document.createElement('a');
-                        a.download = `${baseName}_P${i}.jpg`;
-                        a.href = url;
-                        document.body.appendChild(a);
-                        a.click();
-                        document.body.removeChild(a);
-                    };
+                    img.className = 'w-full rounded border border-slate-800 shadow-lg hover:border-blue-500 transition-colors cursor-pointer';
+                    img.title = `Click to download page ${pageIndex}`;
+                    img.addEventListener('click', () => triggerDownload(url, buildName(pageIndex, total)));
                     grid.appendChild(img);
-                    
-                    exportList.push({ url, name: `${baseName}_P${i}.jpg` });
-                    canvas.width = 0; canvas.height = 0; 
+
+                    exportList.push({ url });
                 }
-                
+
+                filenameInput.value = baseName;
                 setup.classList.add('hidden');
+                filenameGroup.classList.remove('hidden');
                 dlBtn.classList.remove('hidden');
                 resetBtn.classList.remove('hidden');
+
             } catch (err) {
-                alert("Fail: PDF is encrypted or invalid.");
+                console.error(err);
+                showError('Could not read that PDF — it may be encrypted or damaged.');
             } finally {
                 loader.style.display = 'none';
             }
         }
 
-        async function downloadQueue() {
-            if (exportList.length === 0) return;
+        /* --- HELPERS --- */
+        function buildName(page, total) {
+            const base = filenameInput.value.trim() || 'export';
+            return `${base}_Page_${page}_of_${total}.jpg`;
+        }
 
+        function triggerDownload(url, filename) {
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
+
+        /* --- BATCH DOWNLOAD --- */
+        async function downloadQueue() {
             const total = exportList.length;
-            const defaultName = exportList[0].name.split('_P')[0];
-            const userFileName = prompt("Enter base name (Files will be numbered for QDoc):", defaultName);
-            
-            if (userFileName === null) return;
+            if (total === 0) return;
 
             dlBtn.disabled = true;
+
             for (let i = 0; i < total; i++) {
-                dlBtn.innerText = `SAVING ${i + 1}/${total}`;
-                
-                const a = document.createElement('a');
-                // Adds clear sequential numbering for the doctor
-                const finalName = `${userFileName.trim()}_Page_${i + 1}_of_${total}.jpg`;
-                
-                a.download = finalName;
-                a.href = exportList[i].url;
-                
-                document.body.appendChild(a);
-                a.click();
-                
-                // 800ms throttle to prevent the .bin error and ensure browser stability
-                await new Promise(r => setTimeout(r, 800));
-                document.body.removeChild(a);
+                dlBtn.innerText = `SAVING ${i + 1} / ${total}`;
+                triggerDownload(exportList[i].url, buildName(i + 1, total));
+                // Throttle to prevent browser .bin bug on rapid downloads
+                await new Promise(r => setTimeout(r, 400));
             }
+
+            // Clean up blob URLs — no longer needed after download
+            exportList.forEach(item => URL.revokeObjectURL(item.url));
+            exportList = [];
+
             dlBtn.disabled = false;
-            dlBtn.innerText = "Save All JPEGs";
+            dlBtn.innerText = 'Save All JPEGs';
         }
     </script>
 </body>
