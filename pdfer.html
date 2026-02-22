@@ -189,6 +189,7 @@
     let currentMode      = 'crop';
     let generatedPdfBlob = null;
     let redactReady      = false; // true once redact canvas has been initialized for this edit session
+    let baseCroppedUrl   = null;  // data URL of crop result, used as redact base
     let redactHistory    = [];    // snapshots for undo
     let cropAction       = null;  // 'move' | 'resize'
     let cropStart        = {};
@@ -236,10 +237,11 @@
     /* EDIT MODAL                                                           */
     /* ------------------------------------------------------------------ */
     function openEditModal(id) {
-        editingId   = id;
-        redactReady = false;
-        redactHistory = [];
-        currentMode = 'crop';
+        editingId      = id;
+        redactReady    = false;
+        baseCroppedUrl = null;
+        redactHistory  = [];
+        currentMode    = 'crop';
 
         if (id) {
             const p = appData.pages.find(pg => pg.id === id);
@@ -267,8 +269,9 @@
 
     function closeModal() {
         document.getElementById('editModal').style.display = 'none';
-        redactReady = false;
-        redactHistory = [];
+        redactReady    = false;
+        baseCroppedUrl = null;
+        redactHistory  = [];
     }
 
     function quickTag(t) {
@@ -341,8 +344,10 @@
     /* REDACT                                                               */
     /* ------------------------------------------------------------------ */
     function initRedactCanvas() {
+        // Must be called while editorImg is still visible (before switchTab hides it)
         const canvas  = document.getElementById('redactCanvas');
         const cropped = getCroppedCanvas();
+        baseCroppedUrl = cropped.toDataURL('image/jpeg', 0.92); // store for clearRedactions
         canvas.width  = cropped.width;
         canvas.height = cropped.height;
         const ctx = canvas.getContext('2d');
@@ -402,13 +407,17 @@
     }
 
     function clearRedactions() {
-        const canvas  = document.getElementById('redactCanvas');
-        const cropped = getCroppedCanvas();
-        canvas.width  = cropped.width;
-        canvas.height = cropped.height;
-        const ctx = canvas.getContext('2d');
-        ctx.drawImage(cropped, 0, 0);
-        redactHistory = [ctx.getImageData(0, 0, canvas.width, canvas.height)];
+        if (!baseCroppedUrl) return;
+        const canvas = document.getElementById('redactCanvas');
+        const img    = new Image();
+        img.onload = () => {
+            canvas.width  = img.naturalWidth;
+            canvas.height = img.naturalHeight;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0);
+            redactHistory = [ctx.getImageData(0, 0, canvas.width, canvas.height)];
+        };
+        img.src = baseCroppedUrl;
     }
 
     /* ------------------------------------------------------------------ */
@@ -416,6 +425,12 @@
     /* ------------------------------------------------------------------ */
     function switchTab(mode) {
         currentMode = mode;
+
+        // Init redact canvas BEFORE hiding editorImg — getBoundingClientRect needs it visible
+        if (mode === 'redact' && !redactReady) {
+            initRedactCanvas();
+        }
+
         document.getElementById('tabCrop').classList.toggle('active',   mode === 'crop');
         document.getElementById('tabRedact').classList.toggle('active', mode === 'redact');
 
@@ -427,10 +442,6 @@
         document.getElementById('redactCanvas').style.display    = showRedact ? 'block' : 'none';
         document.getElementById('redactToolbar').style.display   = showRedact ? 'flex'  : 'none';
         document.getElementById('redactHint').style.display      = showRedact ? 'block' : 'none';
-
-        if (showRedact && !redactReady) {
-            initRedactCanvas();
-        }
     }
 
     /* ------------------------------------------------------------------ */
