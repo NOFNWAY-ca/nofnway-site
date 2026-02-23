@@ -125,15 +125,16 @@
     });
 
     // ----------------------------------------
-    // OUTPUT — plain text so copy-console works
+    // OUTPUT — injects results directly onto the page
+    // as a full-screen overlay. Click anywhere to close.
     // ----------------------------------------
     const pad = (s, n) => String(s).padEnd(n);
-    const header = `${pad('Condition',14)} | ${pad('Avg Tasks',9)} | ${pad('Burnout%',8)} | ${pad('Finished%',9)} | Avg Stress`;
+    const header  = `${pad('Condition',14)} | ${pad('Avg Tasks',9)} | ${pad('Burnout%',8)} | ${pad('Finished%',9)} | Avg Stress`;
     const divider = '-'.repeat(header.length);
 
     const lines = [
-        '',
-        `🎮 NO Fs TO GIVE — Balance Sim  (${N} games/condition, ${MODE} mode)`,
+        `🎮  NO Fs TO GIVE — Balance Sim  (${N} games/condition, ${MODE} mode)`,
+        `    Click anywhere to close`,
         '',
         header,
         divider,
@@ -142,26 +143,36 @@
         ),
         divider,
         '',
-        '📊 Task delta vs Neurotypical  (negative = harder):',
+        '📊  Task delta vs Neurotypical  (negative = harder):',
         ...rows
             .filter(r => r.Condition !== 'Neurotypical')
             .map(r => {
                 const delta = parseFloat(r['Avg Tasks']) - baselineAvgTasks;
                 const sign  = delta >= 0 ? '+' : '';
-                let flag = '✅ balanced';
-                if      (delta < -10) flag = '🔴 WAY too hard — reduce penalties';
-                else if (delta <  -6) flag = '🟡 a bit harsh — consider softening';
-                else if (delta >   9) flag = '🔴 too easy — positive may be too strong';
-                else if (delta >   5) flag = '🟡 easier than baseline';
-                return `  ${pad(r.Condition,14)} ${sign}${delta.toFixed(1)} tasks  ${flag}`;
+                let flag = '✅  balanced';
+                if      (delta < -10) flag = '🔴  WAY too hard — reduce penalties';
+                else if (delta <  -6) flag = '🟡  a bit harsh — consider softening';
+                else if (delta >   9) flag = '🔴  too easy — positive may be too strong';
+                else if (delta >   5) flag = '🟡  easier than baseline';
+                return `  ${pad(r.Condition,14)} ${sign}${delta.toFixed(1)} tasks   ${flag}`;
             }),
         '',
-        '💡 Burnout 10-40% = healthy range. Task delta -3 to -8 = meaningfully harder.',
-        '   Bot never uses Discard2Draw or Spend3 — human players will do better.',
-        '   Bipolar variance is high — run twice and average the results.',
-        '',
+        '💡  Burnout 10-40% = healthy range.  Task delta -3 to -8 = meaningfully harder.',
+        '    Bot never uses Discard2Draw or Spend3 — real players will do better.',
+        '    Bipolar variance is high — run twice and average.',
     ];
 
-    console.log(lines.join('\n'));
+    const overlay = document.createElement('pre');
+    overlay.style.cssText = [
+        'position:fixed', 'inset:0', 'z-index:99999',
+        'background:#0a0a0a', 'color:#00ff88',
+        'font-family:monospace', 'font-size:14px', 'line-height:1.6',
+        'padding:32px', 'overflow:auto', 'cursor:pointer',
+        'white-space:pre',
+    ].join(';');
+    overlay.textContent = lines.join('\n');
+    overlay.title = 'Click to close';
+    overlay.onclick = () => overlay.remove();
+    document.body.appendChild(overlay);
 
 })();
