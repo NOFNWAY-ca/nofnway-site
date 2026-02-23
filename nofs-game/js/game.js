@@ -6,13 +6,13 @@
 class Game {
     constructor(mode, conditions = []) {
         this.mode = mode;
-        this.conditions = conditions;
-        this.day = 1; 
-        this.turn = 1; 
-        // === MODIFIED: Depression no longer adds start stress ===
-        this.stress = 0; 
+        // Strip neurotypical out — it's a UI label, not a real condition flag
+        this.conditions = conditions.filter(c => c !== 'neurotypical');
+        this.day = 1;
+        this.turn = 1;
+        this.stress = 0;
         this.completedTasks = [];
-        
+
         this.dayLimit = 0;
         if (mode === 'day') {
             this.dayLimit = 1;
@@ -21,56 +21,70 @@ class Game {
         } else if (mode === 'life') {
             this.dayLimit = Infinity;
         }
-        
+
         this.fDeck = this.createFDeck();
-        this.fDeckDiscard = []; 
+        this.fDeckDiscard = [];
 
-        this.morningTasks = this.shuffle(AppConfig.tasks.filter(t => t.time === "Morning"));
-        this.middayTasks = this.shuffle(AppConfig.tasks.filter(t => t.time === "Midday"));
-        this.afternoonTasks = this.shuffle(AppConfig.tasks.filter(t => t.time === "Afternoon"));
-        this.eveningTasks = this.shuffle(AppConfig.tasks.filter(t => t.time === "Evening"));
-        
-        this.morningTasksDiscard = [];
-        this.middayTasksDiscard = [];
+        this.morningTasks    = this.shuffle(AppConfig.tasks.filter(t => t.time === "Morning"));
+        this.middayTasks     = this.shuffle(AppConfig.tasks.filter(t => t.time === "Midday"));
+        this.afternoonTasks  = this.shuffle(AppConfig.tasks.filter(t => t.time === "Afternoon"));
+        this.eveningTasks    = this.shuffle(AppConfig.tasks.filter(t => t.time === "Evening"));
+
+        this.morningTasksDiscard   = [];
+        this.middayTasksDiscard    = [];
         this.afternoonTasksDiscard = [];
-        this.eveningTasksDiscard = [];
-        
-        this.lingeringMorningTasks = [];
-        this.lingeringMiddayTasks = [];
-        this.lingeringAfternoonTasks = [];
-        this.lingeringEveningTasks = [];
-        
-        this.hand = [];
-        this.currentTasks = [];
-        this.selectedCards = [];
-        this.selectedTask = null;
-        this.message = "📅 Day 1 - Morning (Turn 1) started."; 
-        this.gameOver = false;
-        
-        this.burntOut = false; 
-        this.firstTaskAttempted = false; 
-        this.hyperfocusUsed = false;
-        this.discardToDrawUsed = false; 
-        
-        this.stressShield = 0; 
-        this.turnCostReduction = { physical: 0, social: 0, mental: 0 }; 
+        this.eveningTasksDiscard   = [];
 
-        // === MODIFIED: Anhedonia logic removed ===
-        
+        this.lingeringMorningTasks   = [];
+        this.lingeringMiddayTasks    = [];
+        this.lingeringAfternoonTasks = [];
+        this.lingeringEveningTasks   = [];
+
+        this.hand           = [];
+        this.currentTasks   = [];
+        this.selectedCards  = [];
+        this.selectedTask   = null;
+        this.message        = "📅 Day 1 - Morning (Turn 1) started.";
+        this.gameOver       = false;
+
+        this.burntOut           = false;
+        this.firstTaskAttempted = false;
+        this.hyperfocusUsed     = false;
+        this.discardToDrawUsed  = false;
+
+        this.stressShield       = 0;
+        this.turnCostReduction  = { physical: 0, social: 0, mental: 0 };
+
+        // --- Per-turn condition trackers ---
+        this.adhdFirstTaskBonus    = false;  // ADHD: after 1st task, next costs -1
+        this.tasksCompletedThisTurn = 0;     // OCD: track completions for bonus
+        this.nextTurnOcdBonus      = false;  // OCD: perfect turn → +2 draw next turn
+        this.anxietyPeekUsed       = false;  // Anxiety: once-per-turn peek
+        this.anxietyPeekedTask     = null;   // Anxiety: the peeked task object
+
+        // --- Bipolar ---
+        this.bipolarState = null; // 'manic' | 'depressive' | null
+
+        if (this.conditions.includes('bipolar')) {
+            this.bipolarDayFlip();
+        }
+
         this.drawCards();
-        this.drawTasks(); 
+        this.drawTasks();
     }
-    
-    // Create the F-card deck (60 cards)
+
+    // ----------------------------------------
+    // DECK CREATION & UTILITIES
+    // ----------------------------------------
+
     createFDeck() {
         const deck = [];
-        for (let i = 0; i < 20; i++) deck.push({type: 'physical'});
-        for (let i = 0; i < 20; i++) deck.push({type: 'social'});
-        for (let i = 0; i < 20; i++) deck.push({type: 'mental'});
+        for (let i = 0; i < 20; i++) deck.push({ type: 'physical' });
+        for (let i = 0; i < 20; i++) deck.push({ type: 'social' });
+        for (let i = 0; i < 20; i++) deck.push({ type: 'mental' });
         return this.shuffle(deck);
     }
-    
-    // Fisher-Yates shuffle algorithm
+
     shuffle(arr) {
         const shuffled = [...arr];
         for (let i = shuffled.length - 1; i > 0; i--) {
@@ -80,18 +94,16 @@ class Game {
         return shuffled;
     }
 
-    // Gets the correct deck/discard for the current turn
     getDecksForCurrentTurn() {
         switch (this.turn) {
-            case 1: return { deck: this.morningTasks, discard: this.morningTasksDiscard, name: "Morning" };
-            case 2: return { deck: this.middayTasks, discard: this.middayTasksDiscard, name: "Midday" };
+            case 1: return { deck: this.morningTasks,   discard: this.morningTasksDiscard,   name: "Morning" };
+            case 2: return { deck: this.middayTasks,    discard: this.middayTasksDiscard,    name: "Midday" };
             case 3: return { deck: this.afternoonTasks, discard: this.afternoonTasksDiscard, name: "Afternoon" };
-            case 4: return { deck: this.eveningTasks, discard: this.eveningTasksDiscard, name: "Evening" };
+            case 4: return { deck: this.eveningTasks,   discard: this.eveningTasksDiscard,   name: "Evening" };
             default: return { deck: [], discard: [], name: "Error" };
         }
     }
 
-    // Gets the correct LINGERING deck for the current turn
     getLingeringDeckForCurrentTurn() {
         switch (this.turn) {
             case 1: return this.lingeringMorningTasks;
@@ -101,15 +113,54 @@ class Game {
             default: return [];
         }
     }
-    
-    // Draw cards based on conditions/stress
+
+    // ----------------------------------------
+    // BIPOLAR DAY FLIP
+    // ----------------------------------------
+
+    bipolarDayFlip() {
+        if (this.fDeck.length === 0) {
+            this.fDeck.push(...this.shuffle(this.fDeckDiscard));
+            this.fDeckDiscard = [];
+        }
+        const card = this.fDeck.pop();
+        this.fDeckDiscard.push(card);
+        this.bipolarState = card.type === 'physical' ? 'manic' : 'depressive';
+        const label = this.bipolarState === 'manic'
+            ? '⚡ Manic episode — draw +2, 3 tasks, discard 3 at end of turn'
+            : '🌧️ Depressive episode — draw -2, free skips, task completions heal Stress';
+        this.message += ` (Bipolar: ${label})`;
+    }
+
+    // ----------------------------------------
+    // DRAW CARDS
+    // ----------------------------------------
+
     drawCards() {
-        let drawCount = 5; 
+        let drawCount = 5;
+
+        // ADHD: draw 6
         if (this.conditions.includes('adhd')) drawCount += 1;
+
+        // Bipolar episode modifier
+        if (this.conditions.includes('bipolar')) {
+            if (this.bipolarState === 'manic')      drawCount += 2;
+            if (this.bipolarState === 'depressive') drawCount -= 2;
+        }
+
+        // Stress penalty
         if (this.stress >= 3 && this.stress <= 4) drawCount -= 1;
-        if (this.stress >= 5 || this.burntOut) drawCount -= 2; 
-        drawCount = Math.max(1, drawCount); 
-        
+        if (this.stress >= 5 || this.burntOut)    drawCount -= 2;
+
+        drawCount = Math.max(1, drawCount);
+
+        // OCD perfect-turn bonus (from previous turn)
+        if (this.nextTurnOcdBonus) {
+            drawCount += 2;
+            this.nextTurnOcdBonus = false;
+            this.message += ' (OCD: Perfect turn! +2 cards)';
+        }
+
         if (this.fDeck.length < drawCount) {
             this.fDeck.push(...this.shuffle(this.fDeckDiscard));
             this.fDeckDiscard = [];
@@ -119,18 +170,35 @@ class Game {
         for (let i = 0; i < drawCount && this.fDeck.length > 0; i++) {
             this.hand.push(this.fDeck.pop());
         }
+
+        // OCD ritual: discard 1 card from hand at start of each turn
+        if (this.conditions.includes('ocd') && this.hand.length > 0) {
+            this.fDeckDiscard.push(this.hand.splice(0, 1)[0]);
+            this.message += ' (OCD: Ritual discard -1 card)';
+        }
+
+        // PTSD: 1 free Stress Shield per turn
+        if (this.conditions.includes('ptsd')) {
+            this.stressShield += 1;
+            this.message += ' (PTSD: +1 Stress Shield)';
+        }
     }
-    
-    // Draw tasks, prioritizing lingering
+
+    // ----------------------------------------
+    // DRAW TASKS
+    // ----------------------------------------
+
     drawTasks() {
         const { deck, discard, name } = this.getDecksForCurrentTurn();
         const lingeringDeck = this.getLingeringDeckForCurrentTurn();
         this.currentTasks = [];
-        const tasksToDraw = 2;
+
+        // Bipolar manic gets 3 tasks; everyone else gets 2
+        const tasksToDraw = (this.conditions.includes('bipolar') && this.bipolarState === 'manic') ? 3 : 2;
 
         if (deck.length < tasksToDraw && discard.length > 0) {
             deck.push(...this.shuffle(discard));
-            discard.splice(0, discard.length); 
+            discard.splice(0, discard.length);
             this.message += ` (Shuffling ${name} task discard...)`;
         }
 
@@ -144,8 +212,11 @@ class Game {
             this.currentTasks.push(lingeringDeck.pop());
         }
     }
-    
-    // Toggle card selection
+
+    // ----------------------------------------
+    // SELECTION
+    // ----------------------------------------
+
     selectCard(index) {
         const cardIndex = this.selectedCards.indexOf(index);
         if (cardIndex > -1) {
@@ -154,107 +225,171 @@ class Game {
             this.selectedCards.push(index);
         }
     }
-    
-    // Toggle task selection
+
     selectTask(index) {
         this.selectedTask = this.selectedTask === index ? null : index;
     }
-    
-    // Calculate modified cost
+
+    // ----------------------------------------
+    // COST CALCULATION
+    // ----------------------------------------
+
     getModifiedCost(task) {
-        const cost = {...task.cost};
+        const cost = { ...task.cost };
         const isFirstTask = !this.firstTaskAttempted;
-        
+
+        // --- DEPRESSION ---
+        // Penalty 1: all Physical tasks +1
         if (this.conditions.includes('depression') && (task.cost.physical || 0) > 0) {
             cost.physical = (cost.physical || 0) + 1;
         }
-        if (this.conditions.includes('anxiety') && (task.cost.social || 0) > 0) {
-             cost.social = (cost.social || 0) + 1;
-        }
-        if (this.conditions.includes('execDys') && isFirstTask) {
+        // Penalty 2: first task of the turn +1 (absorbed from Executive Dysfunction)
+        if (this.conditions.includes('depression') && isFirstTask) {
             if ((task.cost.physical || 0) > 0) {
                 cost.physical = (cost.physical || 0) + 1;
             } else {
                 cost.mental = (cost.mental || 0) + 1;
             }
         }
-        if (this.conditions.includes('dyslexia') && (task.cost.mental || 0) > 0) {
-            cost.mental = (cost.mental || 0) + 1;
+
+        // --- ADHD ---
+        // Penalty: first task of the turn +1 (absorbed from Executive Dysfunction)
+        if (this.conditions.includes('adhd') && isFirstTask) {
+            if ((task.cost.physical || 0) > 0) {
+                cost.physical = (cost.physical || 0) + 1;
+            } else {
+                cost.mental = (cost.mental || 0) + 1;
+            }
         }
+
+        // --- ANXIETY ---
+        // Penalty: all Social tasks +1
+        if (this.conditions.includes('anxiety') && (task.cost.social || 0) > 0) {
+            cost.social = (cost.social || 0) + 1;
+        }
+
+        // --- ASD ---
+        // Penalty: all Social tasks +1 Social and +1 Mental
         if (this.conditions.includes('asd') && (task.cost.social || 0) > 0) {
             cost.social = (cost.social || 0) + 1;
             cost.mental = (cost.mental || 0) + 1;
         }
 
+        // --- HIGH STRESS PENALTY ---
         if (this.stress >= 5 || this.burntOut) {
             cost.physical = (cost.physical || 0) + 1;
-            cost.social = (cost.social || 0) + 1;
-            cost.mental = (cost.mental || 0) + 1;
+            cost.social   = (cost.social   || 0) + 1;
+            cost.mental   = (cost.mental   || 0) + 1;
         }
-        
+
+        // --- Apply turn cost reductions (COST_REDUCTION_TURN effects) ---
         cost.physical = Math.max(0, (cost.physical || 0) - this.turnCostReduction.physical);
-        cost.social = Math.max(0, (cost.social || 0) - this.turnCostReduction.social);
-        cost.mental = Math.max(0, (cost.mental || 0) - this.turnCostReduction.mental);
-        
+        cost.social   = Math.max(0, (cost.social   || 0) - this.turnCostReduction.social);
+        cost.mental   = Math.max(0, (cost.mental   || 0) - this.turnCostReduction.mental);
+
+        // --- ADHD POSITIVE ---
+        // After completing first task, the next task costs -1 any type
+        if (this.conditions.includes('adhd') && this.adhdFirstTaskBonus && !isFirstTask) {
+            if      (cost.physical > 0) cost.physical--;
+            else if (cost.social   > 0) cost.social--;
+            else if (cost.mental   > 0) cost.mental--;
+        }
+
         return cost;
     }
-    
-    // Attempt to complete task
+
+    // ----------------------------------------
+    // ATTEMPT TASK
+    // ----------------------------------------
+
     attemptTask() {
         if (this.selectedTask === null) { this.message = "⚠️ Select a task first!"; return; }
         if (this.selectedCards.length === 0) { this.message = "⚠️ Select F cards to play!"; return; }
-        
-        const task = this.currentTasks[this.selectedTask];
+
+        const task          = this.currentTasks[this.selectedTask];
         const selectedFCards = this.selectedCards.map(i => this.hand[i]);
-        const modifiedCost = this.getModifiedCost(task);
-        
+        const modifiedCost  = this.getModifiedCost(task);
+
         const physicalNeeded = modifiedCost.physical || 0;
-        const socialNeeded = modifiedCost.social || 0;
-        const mentalNeeded = modifiedCost.mental || 0;
-        
+        const socialNeeded   = modifiedCost.social   || 0;
+        const mentalNeeded   = modifiedCost.mental   || 0;
+
         const physicalPlayed = selectedFCards.filter(c => c.type === 'physical').length;
-        const socialPlayed = selectedFCards.filter(c => c.type === 'social').length;
-        const mentalPlayed = selectedFCards.filter(c => c.type === 'mental').length;
-        
+        const socialPlayed   = selectedFCards.filter(c => c.type === 'social').length;
+        const mentalPlayed   = selectedFCards.filter(c => c.type === 'mental').length;
+
         if (physicalPlayed >= physicalNeeded && socialPlayed >= socialNeeded && mentalPlayed >= mentalNeeded) {
-            this.firstTaskAttempted = true; 
-            
+            const wasFirstTask = !this.firstTaskAttempted;
+            this.firstTaskAttempted = true;
+
             const { discard } = this.getDecksForCurrentTurn();
-            discard.push(task); 
+            discard.push(task);
 
             this.completedTasks.push(task.name);
             this.currentTasks.splice(this.selectedTask, 1);
-            
-            this.selectedCards.sort((a,b) => b - a).forEach(i => {
+
+            this.selectedCards.sort((a, b) => b - a).forEach(i => {
                 this.fDeckDiscard.push(this.hand.splice(i, 1)[0]);
             });
-            
+
             this.message = `✅ Completed: ${task.name}`;
             this.selectedCards = [];
-            this.selectedTask = null;
-            
+            this.selectedTask  = null;
+
+            // Apply task effect
             if (task.effect) {
-                this.applyEffect(task.effect, task.name); 
+                this.applyEffect(task.effect, task.name);
             }
+
+            // --- CONDITION POSITIVES ON TASK COMPLETION ---
+
+            // Depression: completing first task draws +1 card
+            if (wasFirstTask && this.conditions.includes('depression')) {
+                this.drawWithReshuffle(1);
+                this.message += ' (Depression: Momentum! +1 card)';
+            }
+
+            // ADHD: after completing first task, activate next-task discount
+            if (wasFirstTask && this.conditions.includes('adhd')) {
+                this.adhdFirstTaskBonus = true;
+            } else if (!wasFirstTask && this.conditions.includes('adhd') && this.adhdFirstTaskBonus) {
+                // Consume the bonus (it was applied in getModifiedCost)
+                this.adhdFirstTaskBonus = false;
+            }
+
+            // ASD: completing a Social task draws +1 card
+            if ((task.cost.social || 0) > 0 && this.conditions.includes('asd')) {
+                this.drawWithReshuffle(1);
+                this.message += ' (ASD: Social win! +1 card)';
+            }
+
+            // Bipolar Depressive: completing any task removes 1 Stress
+            if (this.conditions.includes('bipolar') && this.bipolarState === 'depressive' && this.stress > 0) {
+                this.stress = Math.max(0, this.stress - 1);
+                this.message += ' (Bipolar Depressive: -1 Stress)';
+            }
+
+            // OCD: count tasks completed this turn
+            this.tasksCompletedThisTurn++;
 
         } else {
             this.message = "❌ Wrong cards! Check the task requirements.";
         }
     }
-    
-    // === MODIFIED: Removed Anhedonia and ASD bonus logic ===
+
+    // ----------------------------------------
+    // EFFECTS
+    // ----------------------------------------
+
     applyEffect(effect, taskName) {
-        // Check for Burnout Anhedonia
-        if (this.burntOut && 
-            (effect.code.includes('REMOVE_STRESS') || 
+        if (this.burntOut &&
+            (effect.code.includes('REMOVE_STRESS') ||
              effect.code.includes('PREVENT_STRESS') ||
              effect.code.includes('DRAW'))) {
             this.message += " (😡 Burnt Out: Effect fizzled...)";
             return;
         }
-        
-        // Depression/Anhedonia check removed
-        
+
         this.message += ` (${effect.text})`;
 
         switch (effect.code) {
@@ -283,8 +418,7 @@ class Game {
                 break;
         }
     }
-    
-    // Helper for drawing with reshuffle check
+
     drawWithReshuffle(amount) {
         if (this.fDeck.length < amount) {
             this.fDeck.push(...this.shuffle(this.fDeckDiscard));
@@ -295,7 +429,6 @@ class Game {
         }
     }
 
-    // Helper for drawing specific cards
     drawSpecific(type, amount) {
         let found = 0;
         for (let i = this.fDeck.length - 1; i >= 0; i--) {
@@ -315,10 +448,13 @@ class Game {
             }
         }
     }
-    
-    // Helper function to add stress, checking shield
+
+    // ----------------------------------------
+    // STRESS
+    // ----------------------------------------
+
     addStress(amount) {
-        if (this.burntOut) return; 
+        if (this.burntOut) return;
 
         if (this.stressShield > 0) {
             const prevented = Math.min(this.stressShield, amount);
@@ -326,231 +462,284 @@ class Game {
             amount -= prevented;
             this.message += ` (Prevented ${prevented} Stress!)`;
         }
-        
+
         this.stress = Math.min(7, this.stress + amount);
 
         if (this.stress >= 7) {
             if (this.mode === 'life') {
-                this.endGame(); 
+                this.endGame();
             } else {
                 this.burntOut = true;
-                this.stress = 7; 
-                this.message += " 😡 You are Burnt Out! All tasks cost more and positive effects have fizzled.";
+                this.stress = 7;
+                this.message += " 😡 You are Burnt Out! All tasks cost more and positive effects fizzle.";
             }
         }
     }
-    
-    // === MODIFIED: Removed Anxiety penalty ===
+
+    // ----------------------------------------
+    // SKIP TASK
+    // ----------------------------------------
+
     skipTask() {
         if (this.selectedTask === null) { this.message = "⚠️ Select a task to skip!"; return; }
-        
-        this.firstTaskAttempted = true; 
-        
+
+        this.firstTaskAttempted = true;
+
         const task = this.currentTasks.splice(this.selectedTask, 1)[0];
         const { discard } = this.getDecksForCurrentTurn();
-        discard.push(task); 
+        discard.push(task);
 
         this.message = `⏭️ Skipped: ${task.name}`;
         this.selectedTask = null;
-        
-        let stressToAdd = 2; // Base penalty
-        // Anxiety check removed
+
+        // Bipolar depressive: skipping costs 0 stress
+        if (this.conditions.includes('bipolar') && this.bipolarState === 'depressive') {
+            this.message += ' (Bipolar Depressive: no stress penalty)';
+            return;
+        }
+
+        // PTSD: skipping costs +3 instead of +2
+        let stressToAdd = this.conditions.includes('ptsd') ? 3 : 2;
         this.addStress(stressToAdd);
         this.message += ` (+${stressToAdd} Stress)`;
     }
 
-    // Hyperfocus ability
+    // ----------------------------------------
+    // ANXIETY PEEK
+    // ----------------------------------------
+
+    peekNextTask() {
+        if (!this.conditions.includes('anxiety')) return;
+        if (this.anxietyPeekUsed) { this.message = "⚠️ Anxiety Peek already used this turn."; return; }
+
+        // Get the next turn's deck (wraps to morning if on evening)
+        const nextTurn = this.turn < 4 ? this.turn + 1 : 1;
+        let nextDeck;
+        switch (nextTurn) {
+            case 1: nextDeck = this.morningTasks;   break;
+            case 2: nextDeck = this.middayTasks;    break;
+            case 3: nextDeck = this.afternoonTasks; break;
+            case 4: nextDeck = this.eveningTasks;   break;
+        }
+
+        if (!nextDeck || nextDeck.length === 0) {
+            this.message = "👁️ Next task deck is empty — nothing to peek at.";
+            return;
+        }
+
+        this.anxietyPeekedTask = nextDeck[nextDeck.length - 1];
+        this.anxietyPeekUsed   = true;
+        const nextTurnName = ["Morning", "Midday", "Afternoon", "Evening"][nextTurn - 1];
+        this.message = `👁️ Anxiety Peek: Coming up in ${nextTurnName} — "${this.anxietyPeekedTask.name}"`;
+    }
+
+    // ----------------------------------------
+    // HYPERFOCUS (ADHD ability)
+    // ----------------------------------------
+
     useHyperfocus() {
         if (!this.conditions.includes('adhd')) return;
-        if (this.hyperfocusUsed) { this.message = "⚠️ Hyperfocus already used this turn."; return; }
+        if (this.hyperfocusUsed)    { this.message = "⚠️ Hyperfocus already used this turn."; return; }
         if (this.selectedTask === null) { this.message = "⚠️ Select a task to hyperfocus on!"; return; }
-        if (this.hand.length < 3) { this.message = "⚠️ Need at least 3 cards to hyperfocus!"; return; }
+        if (this.hand.length < 3)   { this.message = "⚠️ Need at least 3 cards to Hyperfocus!"; return; }
 
         const task = this.currentTasks[this.selectedTask];
-        
-        for(let i = 0; i < 3; i++) {
+
+        for (let i = 0; i < 3; i++) {
             this.fDeckDiscard.push(this.hand.splice(0, 1)[0]);
         }
-        this.hyperfocusUsed = true;
-        this.firstTaskAttempted = true; 
-        
+        this.hyperfocusUsed     = true;
+        this.firstTaskAttempted = true;
+
         const { discard } = this.getDecksForCurrentTurn();
-        discard.push(task); 
+        discard.push(task);
         this.completedTasks.push(task.name);
         this.currentTasks.splice(this.selectedTask, 1);
-        
+
         this.message = `⚡ HYPERFOCUS! Completed: ${task.name}`;
         this.selectedCards = [];
-        this.selectedTask = null;
-        
+        this.selectedTask  = null;
+
+        this.tasksCompletedThisTurn++;
+        // Activate ADHD discount for next task
+        this.adhdFirstTaskBonus = true;
+
         if (task.effect) {
-            this.applyEffect(task.effect, task.name); 
+            this.applyEffect(task.effect, task.name);
         }
     }
 
-    // Discard 2 *selected* to draw 2 (Once per turn)
+    // ----------------------------------------
+    // DISCARD 2 → DRAW 2
+    // ----------------------------------------
+
     discardToDraw() {
-        if (this.burntOut) { this.message = "😡 You are burnt out and too exhausted to search for cards."; return; }
-        if (this.discardToDrawUsed) {
-            this.message = "⚠️ Discard 2, Draw 2 already used this turn.";
-            return;
-        }
-        if (this.selectedTask !== null) {
-            this.message = "⚠️ Cannot discard cards while a task is selected.";
-            return;
-        }
-        if (this.selectedCards.length !== 2) {
-            this.message = "⚠️ Select exactly 2 cards to discard!";
-            return;
-        }
+        if (this.burntOut)         { this.message = "😡 Burnt out — too exhausted to search for cards."; return; }
+        if (this.discardToDrawUsed) { this.message = "⚠️ Discard 2, Draw 2 already used this turn."; return; }
+        if (this.selectedTask !== null) { this.message = "⚠️ Cannot discard cards while a task is selected."; return; }
+        if (this.selectedCards.length !== 2) { this.message = "⚠️ Select exactly 2 cards to discard!"; return; }
 
-        this.selectedCards.sort((a,b) => b - a).forEach(i => {
+        this.selectedCards.sort((a, b) => b - a).forEach(i => {
             this.fDeckDiscard.push(this.hand.splice(i, 1)[0]);
         });
-        this.selectedCards = [];
-        this.discardToDrawUsed = true; 
-        
-        this.drawWithReshuffle(2); 
+        this.selectedCards     = [];
+        this.discardToDrawUsed = true;
+
+        this.drawWithReshuffle(2);
         this.message = "♻️ Discarded 2, drew 2.";
-        if (this.fDeck.length < 2 && this.fDeckDiscard.length > 0) {
-             this.message += " (Shuffled discard pile)";
-        }
     }
 
-    // Spend 3 *selected* to remove 1 stress
-    spendToRemoveStress() {
-        if (this.burntOut) { this.message = "😡 You are burnt out. This has no effect."; return; }
-        if (this.selectedTask !== null) {
-            this.message = "⚠️ Cannot spend cards while a task is selected.";
-            return;
-        }
-        if (this.stress <= 0) {
-            this.message = "⚠️ No stress to remove!";
-            return;
-        }
-        if (this.selectedCards.length !== 3) {
-            this.message = "⚠️ Select exactly 3 cards to spend!";
-            return;
-        }
+    // ----------------------------------------
+    // SPEND 3 → REMOVE 1 STRESS
+    // ----------------------------------------
 
-        this.selectedCards.sort((a,b) => b - a).forEach(i => {
+    spendToRemoveStress() {
+        if (this.burntOut)    { this.message = "😡 Burnt out. This has no effect."; return; }
+        if (this.selectedTask !== null) { this.message = "⚠️ Cannot spend cards while a task is selected."; return; }
+        if (this.stress <= 0) { this.message = "⚠️ No stress to remove!"; return; }
+        if (this.selectedCards.length !== 3) { this.message = "⚠️ Select exactly 3 cards to spend!"; return; }
+
+        this.selectedCards.sort((a, b) => b - a).forEach(i => {
             this.fDeckDiscard.push(this.hand.splice(i, 1)[0]);
         });
         this.selectedCards = [];
-        
+
         this.stress--;
         this.message = "🧘 Spent 3 cards to remove 1 stress.";
     }
-    
-    // === MODIFIED: Removed ASD lingering penalty and Anhedonia flip ===
+
+    // ----------------------------------------
+    // END TURN
+    // ----------------------------------------
+
     endTurn() {
+        // Burnout critical exhaustion
         if (this.burntOut && this.hand.length > 0) {
-            this.fDeckDiscard.push(this.hand.splice(0, 1)[0]); 
+            this.fDeckDiscard.push(this.hand.splice(0, 1)[0]);
             this.message = "😡 Critical Exhaustion: Discarded 1 card. ";
         } else {
-            this.message = ""; 
+            this.message = "";
         }
 
-        let stressFromIncomplete = 0;
-        let stressPerTask = 1; 
+        // OCD perfect-turn bonus check: both tasks done, nothing lingering
+        if (this.conditions.includes('ocd')) {
+            if (this.tasksCompletedThisTurn >= 2 && this.currentTasks.length === 0) {
+                this.nextTurnOcdBonus = true;
+                this.message += '(OCD: Perfect turn — +2 cards next turn!) ';
+            }
+        }
 
-        // ASD check removed
-
+        // Handle incomplete tasks → lingering
         if (this.currentTasks.length > 0) {
             const lingeringDeck = this.getLingeringDeckForCurrentTurn();
-            stressFromIncomplete = this.currentTasks.length * stressPerTask;
-            
+            const stressFromIncomplete = this.currentTasks.length;
             while (this.currentTasks.length > 0) {
                 lingeringDeck.push(this.currentTasks.pop());
             }
+            this.addStress(stressFromIncomplete);
+            this.message += `+${stressFromIncomplete} Stress from lingering tasks. `;
         }
-        
+
+        // ADHD end-of-turn discard
         if (this.conditions.includes('adhd') && this.hand.length > 0) {
             const discardAmount = Math.min(this.hand.length, 2);
-            for(let i = 0; i < discardAmount; i++) {
+            for (let i = 0; i < discardAmount; i++) {
                 this.fDeckDiscard.push(this.hand.splice(0, 1)[0]);
             }
-            this.message += `⏩ End Turn. Discarded ${discardAmount} cards (ADHD penalty).`;
+            this.message += `⏩ End Turn. Discarded ${discardAmount} cards (ADHD). `;
         } else {
-             this.message += `⏩ End Turn.`;
+            this.message += `⏩ End Turn. `;
         }
-        
-        if (stressFromIncomplete > 0) {
-            this.addStress(stressFromIncomplete); 
-            this.message += ` (+${stressFromIncomplete} Stress from lingering tasks)`;
+
+        // Bipolar Manic end-of-turn discard
+        if (this.conditions.includes('bipolar') && this.bipolarState === 'manic' && this.hand.length > 0) {
+            const discardAmount = Math.min(this.hand.length, 3);
+            for (let i = 0; i < discardAmount; i++) {
+                this.fDeckDiscard.push(this.hand.splice(0, 1)[0]);
+            }
+            this.message += `Discarded ${discardAmount} cards (Bipolar Manic). `;
         }
-        
+
+        // Discard all remaining hand cards to F-deck discard
         while (this.hand.length > 0) {
             this.fDeckDiscard.push(this.hand.pop());
         }
-        this.selectedCards = [];
-        this.selectedTask = null;
-        
-        this.firstTaskAttempted = false;
-        this.hyperfocusUsed = false;
-        this.discardToDrawUsed = false; 
-        this.stressShield = 0; 
-        this.turnCostReduction = { physical: 0, social: 0, mental: 0 }; 
 
-        // Anhedonia flip logic removed
-        
-        this.turn++; 
-        if (this.turn > 4) { 
-            this.turn = 1; 
-            this.day++; 
+        // Reset per-turn state
+        this.selectedCards         = [];
+        this.selectedTask          = null;
+        this.firstTaskAttempted    = false;
+        this.hyperfocusUsed        = false;
+        this.discardToDrawUsed     = false;
+        this.stressShield          = 0;
+        this.turnCostReduction     = { physical: 0, social: 0, mental: 0 };
+        this.adhdFirstTaskBonus    = false;
+        this.tasksCompletedThisTurn = 0;
+        this.anxietyPeekUsed       = false;
+        this.anxietyPeekedTask     = null;
+
+        // Advance turn/day
+        this.turn++;
+        if (this.turn > 4) {
+            this.turn = 1;
+            this.day++;
         }
-        
+
         if (this.day > this.dayLimit) {
             this.endGame();
         } else {
+            // Bipolar: flip new episode card at the start of each new day
+            if (this.turn === 1 && this.conditions.includes('bipolar')) {
+                this.bipolarDayFlip();
+            }
+
             this.drawCards();
-            this.drawTasks(); 
-            
-            let turnName = "";
-            if (this.turn === 1) turnName = "Morning";
-            else if (this.turn === 2) turnName = "Midday";
-            else if (this.turn === 3) turnName = "Afternoon";
-            else if (this.turn === 4) turnName = "Evening";
-            this.message += ` 📅 Day ${this.day} - ${turnName} (Turn ${this.turn}) started.`;
+            this.drawTasks();
+
+            const turnName = ["Morning", "Midday", "Afternoon", "Evening"][this.turn - 1] || "";
+            this.message += `📅 Day ${this.day} - ${turnName} (Turn ${this.turn}) started.`;
         }
     }
-    
-    // End the game
+
+    // ----------------------------------------
+    // GAME OVER
+    // ----------------------------------------
+
     endGame() {
         this.gameOver = true;
         const tasksCompleted = this.completedTasks.length;
 
         if (this.stress >= 7) {
-            this.message = `😡 BURNOUT! Stress limit reached at ${this.stress}.`;
+            this.message = `😡 BURNOUT. Stress limit reached.`;
             if (this.mode === 'life') {
-                this.message += ` You survived for ${this.day - 1} days and completed ${tasksCompleted} tasks.`;
+                this.message += ` You survived ${this.day - 1} days and completed ${tasksCompleted} tasks. Life continues — just differently.`;
             } else {
-                this.message += ` You completed ${tasksCompleted} tasks.`;
+                this.message += ` You completed ${tasksCompleted} tasks. Rest up.`;
             }
             return;
         }
 
         if (this.mode === 'life') {
-            this.message = "Error: 'Life' mode ended without burnout.";
+            this.message = "Error: Life mode ended without burnout.";
             return;
         }
-        
+
         if (this.burntOut) {
-            this.message = `😡 BURNOUT. You finished the ${this.mode} in a state of burnout. You completed ${tasksCompleted} tasks.`;
+            this.message = `😡 BURNOUT. You finished the ${this.mode} in a burnt-out state. You completed ${tasksCompleted} tasks.`;
             return;
         }
-        
-        const totalPossibleTasks = this.dayLimit * 8; 
-        const completionRate = tasksCompleted / totalPossibleTasks;
+
+        const totalPossibleTasks = this.dayLimit * 8;
+        const completionRate     = tasksCompleted / totalPossibleTasks;
 
         if (completionRate >= 0.8) {
-            this.message = `🎉 Fantastic! (A+) - You didn't just survive, you thrived! You completed ${tasksCompleted} tasks.`;
+            this.message = `🎉 Fantastic! (A+) — You didn't just survive, you thrived! ${tasksCompleted} tasks completed.`;
         } else if (completionRate >= 0.6) {
-            this.message = `👍 Great Job! (B) - You managed your Fs well and got a lot done. You completed ${tasksCompleted} tasks.`;
+            this.message = `👍 Great Job! (B) — You managed your Fs well. ${tasksCompleted} tasks completed.`;
         } else if (completionRate >= 0.4) {
-            this.message = `😓 You Survived. (C) - It was a struggle, but you made it through. You completed ${tasksCompleted} tasks.`;
+            this.message = `😓 You Survived. (C) — It was a struggle, but you made it through. ${tasksCompleted} tasks completed.`;
         } else {
-            this.message = `💔 Overwhelmed. (D) - The ${this.mode} was tough, but you'll get 'em next time. You completed ${tasksCompleted} tasks.`;
+            this.message = `💔 Overwhelmed. (D) — The ${this.mode} was tough. ${tasksCompleted} tasks completed. You'll get 'em next time.`;
         }
     }
 }

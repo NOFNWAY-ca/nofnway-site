@@ -3,39 +3,31 @@
 // User interaction and game control
 // ============================================
 
-// === NEW: Global variable for game mode ===
-let selectedMode = 'week'; // Default mode
+let selectedMode = 'week'; // Default
 
-// Toggle condition selection
-function toggleCondition(cond) {
-    const elem = document.getElementById(`cond-${cond}`);
-    if (selectedConditions.has(cond)) {
-        selectedConditions.delete(cond);
-        elem.classList.remove('selected');
-    } else {
-        selectedConditions.add(cond);
-        elem.classList.add('selected');
-    }
-}
-
-// === NEW: Function to select game mode ===
+// Select game mode and re-render setup screen to reflect selection
 function selectMode(mode) {
     selectedMode = mode;
-    // Update button visual state
-    document.getElementById('mode-day').classList.remove('selected');
-    document.getElementById('mode-week').classList.remove('selected');
-    document.getElementById('mode-life').classList.remove('selected');
-    document.getElementById(`mode-${mode}`).classList.add('selected');
+    render();
 }
 
-// Enable/disable start button
-function checkAgreement() {
-    const checkbox = document.getElementById('agreementCheckbox');
-    const button = document.getElementById('startButton');
-    button.disabled = !checkbox.checked;
+// Toggle a condition on/off, then re-render
+function toggleCondition(cond) {
+    if (selectedConditions.has(cond)) {
+        selectedConditions.delete(cond);
+    } else {
+        selectedConditions.add(cond);
+    }
+    render();
 }
 
-// === MODIFIED: Start a new game with selected mode and conditions ===
+// Select Neurotypical (tutorial) — clears all other conditions
+function clearConditions() {
+    selectedConditions.clear();
+    render();
+}
+
+// Start a new game with selected mode and conditions
 function startGame() {
     game = new Game(selectedMode, [...selectedConditions]);
     render();
@@ -59,9 +51,15 @@ function attemptTask() {
     render();
 }
 
-// Use the ADHD Hyperfocus ability
+// ADHD: Hyperfocus ability
 function useHyperfocus() {
     game.useHyperfocus();
+    render();
+}
+
+// Anxiety: Peek at next task deck
+function anxietyPeek() {
+    game.peekNextTask();
     render();
 }
 
@@ -89,13 +87,13 @@ function endTurn() {
     render();
 }
 
-// === MODIFIED: Reset game with same mode and conditions ===
+// Reset with same mode and conditions
 function resetGame() {
-    game = new Game(selectedMode, [...selectedConditions]); 
+    game = new Game(selectedMode, [...selectedConditions]);
     render();
 }
 
-// Initialize the game when page loads
-document.addEventListener('DOMContentLoaded', function() {
+// Initialize on load
+document.addEventListener('DOMContentLoaded', function () {
     render();
 });
