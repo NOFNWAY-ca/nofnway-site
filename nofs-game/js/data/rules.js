@@ -37,9 +37,9 @@ const GAME_TEXT = {
         },
         'adhd': {
             name: "ADHD",
-            penalty: "Draw 6 cards but discard 2 at end of turn. The <em>first</em> task each turn costs +1 🧠 (initiation).",
-            positive: "After completing your first task, the next task costs -1 (any type). Hyperfocus: discard 3 to complete any task for free (once per <em>day</em>).",
-            rule: "Draw 6 cards, discard 2 at end of turn. First task costs +1 🧠. After first task, next task costs -1. Hyperfocus once per day."
+            penalty: "Draw 6 cards but discard 2 at end of turn. The <em>first</em> task each turn costs +1 🧠 (initiation difficulty).",
+            positive: "Hyperfocus: discard 3 cards to complete any task for free (once per <em>day</em>).",
+            rule: "Draw 6 cards, discard 2 at end of turn. First task costs +1 🧠. Hyperfocus once per day: discard 3 to complete any task free."
         },
         'anxiety': {
             name: "Anxiety",
@@ -50,26 +50,26 @@ const GAME_TEXT = {
         'asd': {
             name: "ASD",
             penalty: "All 👥 Social tasks cost +1 👥 (social battery drain).",
-            positive: "Completing a Social task draws +2 F-Cards (social win = energy spike).",
-            rule: "All 👥 Social tasks cost +1 👥. But completing a Social task draws +2 cards."
+            positive: "Completing a Social task draws +3 F-Cards (social win = energy spike).",
+            rule: "All 👥 Social tasks cost +1 👥. But completing a Social task draws +3 cards."
         },
         'ocd': {
             name: "OCD",
-            penalty: "At the start of each turn, discard 1 card from your hand (ritual tax).",
+            penalty: "At the start of each turn, if you have 4+ cards, discard 1 (ritual tax).",
             positive: "If you complete <em>both</em> tasks this turn with none lingering, draw +2 cards next turn.",
-            rule: "Discard 1 card at turn start (ritual). Complete both tasks with no lingering → draw +2 next turn."
+            rule: "Discard 1 card at turn start if hand ≥ 4 (ritual). Complete both tasks with no lingering → draw +2 next turn."
         },
         'bipolar': {
             name: "Bipolar",
-            penalty: "Each day, flip an F-Card: ⚡Physical = Manic (draw +2, discard 3 at turn end, 3 tasks/turn). Social or Mental = Depressive (draw -1, skips cost 0 stress).",
-            positive: "Manic: 3 tasks per turn. Depressive: completing any task removes 1 Stress.",
-            rule: "Day-start flip determines episode. Manic: +2 draw, discard 3/turn, 3 tasks. Depressive: -1 draw, free skips, completing tasks removes 1 Stress."
+            penalty: "Each day, flip an F-Card: ⚡Physical = Manic (draw +2, discard 3 at turn end, 3 tasks/turn). 👥Social or 🧠Mental = Depressive (draw -1).",
+            positive: "Manic: draw +2 and face 3 tasks per turn. Depressive: skipping a task costs 0 Stress.",
+            rule: "Day-start flip determines episode. Manic: +2 draw, discard 3/turn, 3 tasks. Depressive: -1 draw, free skips."
         },
         'ptsd': {
             name: "PTSD",
-            penalty: "Skipping costs +3 Stress. Lingering tasks cost +2 Stress each (instead of +1).",
+            penalty: "Skipping a task costs +3 Stress (instead of +2).",
             positive: "Start each <em>day</em> with 1 free Stress Shield (absorbs 1 incoming Stress).",
-            rule: "Skipping costs +3 Stress. Lingering tasks cost +2 each. But start each day with 1 free Stress Shield."
+            rule: "Skipping costs +3 Stress. But start each day with 1 free Stress Shield."
         }
     }
 };

@@ -54,7 +54,6 @@ class Game {
         this.stressShield       = 0;
         this.turnCostReduction  = { physical: 0, social: 0, mental: 0 };
 
-        this.adhdFirstTaskBonus    = false;
         this.tasksCompletedThisTurn = 0;
         this.nextTurnOcdBonus      = false;
         this.anxietyPeekUsed       = false;
@@ -141,7 +140,7 @@ class Game {
 
         this.drawWithReshuffle(drawCount);
 
-        if (this.conditions.includes('ocd') && this.hand.length > 0) {
+        if (this.conditions.includes('ocd') && this.hand.length >= 4) {
             this.fDeckDiscard.push(this.hand.splice(0, 1)[0]);
         }
         // PTSD: 1 stress shield only at the start of each day (not every turn)
@@ -182,8 +181,9 @@ class Game {
             cost.mental = (cost.mental || 0) + 1;
         }
 
-        // Anxiety: social tasks cost +1 mental (cognitive/overthinking load)
-        if (this.conditions.includes('anxiety') && (task.cost.social || 0) > 0) {
+        // Anxiety: purely-social tasks cost +1 mental (overthinking).
+        // Tasks that already have a mental cost are unaffected — you're already using that energy.
+        if (this.conditions.includes('anxiety') && (task.cost.social || 0) > 0 && (task.cost.mental || 0) === 0) {
             cost.mental = (cost.mental || 0) + 1;
         }
 
@@ -238,13 +238,9 @@ class Game {
             if (wasFirst && this.conditions.includes('depression')) {
                 this.drawWithReshuffle(1);
             }
-            // ASD: completing a social task draws +2 (social wins = energy)
+            // ASD: completing a social task draws +3 (social win = energy spike)
             if ((task.cost.social || 0) > 0 && this.conditions.includes('asd')) {
-                this.drawWithReshuffle(2);
-            }
-            // Bipolar depressive: every completion removes 1 stress
-            if (this.conditions.includes('bipolar') && this.bipolarState === 'depressive' && this.stress > 0) {
-                this.stress = Math.max(0, this.stress - 1);
+                this.drawWithReshuffle(3);
             }
 
             this.tasksCompletedThisTurn++;
@@ -303,9 +299,7 @@ class Game {
     endTurn() {
         if (this.currentTasks.length > 0) {
             const lingering = this.getLingeringDeckForCurrentTurn();
-            // PTSD: lingering tasks cost +2 stress each (trauma response to falling behind)
-            const lingerCost = this.conditions.includes('ptsd') ? 2 : 1;
-            this.addStress(this.currentTasks.length * lingerCost);
+            this.addStress(this.currentTasks.length);
             while (this.currentTasks.length > 0) lingering.push(this.currentTasks.pop());
         }
 
