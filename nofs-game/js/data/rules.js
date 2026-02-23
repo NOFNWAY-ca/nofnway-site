@@ -31,9 +31,9 @@ const GAME_TEXT = {
         },
         'depression': {
             name: "Depression",
-            penalty: "All ⚡ Physical tasks cost +1 ⚡.",
-            positive: "Completing your <em>first</em> task each turn draws +1 F-Card (momentum).",
-            rule: "All ⚡ Physical tasks cost +1 ⚡. But completing your first task each turn draws +1 card."
+            penalty: "Draw 1 fewer F-Card each turn (motivation deficit — 4 instead of 5).",
+            positive: "Completing your <em>first</em> task each turn draws +1 card back (momentum restores you to 5).",
+            rule: "Draw 4 cards/turn instead of 5. But completing your first task draws +1 card — if you get started, you're back to normal."
         },
         'adhd': {
             name: "ADHD",
@@ -50,8 +50,8 @@ const GAME_TEXT = {
         'asd': {
             name: "ASD",
             penalty: "All 👥 Social tasks cost +1 👥 (social battery drain).",
-            positive: "Completing a Social task draws +1 F-Card.",
-            rule: "All 👥 Social tasks cost +1 👥. Completing a Social task draws +1 card."
+            positive: "Completing a Social task draws +2 F-Cards (social win = energy spike).",
+            rule: "All 👥 Social tasks cost +1 👥. But completing a Social task draws +2 cards."
         },
         'ocd': {
             name: "OCD",
@@ -67,9 +67,9 @@ const GAME_TEXT = {
         },
         'ptsd': {
             name: "PTSD",
-            penalty: "Skipping a task costs +3 Stress instead of +2.",
+            penalty: "Skipping costs +3 Stress. Lingering tasks cost +2 Stress each (instead of +1).",
             positive: "Start each <em>day</em> with 1 free Stress Shield (absorbs 1 incoming Stress).",
-            rule: "Skipping costs +3 Stress. But start each day (not each turn) with 1 free Stress Shield."
+            rule: "Skipping costs +3 Stress. Lingering tasks cost +2 each. But start each day with 1 free Stress Shield."
         }
     }
 };

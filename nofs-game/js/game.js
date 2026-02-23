@@ -123,7 +123,8 @@ class Game {
 
     drawCards() {
         let drawCount = 5;
-        if (this.conditions.includes('adhd')) drawCount += 1;
+        if (this.conditions.includes('adhd'))      drawCount += 1;
+        if (this.conditions.includes('depression')) drawCount -= 1; // motivation deficit; positive restores on first task
         if (this.conditions.includes('bipolar')) {
             if (this.bipolarState === 'manic')      drawCount += 2;
             if (this.bipolarState === 'depressive') drawCount -= 1; // was -2
@@ -174,10 +175,7 @@ class Game {
         const cost = { ...task.cost };
         const isFirstTask = !this.firstTaskAttempted;
 
-        // Depression: physical tasks cost +1. No extra first-task penalty.
-        if (this.conditions.includes('depression')) {
-            if ((task.cost.physical || 0) > 0) cost.physical = (cost.physical || 0) + 1;
-        }
+        // Depression: draw -1/turn (motivation deficit) handled in drawCards
 
         // ADHD: first task of turn costs +1 mental (initiation difficulty)
         if (this.conditions.includes('adhd') && isFirstTask) {
@@ -203,12 +201,6 @@ class Game {
         cost.physical = Math.max(0, (cost.physical || 0) - this.turnCostReduction.physical);
         cost.social   = Math.max(0, (cost.social   || 0) - this.turnCostReduction.social);
         cost.mental   = Math.max(0, (cost.mental   || 0) - this.turnCostReduction.mental);
-
-        if (this.conditions.includes('adhd') && this.adhdFirstTaskBonus && !isFirstTask) {
-            if (cost.mental > 0) cost.mental--;
-            else if (cost.physical > 0) cost.physical--;
-            else if (cost.social > 0) cost.social--;
-        }
 
         return cost;
     }
@@ -240,7 +232,21 @@ class Game {
             });
 
             if (task.effect) this.applyEffect(task.effect);
-            if (wasFirst && this.conditions.includes('adhd')) this.adhdFirstTaskBonus = true;
+
+            // --- CONDITION POSITIVES ON COMPLETION ---
+            // Depression: completing first task draws +1 (momentum)
+            if (wasFirst && this.conditions.includes('depression')) {
+                this.drawWithReshuffle(1);
+            }
+            // ASD: completing a social task draws +2 (social wins = energy)
+            if ((task.cost.social || 0) > 0 && this.conditions.includes('asd')) {
+                this.drawWithReshuffle(2);
+            }
+            // Bipolar depressive: every completion removes 1 stress
+            if (this.conditions.includes('bipolar') && this.bipolarState === 'depressive' && this.stress > 0) {
+                this.stress = Math.max(0, this.stress - 1);
+            }
+
             this.tasksCompletedThisTurn++;
             
             this.selectedTask = null;
@@ -263,7 +269,6 @@ class Game {
         discard.push(this.currentTasks.splice(this.selectedTask, 1)[0]);
 
         if (task.effect) this.applyEffect(task.effect);
-        this.adhdFirstTaskBonus = true;
         this.selectedTask = null;
     }
 
@@ -298,7 +303,9 @@ class Game {
     endTurn() {
         if (this.currentTasks.length > 0) {
             const lingering = this.getLingeringDeckForCurrentTurn();
-            this.addStress(this.currentTasks.length);
+            // PTSD: lingering tasks cost +2 stress each (trauma response to falling behind)
+            const lingerCost = this.conditions.includes('ptsd') ? 2 : 1;
+            this.addStress(this.currentTasks.length * lingerCost);
             while (this.currentTasks.length > 0) lingering.push(this.currentTasks.pop());
         }
 
@@ -319,10 +326,8 @@ class Game {
         else {
             if (this.turn === 1 && this.conditions.includes('bipolar')) this.bipolarDayFlip();
             this.firstTaskAttempted = false;
-            // Hyperfocus resets once per day (turn 1 = new day)
-            if (this.turn === 1) this.hyperfocusUsed = false;
+            if (this.turn === 1) this.hyperfocusUsed = false; // resets once per day
             this.tasksCompletedThisTurn = 0;
-            this.adhdFirstTaskBonus = false;
             this.drawCards();
             this.drawTasks();
         }
