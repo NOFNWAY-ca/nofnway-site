@@ -31,27 +31,27 @@ const GAME_TEXT = {
         },
         'depression': {
             name: "Depression",
-            penalty: "All ⚡ Physical tasks cost +1 ⚡. The <em>first</em> task each turn costs an extra +1.",
+            penalty: "All ⚡ Physical tasks cost +1 ⚡.",
             positive: "Completing your <em>first</em> task each turn draws +1 F-Card (momentum).",
-            rule: "All ⚡ Physical tasks cost +1 ⚡. First task each turn costs +1 extra. But completing your first task draws +1 card."
+            rule: "All ⚡ Physical tasks cost +1 ⚡. But completing your first task each turn draws +1 card."
         },
         'adhd': {
             name: "ADHD",
-            penalty: "Draw 6 cards but discard 2 at end of turn. The <em>first</em> task each turn costs +1 extra.",
-            positive: "After completing your first task, the next task costs -1 (any type). Gain one-use Hyperfocus ability each turn.",
-            rule: "Draw 6 cards, discard 2 at end of turn. First task costs +1 extra. After first task, next task costs -1. Hyperfocus: discard 3 to complete any task for free (once/turn)."
+            penalty: "Draw 6 cards but discard 2 at end of turn. The <em>first</em> task each turn costs +1 🧠 (initiation).",
+            positive: "After completing your first task, the next task costs -1 (any type). Hyperfocus: discard 3 to complete any task for free (once per <em>day</em>).",
+            rule: "Draw 6 cards, discard 2 at end of turn. First task costs +1 🧠. After first task, next task costs -1. Hyperfocus once per day."
         },
         'anxiety': {
             name: "Anxiety",
-            penalty: "All 👥 Social tasks cost +1 👥 to complete.",
+            penalty: "All 👥 Social tasks cost +1 🧠 (the overthinking/cognitive load).",
             positive: "Once per turn, Peek at the top card of the next time slot's task deck.",
-            rule: "All 👥 Social tasks cost +1 👥. Once per turn, Peek at the top card of the next task deck."
+            rule: "All 👥 Social tasks cost +1 🧠 (worry). Once per turn, Peek at the top card of the next task deck."
         },
         'asd': {
             name: "ASD",
-            penalty: "All 👥 Social tasks cost +1 👥 and +1 🧠 to complete.",
+            penalty: "All 👥 Social tasks cost +1 👥 (social battery drain).",
             positive: "Completing a Social task draws +1 F-Card.",
-            rule: "All 👥 Social tasks cost +1 👥 and +1 🧠. Completing a Social task draws +1 card."
+            rule: "All 👥 Social tasks cost +1 👥. Completing a Social task draws +1 card."
         },
         'ocd': {
             name: "OCD",
@@ -61,15 +61,15 @@ const GAME_TEXT = {
         },
         'bipolar': {
             name: "Bipolar",
-            penalty: "Each day, flip an F-Card: ⚡Physical = Manic (draw +2, discard 3 at turn end, 3 tasks/turn). Social or Mental = Depressive (draw -2, skips cost 0 stress).",
+            penalty: "Each day, flip an F-Card: ⚡Physical = Manic (draw +2, discard 3 at turn end, 3 tasks/turn). Social or Mental = Depressive (draw -1, skips cost 0 stress).",
             positive: "Manic: 3 tasks per turn. Depressive: completing any task removes 1 Stress.",
-            rule: "Day-start flip determines episode. Manic: +2 draw, discard 3/turn, 3 tasks. Depressive: -2 draw, free skips, completing tasks removes 1 Stress."
+            rule: "Day-start flip determines episode. Manic: +2 draw, discard 3/turn, 3 tasks. Depressive: -1 draw, free skips, completing tasks removes 1 Stress."
         },
         'ptsd': {
             name: "PTSD",
             penalty: "Skipping a task costs +3 Stress instead of +2.",
-            positive: "Start each turn with 1 free Stress Shield (absorbs 1 incoming Stress).",
-            rule: "Skipping costs +3 Stress. But start each turn with 1 free Stress Shield."
+            positive: "Start each <em>day</em> with 1 free Stress Shield (absorbs 1 incoming Stress).",
+            rule: "Skipping costs +3 Stress. But start each day (not each turn) with 1 free Stress Shield."
         }
     }
 };

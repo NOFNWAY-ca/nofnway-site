@@ -126,7 +126,7 @@ class Game {
         if (this.conditions.includes('adhd')) drawCount += 1;
         if (this.conditions.includes('bipolar')) {
             if (this.bipolarState === 'manic')      drawCount += 2;
-            if (this.bipolarState === 'depressive') drawCount -= 2;
+            if (this.bipolarState === 'depressive') drawCount -= 1; // was -2
         }
         if (this.stress >= 3 && this.stress <= 4) drawCount -= 1;
         if (this.stress >= 5 || this.burntOut)    drawCount -= 2;
@@ -143,7 +143,8 @@ class Game {
         if (this.conditions.includes('ocd') && this.hand.length > 0) {
             this.fDeckDiscard.push(this.hand.splice(0, 1)[0]);
         }
-        if (this.conditions.includes('ptsd')) {
+        // PTSD: 1 stress shield only at the start of each day (not every turn)
+        if (this.conditions.includes('ptsd') && this.turn === 1) {
             this.stressShield += 1;
         }
     }
@@ -173,22 +174,24 @@ class Game {
         const cost = { ...task.cost };
         const isFirstTask = !this.firstTaskAttempted;
 
+        // Depression: physical tasks cost +1. No extra first-task penalty.
         if (this.conditions.includes('depression')) {
             if ((task.cost.physical || 0) > 0) cost.physical = (cost.physical || 0) + 1;
-            if (isFirstTask) cost.mental = (cost.mental || 0) + 1;
         }
 
+        // ADHD: first task of turn costs +1 mental (initiation difficulty)
         if (this.conditions.includes('adhd') && isFirstTask) {
             cost.mental = (cost.mental || 0) + 1;
         }
 
+        // Anxiety: social tasks cost +1 mental (cognitive/overthinking load)
         if (this.conditions.includes('anxiety') && (task.cost.social || 0) > 0) {
-            cost.social = (cost.social || 0) + 1;
+            cost.mental = (cost.mental || 0) + 1;
         }
 
+        // ASD: social tasks cost +1 social (social battery drain)
         if (this.conditions.includes('asd') && (task.cost.social || 0) > 0) {
             cost.social = (cost.social || 0) + 1;
-            cost.mental = (cost.mental || 0) + 1;
         }
 
         if (this.stress >= 5 || this.burntOut) {
@@ -316,7 +319,8 @@ class Game {
         else {
             if (this.turn === 1 && this.conditions.includes('bipolar')) this.bipolarDayFlip();
             this.firstTaskAttempted = false;
-            this.hyperfocusUsed = false;
+            // Hyperfocus resets once per day (turn 1 = new day)
+            if (this.turn === 1) this.hyperfocusUsed = false;
             this.tasksCompletedThisTurn = 0;
             this.adhdFirstTaskBonus = false;
             this.drawCards();
