@@ -121,6 +121,12 @@ class Game {
     }
 
     drawCards() {
+        // Reset per-turn flags
+        this.discardToDrawUsed = false;
+        this.anxietyPeekUsed   = false;
+        this.anxietyPeekedTask = null;
+        this.turnCostReduction = { physical: 0, social: 0, mental: 0 };
+
         let drawCount = 5;
         if (this.conditions.includes('adhd'))      drawCount += 1;
         if (this.conditions.includes('depression')) drawCount -= 1; // motivation deficit; positive restores on first task
@@ -271,9 +277,42 @@ class Game {
     applyEffect(effect) {
         if (this.burntOut) return;
         switch (effect.code) {
-            case "DRAW": this.drawWithReshuffle(effect.value); break;
-            case "REMOVE_STRESS": this.stress = Math.max(0, this.stress - effect.value); break;
-            case "PREVENT_STRESS": this.stressShield += effect.value; break;
+            case "DRAW":
+                this.drawWithReshuffle(effect.value);
+                break;
+            case "REMOVE_STRESS":
+                this.stress = Math.max(0, this.stress - effect.value);
+                break;
+            case "REMOVE_STRESS_ALL":
+                this.stress = 0;
+                break;
+            case "PREVENT_STRESS":
+                this.stressShield += effect.value;
+                break;
+            case "DRAW_SPECIFIC": {
+                // Search deck for cards of the specified type
+                let remaining = effect.value;
+                for (let i = this.fDeck.length - 1; i >= 0 && remaining > 0; i--) {
+                    if (this.fDeck[i].type === effect.type) {
+                        this.hand.push(this.fDeck.splice(i, 1)[0]);
+                        remaining--;
+                    }
+                }
+                // Fall back to discard pile if deck runs out
+                for (let i = this.fDeckDiscard.length - 1; i >= 0 && remaining > 0; i--) {
+                    if (this.fDeckDiscard[i].type === effect.type) {
+                        this.hand.push(this.fDeckDiscard.splice(i, 1)[0]);
+                        remaining--;
+                    }
+                }
+                break;
+            }
+            case "COST_REDUCTION_TURN":
+                this.turnCostReduction[effect.type] = (this.turnCostReduction[effect.type] || 0) + effect.value;
+                break;
+            case "RESET_ACTION":
+                this[effect.action] = false;
+                break;
         }
     }
 
@@ -293,7 +332,13 @@ class Game {
         const prevented = Math.min(this.stressShield, amount);
         this.stressShield -= prevented;
         this.stress = Math.min(7, this.stress + (amount - prevented));
-        if (this.stress >= 7) this.burntOut = true;
+        if (this.stress >= 7) {
+            this.burntOut = true;
+            if (this.mode === 'life') {
+                this.gameOver = true;
+                this.message = `😡 BURNOUT after ${this.completedTasks.length} tasks over ${this.day} days. You gave it everything.`;
+            }
+        }
     }
 
     endTurn() {
@@ -317,8 +362,26 @@ class Game {
 
         this.turn++;
         if (this.turn > 4) { this.turn = 1; this.day++; }
-        if (this.day > this.dayLimit) { this.gameOver = true; } 
-        else {
+
+        if (this.day > this.dayLimit) {
+            this.gameOver = true;
+            const done = this.completedTasks.length;
+            const maxTasks = this.mode === 'day' ? 8 : 56;
+            const pct = done / maxTasks;
+            if (this.burntOut) {
+                this.message = `😡 BURNOUT. You pushed too hard. ${done} tasks completed.`;
+            } else if (pct >= 0.7) {
+                this.message = `🎉 Fantastic! You completed ${done} tasks.`;
+            } else if (pct >= 0.5) {
+                this.message = `👍 Great Job! ${done} tasks done.`;
+            } else if (pct >= 0.25) {
+                this.message = `😓 You Survived. ${done} tasks done.`;
+            } else {
+                this.message = `💔 Overwhelmed. Only ${done} tasks done. Be kind to yourself.`;
+            }
+        } else {
+            const turnNames = ['Morning', 'Midday', 'Afternoon', 'Evening'];
+            this.message = `📅 Day ${this.day} — ${turnNames[this.turn - 1]}`;
             if (this.turn === 1 && this.conditions.includes('bipolar')) this.bipolarDayFlip();
             this.firstTaskAttempted = false;
             if (this.turn === 1) this.hyperfocusUsed = false; // resets once per day
@@ -326,5 +389,82 @@ class Game {
             this.drawCards();
             this.drawTasks();
         }
+    }
+
+    // ----------------------------------------
+    // PLAYER ACTIONS
+    // ----------------------------------------
+
+    selectCard(index) {
+        const pos = this.selectedCards.indexOf(index);
+        if (pos === -1) {
+            this.selectedCards.push(index);
+        } else {
+            this.selectedCards.splice(pos, 1);
+        }
+    }
+
+    selectTask(index) {
+        if (this.selectedTask === index) {
+            this.selectedTask = null;
+        } else {
+            this.selectedTask = index;
+            this.selectedCards = [];
+        }
+    }
+
+    skipTask() {
+        if (this.selectedTask === null || !this.currentTasks[this.selectedTask]) return;
+
+        let skipCost = 2;
+        if (this.conditions.includes('ptsd')) skipCost = 3;
+        if (this.conditions.includes('bipolar') && this.bipolarState === 'depressive') skipCost = 0;
+
+        const { discard } = this.getDecksForCurrentTurn();
+        discard.push(this.currentTasks.splice(this.selectedTask, 1)[0]);
+
+        this.addStress(skipCost);
+        this.firstTaskAttempted = true;
+        this.selectedTask = null;
+        this.selectedCards = [];
+    }
+
+    peekNextTask() {
+        if (!this.conditions.includes('anxiety') || this.anxietyPeekUsed) return;
+
+        const nextTurn = (this.turn % 4) + 1;
+        const decks = [null, this.morningTasks, this.middayTasks, this.afternoonTasks, this.eveningTasks];
+        const nextDeck = decks[nextTurn];
+
+        if (nextDeck && nextDeck.length > 0) {
+            this.anxietyPeekedTask = nextDeck[nextDeck.length - 1];
+            this.anxietyPeekUsed = true;
+            const c = this.anxietyPeekedTask.cost;
+            const costStr = Object.entries(c).filter(([,v]) => v > 0)
+                .map(([k,v]) => `${v}${k === 'physical' ? '⚡' : k === 'social' ? '👥' : '🧠'}`)
+                .join(' ');
+            this.message = `👁️ Peek: "${this.anxietyPeekedTask.name}" is coming up (${costStr || 'free'}).`;
+        }
+    }
+
+    discardToDraw() {
+        if (this.discardToDrawUsed || this.selectedCards.length !== 2) return;
+
+        this.selectedCards.sort((a, b) => b - a).forEach(i => {
+            this.fDeckDiscard.push(this.hand.splice(i, 1)[0]);
+        });
+        this.drawWithReshuffle(2);
+        this.discardToDrawUsed = true;
+        this.selectedCards = [];
+    }
+
+    spendToRemoveStress() {
+        if (this.selectedCards.length !== 3 || this.stress <= 0) return;
+
+        this.selectedCards.sort((a, b) => b - a).forEach(i => {
+            this.fDeckDiscard.push(this.hand.splice(i, 1)[0]);
+        });
+        this.stress = Math.max(0, this.stress - 1);
+        this.selectedCards = [];
     }
 }

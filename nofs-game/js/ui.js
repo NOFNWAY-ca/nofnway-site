@@ -152,7 +152,7 @@ function gameScreen() {
         bipolarBanner = `<div class="bipolar-banner ${isManic ? 'manic' : 'depressive'}">
             ${isManic
                 ? '⚡ MANIC EPISODE — +2 draw, 3 tasks, discard 3 at end of turn'
-                : '🌧️ DEPRESSIVE EPISODE — -2 draw, free skips, task completions heal Stress'}
+                : '🌧️ DEPRESSIVE EPISODE — -1 draw, skipping tasks costs 0 Stress'}
         </div>`;
     }
 
