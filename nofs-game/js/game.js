@@ -143,8 +143,8 @@ class Game {
         if (this.conditions.includes('ocd') && this.hand.length >= 4) {
             this.fDeckDiscard.push(this.hand.splice(0, 1)[0]);
         }
-        // PTSD: 1 stress shield only at the start of each day (not every turn)
-        if (this.conditions.includes('ptsd') && this.turn === 1) {
+        // PTSD: 1 stress shield once per game (day 1 only)
+        if (this.conditions.includes('ptsd') && this.day === 1 && this.turn === 1) {
             this.stressShield += 1;
         }
     }
@@ -238,9 +238,9 @@ class Game {
             if (wasFirst && this.conditions.includes('depression')) {
                 this.drawWithReshuffle(1);
             }
-            // ASD: completing a social task draws +3 (social win = energy spike)
+            // ASD: completing a social task draws +4 (social win = energy spike)
             if ((task.cost.social || 0) > 0 && this.conditions.includes('asd')) {
-                this.drawWithReshuffle(3);
+                this.drawWithReshuffle(4);
             }
 
             this.tasksCompletedThisTurn++;

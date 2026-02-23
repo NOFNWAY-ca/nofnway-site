@@ -50,8 +50,8 @@ const GAME_TEXT = {
         'asd': {
             name: "ASD",
             penalty: "All 👥 Social tasks cost +1 👥 (social battery drain).",
-            positive: "Completing a Social task draws +3 F-Cards (social win = energy spike).",
-            rule: "All 👥 Social tasks cost +1 👥. But completing a Social task draws +3 cards."
+            positive: "Completing a Social task draws +4 F-Cards (social win = energy spike).",
+            rule: "All 👥 Social tasks cost +1 👥. But completing a Social task draws +4 cards."
         },
         'ocd': {
             name: "OCD",
@@ -68,8 +68,8 @@ const GAME_TEXT = {
         'ptsd': {
             name: "PTSD",
             penalty: "Skipping a task costs +3 Stress (instead of +2).",
-            positive: "Start each <em>day</em> with 1 free Stress Shield (absorbs 1 incoming Stress).",
-            rule: "Skipping costs +3 Stress. But start each day with 1 free Stress Shield."
+            positive: "Start the game with 1 free Stress Shield (absorbs 1 incoming Stress).",
+            rule: "Skipping costs +3 Stress. But you begin with 1 free Stress Shield."
         }
     }
 };
