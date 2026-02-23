@@ -297,14 +297,15 @@ class Game {
     }
 
     endTurn() {
+        // OCD bonus: checked BEFORE lingering push — clean turn = nothing left on board
+        if (this.conditions.includes('ocd') && this.tasksCompletedThisTurn >= 1 && this.currentTasks.length === 0) {
+            this.nextTurnOcdBonus = true;
+        }
+
         if (this.currentTasks.length > 0) {
             const lingering = this.getLingeringDeckForCurrentTurn();
             this.addStress(this.currentTasks.length);
             while (this.currentTasks.length > 0) lingering.push(this.currentTasks.pop());
-        }
-
-        if (this.conditions.includes('ocd') && this.tasksCompletedThisTurn >= 2) {
-            this.nextTurnOcdBonus = true;
         }
 
         if (this.conditions.includes('adhd') && this.hand.length > 0) {

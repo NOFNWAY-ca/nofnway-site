@@ -56,8 +56,8 @@ const GAME_TEXT = {
         'ocd': {
             name: "OCD",
             penalty: "At the start of each turn, if you have 4+ cards, discard 1 (ritual tax).",
-            positive: "If you complete <em>both</em> tasks this turn with none lingering, draw +2 cards next turn.",
-            rule: "Discard 1 card at turn start if hand ≥ 4 (ritual). Complete both tasks with no lingering → draw +2 next turn."
+            positive: "Clear your board completely (no lingering) and draw +2 cards next turn.",
+            rule: "Discard 1 card at turn start if hand ≥ 4 (ritual). Clear the board with no lingering → draw +2 next turn."
         },
         'bipolar': {
             name: "Bipolar",
