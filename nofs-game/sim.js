@@ -125,30 +125,43 @@
     });
 
     // ----------------------------------------
-    // OUTPUT
+    // OUTPUT — plain text so copy-console works
     // ----------------------------------------
-    console.log(`\n🎮 NO Fs TO GIVE — Balance Sim  (${N} games/condition, ${MODE} mode)\n`);
-    console.table(rows);
+    const pad = (s, n) => String(s).padEnd(n);
+    const header = `${pad('Condition',14)} | ${pad('Avg Tasks',9)} | ${pad('Burnout%',8)} | ${pad('Finished%',9)} | Avg Stress`;
+    const divider = '-'.repeat(header.length);
 
-    console.log('\n📊 Task delta vs Neurotypical  (negative = harder):');
-    rows.forEach(r => {
-        if (r.Condition === 'Neurotypical') return;
-        const delta = parseFloat(r['Avg Tasks']) - baselineAvgTasks;
-        const sign  = delta >= 0 ? '+' : '';
+    const lines = [
+        '',
+        `🎮 NO Fs TO GIVE — Balance Sim  (${N} games/condition, ${MODE} mode)`,
+        '',
+        header,
+        divider,
+        ...rows.map(r =>
+            `${pad(r.Condition,14)} | ${pad(r['Avg Tasks'],9)} | ${pad(r['Burnout %'],8)} | ${pad(r['Finished %'],9)} | ${r['Avg Stress']}`
+        ),
+        divider,
+        '',
+        '📊 Task delta vs Neurotypical  (negative = harder):',
+        ...rows
+            .filter(r => r.Condition !== 'Neurotypical')
+            .map(r => {
+                const delta = parseFloat(r['Avg Tasks']) - baselineAvgTasks;
+                const sign  = delta >= 0 ? '+' : '';
+                let flag = '✅ balanced';
+                if      (delta < -10) flag = '🔴 WAY too hard — reduce penalties';
+                else if (delta <  -6) flag = '🟡 a bit harsh — consider softening';
+                else if (delta >   9) flag = '🔴 too easy — positive may be too strong';
+                else if (delta >   5) flag = '🟡 easier than baseline';
+                return `  ${pad(r.Condition,14)} ${sign}${delta.toFixed(1)} tasks  ${flag}`;
+            }),
+        '',
+        '💡 Burnout 10-40% = healthy range. Task delta -3 to -8 = meaningfully harder.',
+        '   Bot never uses Discard2Draw or Spend3 — human players will do better.',
+        '   Bipolar variance is high — run twice and average the results.',
+        '',
+    ];
 
-        let flag = ' ✅ balanced';
-        if (delta < -10) flag = ' 🔴 WAY too hard — reduce penalties';
-        else if (delta < -6) flag = ' 🟡 a bit harsh — consider softening';
-        else if (delta >  5) flag = ' 🟡 easier than baseline — penalties may be too light';
-        else if (delta >  9) flag = ' 🔴 too easy — positive may be too strong';
-
-        console.log(`  ${r.Condition.padEnd(14)} ${sign}${delta.toFixed(1)} tasks${flag}`);
-    });
-
-    console.log('\n💡 Tips:');
-    console.log('  • Burnout % 10-40% is a reasonable range for most conditions.');
-    console.log('  • Task delta of -3 to -8 vs baseline = condition feels meaningfully harder.');
-    console.log('  • Bot never uses Discard2Draw or Spend3, so human players will do better.');
-    console.log('  • Bipolar variance is high — run again to see the spread.\n');
+    console.log(lines.join('\n'));
 
 })();
