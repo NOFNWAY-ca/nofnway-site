@@ -1,0 +1,845 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NO Fs TO GIVE — Card Design Sandbox</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&family=Roboto:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    <style>
+
+        /* ═══════════════════════════════════════
+           SANDBOX CHROME  (screen only)
+        ═══════════════════════════════════════ */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: #d0d4d8;
+            padding: 40px 24px;
+            color: #2c3e50;
+        }
+
+        .sandbox-header {
+            text-align: center;
+            margin-bottom: 48px;
+        }
+        .sandbox-header h1 {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 900;
+            font-size: 1.8rem;
+            letter-spacing: -0.5px;
+        }
+        .sandbox-header h1 span { color: #3498db; }
+        .sandbox-header p {
+            color: #7f8c8d;
+            font-size: 0.85rem;
+            margin-top: 6px;
+        }
+
+        .card-section { margin-bottom: 52px; }
+
+        .section-label {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 900;
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            color: #95a5a6;
+            margin-bottom: 18px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #bbb;
+        }
+
+        .card-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            align-items: flex-start;
+        }
+
+
+        /* ═══════════════════════════════════════
+           CARD BASE  (shared by all types)
+        ═══════════════════════════════════════ */
+        .card {
+            width: 2.5in;
+            height: 3.5in;
+            border-radius: 0.125in;
+            border: 1px dashed #c0c0c0;   /* cut line — won't show at print if within bleed */
+            background: white;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+        }
+
+        .nofn-watermark {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 900;
+            font-size: 6.5px;
+            letter-spacing: 1.5px;
+            color: #e0e0e0;
+            text-transform: uppercase;
+        }
+
+
+        /* ═══════════════════════════════════════
+           TASK CARDS
+        ═══════════════════════════════════════ */
+
+        /* Time-of-day color system */
+        .t-morning   { --time-color: #e67e22; --time-name: "MORNING";   }
+        .t-midday    { --time-color: #3498db; --time-name: "MIDDAY";    }
+        .t-afternoon { --time-color: #e74c3c; --time-name: "AFTERNOON"; }
+        .t-evening   { --time-color: #6c3483; --time-name: "EVENING";   }
+
+        .task-card .time-stripe {
+            height: 7px;
+            background: var(--time-color);
+            flex-shrink: 0;
+        }
+
+        .task-card .card-body {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 10px 12px 0;
+            min-height: 0;
+        }
+
+        .task-card .card-name {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 900;
+            font-size: 14.5px;
+            color: #1a1a1a;
+            line-height: 1.15;
+            margin-bottom: 7px;
+            letter-spacing: -0.3px;
+        }
+
+        .task-card .card-meta {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+
+        .card-cost { display: flex; gap: 4px; flex-wrap: wrap; }
+
+        .cost-pip {
+            display: inline-flex;
+            align-items: center;
+            gap: 2px;
+            padding: 2px 6px 2px 4px;
+            border-radius: 20px;
+            font-size: 10.5px;
+            font-weight: 700;
+            line-height: 1;
+        }
+        .cost-pip.physical { background: #fde8e8; color: #c0392b; border: 1px solid #f5b7b7; }
+        .cost-pip.social   { background: #d6eaf8; color: #1a5276; border: 1px solid #aed6f1; }
+        .cost-pip.mental   { background: #fef9e7; color: #9a7d0a; border: 1px solid #f9e79f; }
+
+        .time-badge {
+            font-size: 8px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--time-color);
+            border: 1px solid var(--time-color);
+            padding: 1px 5px;
+            border-radius: 3px;
+            opacity: 0.7;
+            white-space: nowrap;
+        }
+
+        .task-card .divider {
+            height: 1px;
+            background: #f0f0f0;
+            margin: 0 0 8px;
+        }
+
+        .task-card .card-flavor {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-style: italic;
+            font-size: 10.5px;
+            color: #8e9aa8;
+            line-height: 1.45;
+            text-align: center;
+            padding: 2px 2px;
+        }
+
+        .task-card .card-effect {
+            padding: 7px 12px;
+            font-size: 10.5px;
+            font-weight: 700;
+            color: white;
+            text-align: center;
+            line-height: 1.3;
+            background: var(--time-color);
+            flex-shrink: 0;
+        }
+
+        .task-card .card-footer {
+            padding: 5px 12px 6px;
+            display: flex;
+            justify-content: flex-end;
+            border-top: 1px solid #f5f5f5;
+            flex-shrink: 0;
+        }
+
+
+        /* ═══════════════════════════════════════
+           F-CARDS  (energy/resource cards)
+        ═══════════════════════════════════════ */
+        .f-card .f-stripe {
+            height: 7px;
+            flex-shrink: 0;
+        }
+        .f-card .f-body {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 16px 20px;
+            gap: 6px;
+        }
+        .f-card .f-icon-wrap {
+            width: 1in;
+            height: 1in;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 4px;
+        }
+        .f-card .f-icon {
+            font-size: 44px;
+            line-height: 1;
+        }
+        .f-card .f-type {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 900;
+            font-size: 13px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+        .f-card .f-desc {
+            font-size: 9px;
+            color: #aaa;
+            text-align: center;
+            line-height: 1.4;
+            max-width: 1.6in;
+        }
+        .f-card .f-footer {
+            padding: 5px 12px 6px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid #f5f5f5;
+            flex-shrink: 0;
+        }
+        .f-card .f-count {
+            font-size: 8px;
+            color: #ccc;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .f-card.physical .f-stripe    { background: #e74c3c; }
+        .f-card.physical .f-icon-wrap { background: #fde8e8; }
+        .f-card.physical .f-type      { color: #c0392b; }
+
+        .f-card.social .f-stripe    { background: #3498db; }
+        .f-card.social .f-icon-wrap { background: #d6eaf8; }
+        .f-card.social .f-type      { color: #1a5276; }
+
+        .f-card.mental .f-stripe    { background: #e67e22; }
+        .f-card.mental .f-icon-wrap { background: #fef3e2; }
+        .f-card.mental .f-type      { color: #935116; }
+
+
+        /* ═══════════════════════════════════════
+           CONDITION REFERENCE CARDS
+        ═══════════════════════════════════════ */
+
+        /* One accent color per condition */
+        .cond-neurotypical { --cond-color: #7f8c8d; }
+        .cond-depression   { --cond-color: #2471a3; }
+        .cond-adhd         { --cond-color: #d68910; }
+        .cond-anxiety      { --cond-color: #1e8449; }
+        .cond-asd          { --cond-color: #7d3c98; }
+        .cond-ocd          { --cond-color: #117a65; }
+        .cond-ptsd         { --cond-color: #cb4335; }
+        /* Bipolar handled separately with split gradient */
+
+        .ref-card .ref-header {
+            padding: 13px 14px 10px;
+            background: var(--cond-color);
+            flex-shrink: 0;
+        }
+        .ref-card.cond-bipolar .ref-header {
+            background: linear-gradient(105deg, #d4ac0d 50%, #566573 50%);
+        }
+        .ref-card .ref-cond-name {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 900;
+            font-size: 15.5px;
+            color: white;
+            line-height: 1.1;
+            letter-spacing: -0.3px;
+        }
+        .ref-card.cond-bipolar .ref-cond-name { color: #1a1a1a; }
+
+        .ref-card .ref-subline {
+            font-size: 8.5px;
+            color: rgba(255,255,255,0.7);
+            margin-top: 3px;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            font-weight: 700;
+        }
+        .ref-card.cond-bipolar .ref-subline { color: rgba(0,0,0,0.45); }
+
+        .ref-card .ref-body {
+            flex: 1;
+            padding: 10px 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            min-height: 0;
+        }
+
+        .ref-section {
+            padding: 7px 9px;
+            border-radius: 4px;
+        }
+        .ref-section-label {
+            font-size: 7.5px;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 3px;
+        }
+        .ref-text {
+            font-size: 10px;
+            color: #2c3e50;
+            line-height: 1.45;
+        }
+
+        .ref-penalty {
+            background: #fdf2f2;
+            border-left: 3px solid #e74c3c;
+        }
+        .ref-penalty .ref-section-label { color: #c0392b; }
+
+        .ref-bonus {
+            background: #f0fdf4;
+            border-left: 3px solid #27ae60;
+        }
+        .ref-bonus .ref-section-label { color: #1e8449; }
+
+        .ref-card .ref-footer {
+            padding: 5px 12px 6px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid #f0f0f0;
+            flex-shrink: 0;
+        }
+        .cond-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--cond-color);
+            flex-shrink: 0;
+        }
+        .ref-card.cond-bipolar .cond-dot {
+            background: linear-gradient(135deg, #d4ac0d 50%, #566573 50%);
+        }
+
+
+        /* ═══════════════════════════════════════
+           CARD BACK
+        ═══════════════════════════════════════ */
+        .card-back {
+            background: #1c2833;
+            border-color: #1c2833;
+            position: relative;
+            overflow: hidden;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Subtle diagonal stripe texture */
+        .card-back::before {
+            content: '';
+            position: absolute;
+            inset: -50%;
+            background: repeating-linear-gradient(
+                -45deg,
+                transparent,
+                transparent 8px,
+                rgba(255,255,255,0.015) 8px,
+                rgba(255,255,255,0.015) 9px
+            );
+        }
+
+        /* Inner border frame */
+        .back-frame {
+            position: absolute;
+            inset: 10px;
+            border: 1.5px solid rgba(255,255,255,0.08);
+            border-radius: 5px;
+        }
+
+        .back-content {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+            padding: 20px;
+            text-align: center;
+        }
+        .back-eyebrow {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 900;
+            font-size: 8px;
+            letter-spacing: 4px;
+            color: #3498db;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+        .back-divider {
+            width: 28px;
+            height: 2px;
+            background: #3498db;
+            opacity: 0.4;
+            margin: 6px auto;
+        }
+        .back-no {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 900;
+            font-size: 36px;
+            color: white;
+            line-height: 0.9;
+            letter-spacing: -1px;
+        }
+        .back-fs {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 900;
+            font-size: 28px;
+            color: #3498db;
+            line-height: 1;
+            letter-spacing: -0.5px;
+        }
+        .back-to-give {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 900;
+            font-size: 16px;
+            color: rgba(255,255,255,0.5);
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            margin-top: 2px;
+        }
+        .back-tagline {
+            font-size: 7.5px;
+            color: rgba(255,255,255,0.18);
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            margin-top: 10px;
+        }
+
+
+        /* ═══════════════════════════════════════
+           PRINT
+        ═══════════════════════════════════════ */
+        @media print {
+            body { background: white; padding: 0; }
+            .sandbox-header, .section-label, .print-note { display: none; }
+            .card-section { margin: 0; }
+            .card-row {
+                gap: 0.15in;
+                justify-content: flex-start;
+                padding: 0.375in 0.5in;
+                page-break-after: always;
+            }
+            .card { border-color: #ccc; }
+        }
+
+    </style>
+</head>
+<body>
+
+<div class="sandbox-header">
+    <h1>NO <span>Fs</span> TO GIVE — Card Design Sandbox</h1>
+    <p>Cards render at actual print size (2.5" × 3.5"). Dashed border = cut line.</p>
+</div>
+
+
+<!-- ══════════════════════════════════════════
+     TASK CARDS  (one per time slot)
+════════════════════════════════════════════ -->
+<div class="card-section">
+    <div class="section-label">Task Cards — one per time slot (35 total, same template)</div>
+    <div class="card-row">
+
+        <!-- MORNING -->
+        <div class="card task-card t-morning">
+            <div class="time-stripe"></div>
+            <div class="card-body">
+                <div class="card-name">TAKE MEDICATION</div>
+                <div class="card-meta">
+                    <div class="card-cost">
+                        <span class="cost-pip mental">🧠 ×1</span>
+                    </div>
+                    <span class="time-badge">Morning</span>
+                </div>
+                <div class="divider"></div>
+                <div class="card-flavor">"My daily subscription for a functional brain."</div>
+            </div>
+            <div class="card-effect">✨ Prevent the next 1 Stress</div>
+            <div class="card-footer"><span class="nofn-watermark">NOFNWAY</span></div>
+        </div>
+
+        <!-- MIDDAY -->
+        <div class="card task-card t-midday">
+            <div class="time-stripe"></div>
+            <div class="card-body">
+                <div class="card-name">HANDLE INTERRUPTION</div>
+                <div class="card-meta">
+                    <div class="card-cost">
+                        <span class="cost-pip mental">🧠 ×1</span>
+                        <span class="cost-pip social">👥 ×1</span>
+                    </div>
+                    <span class="time-badge">Midday</span>
+                </div>
+                <div class="divider"></div>
+                <div class="card-flavor">"OK, deadline's right around the corner so... oh, look! A squirrel!"</div>
+            </div>
+            <div class="card-effect">✨ Remove 1 Stress</div>
+            <div class="card-footer"><span class="nofn-watermark">NOFNWAY</span></div>
+        </div>
+
+        <!-- AFTERNOON -->
+        <div class="card task-card t-afternoon">
+            <div class="time-stripe"></div>
+            <div class="card-body">
+                <div class="card-name">EXERCISE</div>
+                <div class="card-meta">
+                    <div class="card-cost">
+                        <span class="cost-pip physical">⚡ ×2</span>
+                    </div>
+                    <span class="time-badge">Afternoon</span>
+                </div>
+                <div class="divider"></div>
+                <div class="card-flavor">"The real meaning of 'walk it off'."</div>
+            </div>
+            <div class="card-effect">✨ Remove 2 Stress</div>
+            <div class="card-footer"><span class="nofn-watermark">NOFNWAY</span></div>
+        </div>
+
+        <!-- EVENING -->
+        <div class="card task-card t-evening">
+            <div class="time-stripe"></div>
+            <div class="card-body">
+                <div class="card-name">HOBBIES / RELAXATION</div>
+                <div class="card-meta">
+                    <div class="card-cost">
+                        <span class="cost-pip mental">🧠 ×1</span>
+                    </div>
+                    <span class="time-badge">Evening</span>
+                </div>
+                <div class="divider"></div>
+                <div class="card-flavor">"Remember fun? Let's try to do that."</div>
+            </div>
+            <div class="card-effect">✨ Remove ALL Stress</div>
+            <div class="card-footer"><span class="nofn-watermark">NOFNWAY</span></div>
+        </div>
+
+        <!-- Multi-cost example -->
+        <div class="card task-card t-morning">
+            <div class="time-stripe"></div>
+            <div class="card-body">
+                <div class="card-name">MORNING MEETING</div>
+                <div class="card-meta">
+                    <div class="card-cost">
+                        <span class="cost-pip social">👥 ×1</span>
+                        <span class="cost-pip mental">🧠 ×1</span>
+                    </div>
+                    <span class="time-badge">Morning</span>
+                </div>
+                <div class="divider"></div>
+                <div class="card-flavor">"The ritual of 'Could this have been an email?' begins."</div>
+            </div>
+            <div class="card-effect">✨ Remove 1 Stress</div>
+            <div class="card-footer"><span class="nofn-watermark">NOFNWAY</span></div>
+        </div>
+
+    </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════
+     F-CARDS  (energy / resource cards)
+════════════════════════════════════════════ -->
+<div class="card-section">
+    <div class="section-label">F-Cards — 3 types, 3 copies each (9 total)</div>
+    <div class="card-row">
+
+        <div class="card f-card physical">
+            <div class="f-stripe"></div>
+            <div class="f-body">
+                <div class="f-icon-wrap"><span class="f-icon">⚡</span></div>
+                <div class="f-type">Physical</div>
+                <div class="f-desc">Spend to complete tasks with physical cost</div>
+            </div>
+            <div class="f-footer">
+                <span class="f-count">×3 in deck</span>
+                <span class="nofn-watermark">NOFNWAY</span>
+            </div>
+        </div>
+
+        <div class="card f-card social">
+            <div class="f-stripe"></div>
+            <div class="f-body">
+                <div class="f-icon-wrap"><span class="f-icon">👥</span></div>
+                <div class="f-type">Social</div>
+                <div class="f-desc">Spend to complete tasks with social cost</div>
+            </div>
+            <div class="f-footer">
+                <span class="f-count">×3 in deck</span>
+                <span class="nofn-watermark">NOFNWAY</span>
+            </div>
+        </div>
+
+        <div class="card f-card mental">
+            <div class="f-stripe"></div>
+            <div class="f-body">
+                <div class="f-icon-wrap"><span class="f-icon">🧠</span></div>
+                <div class="f-type">Mental</div>
+                <div class="f-desc">Spend to complete tasks with mental cost</div>
+            </div>
+            <div class="f-footer">
+                <span class="f-count">×3 in deck</span>
+                <span class="nofn-watermark">NOFNWAY</span>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════
+     CONDITION REFERENCE CARDS  (8 total)
+════════════════════════════════════════════ -->
+<div class="card-section">
+    <div class="section-label">Condition Reference Cards — keep face-up during play (8 total)</div>
+    <div class="card-row">
+
+        <div class="card ref-card cond-neurotypical">
+            <div class="ref-header">
+                <div class="ref-cond-name">Neurotypical</div>
+                <div class="ref-subline">Tutorial Mode</div>
+            </div>
+            <div class="ref-body">
+                <div class="ref-section ref-penalty">
+                    <div class="ref-section-label">⚠ Penalty</div>
+                    <div class="ref-text">No condition penalties. Standard rules apply.</div>
+                </div>
+                <div class="ref-section ref-bonus">
+                    <div class="ref-section-label">✦ Bonus</div>
+                    <div class="ref-text">No condition bonuses. Great for learning the game.</div>
+                </div>
+            </div>
+            <div class="ref-footer">
+                <div class="cond-dot"></div>
+                <span class="nofn-watermark">NOFNWAY</span>
+            </div>
+        </div>
+
+        <div class="card ref-card cond-depression">
+            <div class="ref-header">
+                <div class="ref-cond-name">Depression</div>
+                <div class="ref-subline">Motivation Deficit</div>
+            </div>
+            <div class="ref-body">
+                <div class="ref-section ref-penalty">
+                    <div class="ref-section-label">⚠ Penalty</div>
+                    <div class="ref-text">Draw 1 fewer F-Card each turn (4 instead of 5).</div>
+                </div>
+                <div class="ref-section ref-bonus">
+                    <div class="ref-section-label">✦ Bonus</div>
+                    <div class="ref-text">Completing your <em>first</em> task draws +1 card — momentum restores you to 5.</div>
+                </div>
+            </div>
+            <div class="ref-footer">
+                <div class="cond-dot"></div>
+                <span class="nofn-watermark">NOFNWAY</span>
+            </div>
+        </div>
+
+        <div class="card ref-card cond-adhd">
+            <div class="ref-header">
+                <div class="ref-cond-name">ADHD</div>
+                <div class="ref-subline">Initiation Difficulty</div>
+            </div>
+            <div class="ref-body">
+                <div class="ref-section ref-penalty">
+                    <div class="ref-section-label">⚠ Penalty</div>
+                    <div class="ref-text">Draw 6 cards but discard 2 at end of turn. First task each turn costs +1 🧠.</div>
+                </div>
+                <div class="ref-section ref-bonus">
+                    <div class="ref-section-label">✦ Bonus — Hyperfocus</div>
+                    <div class="ref-text">Once per day: discard 3 cards to complete any task for free.</div>
+                </div>
+            </div>
+            <div class="ref-footer">
+                <div class="cond-dot"></div>
+                <span class="nofn-watermark">NOFNWAY</span>
+            </div>
+        </div>
+
+        <div class="card ref-card cond-anxiety">
+            <div class="ref-header">
+                <div class="ref-cond-name">Anxiety</div>
+                <div class="ref-subline">Cognitive Overload</div>
+            </div>
+            <div class="ref-body">
+                <div class="ref-section ref-penalty">
+                    <div class="ref-section-label">⚠ Penalty</div>
+                    <div class="ref-text">All 👥 Social tasks cost +1 🧠 (the overthinking).</div>
+                </div>
+                <div class="ref-section ref-bonus">
+                    <div class="ref-section-label">✦ Bonus — Peek</div>
+                    <div class="ref-text">Once per turn: peek at the top card of the next time slot's task deck.</div>
+                </div>
+            </div>
+            <div class="ref-footer">
+                <div class="cond-dot"></div>
+                <span class="nofn-watermark">NOFNWAY</span>
+            </div>
+        </div>
+
+        <div class="card ref-card cond-asd">
+            <div class="ref-header">
+                <div class="ref-cond-name">ASD</div>
+                <div class="ref-subline">Social Battery Drain</div>
+            </div>
+            <div class="ref-body">
+                <div class="ref-section ref-penalty">
+                    <div class="ref-section-label">⚠ Penalty</div>
+                    <div class="ref-text">All 👥 Social tasks cost +1 👥 (social battery drain).</div>
+                </div>
+                <div class="ref-section ref-bonus">
+                    <div class="ref-section-label">✦ Bonus — Social Win</div>
+                    <div class="ref-text">Completing a Social task draws +4 F-Cards (energy spike).</div>
+                </div>
+            </div>
+            <div class="ref-footer">
+                <div class="cond-dot"></div>
+                <span class="nofn-watermark">NOFNWAY</span>
+            </div>
+        </div>
+
+        <div class="card ref-card cond-ocd">
+            <div class="ref-header">
+                <div class="ref-cond-name">OCD</div>
+                <div class="ref-subline">Ritual Tax</div>
+            </div>
+            <div class="ref-body">
+                <div class="ref-section ref-penalty">
+                    <div class="ref-section-label">⚠ Penalty</div>
+                    <div class="ref-text">At turn start: if you have 4+ cards, discard 1 (ritual tax).</div>
+                </div>
+                <div class="ref-section ref-bonus">
+                    <div class="ref-section-label">✦ Bonus — Perfect Turn</div>
+                    <div class="ref-text">Clear your board with no lingering tasks → draw +2 cards next turn.</div>
+                </div>
+            </div>
+            <div class="ref-footer">
+                <div class="cond-dot"></div>
+                <span class="nofn-watermark">NOFNWAY</span>
+            </div>
+        </div>
+
+        <div class="card ref-card cond-bipolar">
+            <div class="ref-header">
+                <div class="ref-cond-name">Bipolar</div>
+                <div class="ref-subline">Manic / Depressive Episodes</div>
+            </div>
+            <div class="ref-body">
+                <div class="ref-section ref-penalty">
+                    <div class="ref-section-label">⚠ Day Start — Flip a Card</div>
+                    <div class="ref-text">⚡ Physical = <strong>Manic</strong>: +2 draw, discard 3/turn, face 3 tasks.<br>👥 or 🧠 = <strong>Depressive</strong>: −1 draw, free skips.</div>
+                </div>
+                <div class="ref-section ref-bonus">
+                    <div class="ref-section-label">✦ Manic Upside</div>
+                    <div class="ref-text">Manic episodes give +2 cards and extra task capacity.</div>
+                </div>
+            </div>
+            <div class="ref-footer">
+                <div class="cond-dot"></div>
+                <span class="nofn-watermark">NOFNWAY</span>
+            </div>
+        </div>
+
+        <div class="card ref-card cond-ptsd">
+            <div class="ref-header">
+                <div class="ref-cond-name">PTSD</div>
+                <div class="ref-subline">Hypervigilance</div>
+            </div>
+            <div class="ref-body">
+                <div class="ref-section ref-penalty">
+                    <div class="ref-section-label">⚠ Penalty</div>
+                    <div class="ref-text">Skipping a task costs +3 Stress (instead of +2).</div>
+                </div>
+                <div class="ref-section ref-bonus">
+                    <div class="ref-section-label">✦ Bonus — Stress Shield</div>
+                    <div class="ref-text">Start the game with 1 free Stress Shield — absorbs the first incoming Stress.</div>
+                </div>
+            </div>
+            <div class="ref-footer">
+                <div class="cond-dot"></div>
+                <span class="nofn-watermark">NOFNWAY</span>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════
+     CARD BACK
+════════════════════════════════════════════ -->
+<div class="card-section">
+    <div class="section-label">Card Back — single design, all cards (designed for double-sided printing)</div>
+    <div class="card-row">
+
+        <div class="card card-back">
+            <div class="back-frame"></div>
+            <div class="back-content">
+                <div class="back-eyebrow">NOFNWAY</div>
+                <div class="back-divider"></div>
+                <div class="back-no">NO</div>
+                <div class="back-fs">Fs TO</div>
+                <div class="back-to-give">GIVE</div>
+                <div class="back-divider"></div>
+                <div class="back-tagline">Willpower vs. Wiring</div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+
+</body>
+</html>
