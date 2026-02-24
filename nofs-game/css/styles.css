@@ -87,196 +87,212 @@ body {
 }
 
 /* ===================================
-   CARD STYLES
+   CARD LAYOUT AREAS
    =================================== */
 
 .task-card-area {
     display: flex;
     flex-direction: column;
     gap: 12px;
-    align-items: center; 
+    align-items: center;
 }
 
 .f-card-area {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
     gap: 10px;
 }
 
-.card { 
-    border: 2px solid #555; 
-    border-radius: 8px; 
-    padding: 0; 
-    margin-bottom: 0; 
-    cursor: pointer; 
-    transition: all 0.2s ease-in-out; 
-    background: #333;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-    overflow: hidden; 
-    
+/* ===================================
+   CARD BASE
+   =================================== */
+
+.card {
+    border: 2px solid #555;
+    border-radius: 8px;
+    margin-bottom: 0;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    background: #2a2a2a;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+    overflow: hidden;
     position: relative;
-    background-size: cover;
-    background-position: center;
 }
 
-.card:hover:not(.selected) { 
-    border-color: #4CAF50; 
+.card:hover:not(.selected) {
+    border-color: #4CAF50;
     transform: translateY(-3px);
     box-shadow: 0 5px 10px rgba(0, 0, 0, 0.3);
 }
 
-.card.selected { 
-    border-color: #4CAF50; 
-    background-color: #1a3a1a; 
-    transform: translateY(-5px) scale(1.03); 
+.card.selected {
+    border-color: #4CAF50;
+    transform: translateY(-5px) scale(1.03);
     box-shadow: 0 0 15px 3px rgba(76, 175, 80, 0.6), 0 5px 10px rgba(0, 0, 0, 0.3);
 }
 
-/* === Task Card HTML Structure === */
+/* ===================================
+   TASK CARDS — time-of-day color system
+   =================================== */
+
+.t-morning   { --time-color: #e67e22; }
+.t-midday    { --time-color: #3498db; }
+.t-afternoon { --time-color: #e74c3c; }
+.t-evening   { --time-color: #6c3483; }
 
 .task-card {
     width: 100%;
     max-width: 280px;
-    min-height: 390px; 
     display: flex;
     flex-direction: column;
-    padding: 10px;
-    color: white;
-    font-weight: bold;
-    text-shadow: 0 1px 3px rgba(0,0,0,0.8); 
 }
 
-.task-card::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background: rgba(0,0,0,0.4);
-    z-index: 0; 
+.task-card .time-stripe {
+    height: 6px;
+    background: var(--time-color, #555);
+    flex-shrink: 0;
 }
 
-.card-header, .card-content-middle, .card-effect {
-    position: relative; 
-    z-index: 1;
+.task-card .card-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 10px 12px;
+    min-height: 0;
 }
 
-.card-header {
-    background: rgba(0,0,0,0.5);
-    padding: 8px;
-    border-radius: 4px;
-    border: 1px solid rgba(255,255,255,0.2);
-}
-
-.card-title {
-    font-size: 18px;
-    margin-bottom: 5px;
-    color: #fff;
-}
-
-.card-cost {
-    font-size: 16px;
-    color: #ff9800; 
-}
-.card-cost .base-cost {
-    text-decoration: line-through;
-    opacity: 0.7;
-    color: #fff;
+.task-card .card-name {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 900;
     font-size: 14px;
-}
-.card-cost .mod-arrow {
-    color: #f44336;
-    margin: 0 4px;
-}
-.card-cost .mod-cost {
-    color: #f44336; 
-    font-size: 18px;
+    color: #fff;
+    line-height: 1.2;
+    margin-bottom: 8px;
+    letter-spacing: -0.3px;
 }
 
-.card-content-middle {
-    flex-grow: 1; 
+.task-card .card-meta {
     display: flex;
-    flex-direction: column;
-    justify-content: center; 
-    padding: 10px 0;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
 }
 
-.card-time {
-    align-self: flex-start;
-    background: rgba(0,0,0,0.5);
-    padding: 4px 8px;
-    border-radius: 4px;
-    font-size: 12px;
-    color: #ccc;
+.card-cost { display: flex; gap: 4px; flex-wrap: wrap; }
+
+.cost-pip {
+    display: inline-flex;
+    align-items: center;
+    gap: 2px;
+    padding: 2px 6px 2px 4px;
+    border-radius: 20px;
+    font-size: 10px;
+    font-weight: 700;
+    line-height: 1;
+    white-space: nowrap;
+}
+.cost-pip.physical { background: rgba(192,57,43,0.25); color: #e88; border: 1px solid rgba(192,57,43,0.4); }
+.cost-pip.social   { background: rgba(52,152,219,0.2);  color: #8bc; border: 1px solid rgba(52,152,219,0.35); }
+.cost-pip.mental   { background: rgba(230,126,34,0.2);  color: #ca9; border: 1px solid rgba(230,126,34,0.35); }
+.cost-pip.base-cost { opacity: 0.45; text-decoration: line-through; }
+
+.time-badge {
+    font-size: 8px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--time-color, #888);
+    border: 1px solid var(--time-color, #888);
+    padding: 1px 5px;
+    border-radius: 3px;
+    opacity: 0.8;
+    white-space: nowrap;
 }
 
-.card-flavor {
+.task-card .divider {
+    height: 1px;
+    background: #3a3a3a;
+    margin: 0 0 8px;
+}
+
+.task-card .card-flavor {
+    flex: 1;
     font-style: italic;
-    font-size: 14px;
-    font-weight: normal;
-    color: #ccc;
-    text-align: center;
-    padding: 10px;
+    font-size: 11px;
+    color: #888;
     line-height: 1.4;
-    margin-top: 10px;
+    text-align: center;
+    padding: 2px;
 }
 
-.card-effect {
-    background: rgba(0,0,0,0.6);
-    backdrop-filter: blur(2px);
-    color: #4CAF50; 
-    font-size: 14px;
-    padding: 10px;
+.task-card .card-effect {
+    padding: 8px 12px;
+    font-size: 11px;
+    font-weight: 700;
+    color: white;
     text-align: center;
     line-height: 1.3;
-    border-top: 1px solid #4CAF50;
-    border-radius: 0 0 5px 5px;
-    margin: 0 -10px -10px -10px; 
+    background: var(--time-color, #555);
+    flex-shrink: 0;
+    margin-top: auto;
 }
 
+/* ===================================
+   F-CARDS  (hand / energy cards)
+   =================================== */
 
-/* === F-Card HTML Structure === */
-.f-card { 
-    min-height: 140px; 
+.f-card {
+    min-height: 110px;
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    overflow: hidden;
+}
+
+.f-card .f-stripe {
+    height: 6px;
+    flex-shrink: 0;
+}
+
+.f-card .f-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
     align-items: center;
-    text-align: center; 
-    font-weight: bold;
-    color: white;
-    text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+    justify-content: center;
+    padding: 8px;
+    gap: 5px;
 }
 
-.f-card::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background: rgba(0,0,0,0.3); 
-    z-index: 0; 
+.f-card .f-icon-wrap {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-.f-card-symbol {
-    font-size: 3em;
-    line-height: 1;
-    position: relative;
-    z-index: 1;
+.f-card .f-icon { font-size: 22px; line-height: 1; }
+
+.f-card .f-type {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 900;
+    font-size: 8px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
 }
 
-.f-card-label {
-    font-size: 14px;
-    margin-top: 10px;
-    position: relative;
-    z-index: 1;
-}
+.f-card.physical .f-stripe    { background: #e74c3c; }
+.f-card.physical .f-icon-wrap { background: rgba(231,76,60,0.2); }
+.f-card.physical .f-type      { color: #e88; }
 
-.f-card.physical { 
-    border-color: #b71c1c; 
-}
-.f-card.social { 
-    border-color: #0d47a1; 
-}
-.f-card.mental { 
-    border-color: #e65100; 
-}
+.f-card.social .f-stripe    { background: #3498db; }
+.f-card.social .f-icon-wrap { background: rgba(52,152,219,0.2); }
+.f-card.social .f-type      { color: #8bc; }
+
+.f-card.mental .f-stripe    { background: #e67e22; }
+.f-card.mental .f-icon-wrap { background: rgba(230,126,34,0.2); }
+.f-card.mental .f-type      { color: #ca9; }
 
 /* ===================================
    BUTTONS

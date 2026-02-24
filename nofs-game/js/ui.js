@@ -151,17 +151,18 @@ function gameScreen() {
 
     const buildCostHtml = (cost, modifiedCost) => {
         const icons = { physical: '⚡', social: '👥', mental: '🧠' };
-        const renderGroup = (c) =>
+        const renderPips = (c, extraClass = '') =>
             Object.entries(icons)
-                .map(([key, sym]) => c[key] > 0 ? `<span>${sym}<small>x${c[key]}</small></span>` : '')
-                .join('') || '0';
+                .map(([key, sym]) => c[key] > 0
+                    ? `<span class="cost-pip ${key} ${extraClass}">${sym} ×${c[key]}</span>`
+                    : '')
+                .join('');
 
         const isModified = JSON.stringify(cost) !== JSON.stringify(modifiedCost);
-        const base = renderGroup(cost);
-        const mod  = renderGroup(modifiedCost);
-        return isModified
-            ? `<span class="base-cost">${base}</span> → <span class="mod-cost">${mod}</span>`
-            : `<span>${base}</span>`;
+        if (isModified) {
+            return renderPips(cost, 'base-cost') + renderPips(modifiedCost);
+        }
+        return renderPips(cost) || '<span class="cost-pip">0</span>';
     };
 
     // --- Special ability buttons ---
@@ -218,14 +219,17 @@ function gameScreen() {
                         const isSelected  = game.selectedTask === i;
                         const modCost     = game.getModifiedCost(task);
                         const taskData    = AppConfig.tasks.find(t => t.name === task.name) || { flavor: "" };
+                        const timeClass   = { Morning: 't-morning', Midday: 't-midday', Afternoon: 't-afternoon', Evening: 't-evening' }[task.time] || '';
                         return `
-                        <div class="card task-card ${isSelected ? 'selected' : ''}" onclick="handleAction(() => selectTask(${i}))">
-                            <div class="card-header">
-                                <div class="card-title">${task.name}</div>
-                                <div class="card-cost">${buildCostHtml(task.cost, modCost)}</div>
-                            </div>
-                            <div class="card-content-middle">
-                                <div class="card-time">${task.time}</div>
+                        <div class="card task-card ${timeClass} ${isSelected ? 'selected' : ''}" onclick="handleAction(() => selectTask(${i}))">
+                            <div class="time-stripe"></div>
+                            <div class="card-body">
+                                <div class="card-name">${task.name}</div>
+                                <div class="card-meta">
+                                    <div class="card-cost">${buildCostHtml(task.cost, modCost)}</div>
+                                    <span class="time-badge">${task.time}</span>
+                                </div>
+                                <div class="divider"></div>
                                 ${taskData.flavor ? `<div class="card-flavor">"${taskData.flavor}"</div>` : ''}
                             </div>
                             ${task.effect ? `<div class="card-effect">${task.effect.text}</div>` : ''}
@@ -242,8 +246,11 @@ function gameScreen() {
                         const sym = card.type === 'physical' ? '⚡' : card.type === 'social' ? '👥' : '🧠';
                         return `
                         <div class="card f-card ${card.type} ${isSelected ? 'selected' : ''}" onclick="handleAction(() => selectCard(${i}))">
-                            <div class="f-card-symbol">${sym}</div>
-                            <div class="f-card-label">${card.type.toUpperCase()}</div>
+                            <div class="f-stripe"></div>
+                            <div class="f-body">
+                                <div class="f-icon-wrap"><span class="f-icon">${sym}</span></div>
+                                <div class="f-type">${card.type}</div>
+                            </div>
                         </div>`;
                     }).join('')}
                 </div>

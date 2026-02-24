@@ -7,88 +7,125 @@ document.addEventListener('DOMContentLoaded', function() {
     const container = document.getElementById('print-sheets');
     if (!container) return;
 
-    // --- Helper to build cost HTML (Simplified for print) ---
-    // This only shows the BASE cost
-    const buildCostHtml = (cost) => {
-        const p = cost.physical || 0;
-        const s = cost.social || 0;
-        const m = cost.mental || 0;
-
-        let baseHtml = `
-            ${p > 0 ? '⚡'.repeat(p) : ''}
-            ${s > 0 ? '👥'.repeat(s) : ''}
-            ${m > 0 ? '🧠'.repeat(m) : ''}
-        `;
-        if (baseHtml.trim() === '') baseHtml = '0'; 
-        return `<span>${baseHtml}</span>`;
+    // --- Time slot → CSS class ---
+    const timeClass = {
+        'Morning':   't-morning',
+        'Midday':    't-midday',
+        'Afternoon': 't-afternoon',
+        'Evening':   't-evening'
     };
 
-    // --- Helper to build a single card's HTML ---
+    // --- Cost pips HTML ---
+    const buildCostHtml = (cost) => {
+        const pips = [
+            { key: 'physical', sym: '⚡' },
+            { key: 'social',   sym: '👥' },
+            { key: 'mental',   sym: '🧠' }
+        ];
+        const html = pips
+            .filter(p => cost[p.key] > 0)
+            .map(p => `<span class="cost-pip ${p.key}">${p.sym} ×${cost[p.key]}</span>`)
+            .join('');
+        return html || '<span class="cost-pip">0</span>';
+    };
+
+    // --- Single task card HTML ---
     const buildTaskCardHtml = (task) => {
+        const tc = timeClass[task.time] || '';
         return `
-        <div class="card task-card" style="background-image: url('${task.image}')">
-            <div class="card-header">
-                <div class="card-title">${task.name}</div>
-                <div class="card-cost">${buildCostHtml(task.cost)}</div>
-            </div>
-            <div class="card-content-middle">
-                <div class="card-time">${task.time}</div>
+        <div class="card task-card ${tc}">
+            <div class="time-stripe"></div>
+            <div class="card-body">
+                <div class="card-name">${task.name}</div>
+                <div class="card-meta">
+                    <div class="card-cost">${buildCostHtml(task.cost)}</div>
+                    <span class="time-badge">${task.time}</span>
+                </div>
+                <div class="divider"></div>
                 ${task.flavor ? `<div class="card-flavor">"${task.flavor}"</div>` : ''}
             </div>
             ${task.effect ? `<div class="card-effect">${task.effect.text}</div>` : ''}
+            <div class="card-footer"><span class="nofn-watermark">NOFNWAY</span></div>
         </div>`;
     };
 
-    // === 1. Build F-Card Sheet ===
-    let fCardPage = document.createElement('div');
+    // === 1. F-Card Sheet ===
+    const fCardPage = document.createElement('div');
     fCardPage.className = 'print-page';
-    
+
     const fCards = [
-        { type: 'physical', symbol: '⚡' },
-        { type: 'social', symbol: '👥' },
-        { type: 'mental', symbol: '🧠' }
+        { type: 'physical', symbol: '⚡', label: 'Physical', desc: 'Spend to complete tasks with physical cost' },
+        { type: 'social',   symbol: '👥', label: 'Social',   desc: 'Spend to complete tasks with social cost'   },
+        { type: 'mental',   symbol: '🧠', label: 'Mental',   desc: 'Spend to complete tasks with mental cost'   }
     ];
 
     fCards.forEach(card => {
-        // Add 3 copies of each F-Card to fill the first 9 slots
-        for (let i=0; i < 3; i++) {
+        for (let i = 0; i < 3; i++) {
             fCardPage.innerHTML += `
-            <div class="card f-card ${card.type}" 
-                 style="background-image: url('assets/images/f_cards/${card.type}.png')">
-                <div class="f-card-symbol">${card.symbol}</div>
-                <div class="f-card-label">${card.type.toUpperCase()} F</div>
+            <div class="card f-card ${card.type}">
+                <div class="f-stripe"></div>
+                <div class="f-body">
+                    <div class="f-icon-wrap"><span class="f-icon">${card.symbol}</span></div>
+                    <div class="f-type">${card.label}</div>
+                    <div class="f-desc">${card.desc}</div>
+                </div>
+                <div class="f-footer">
+                    <span class="f-count">×3 in deck</span>
+                    <span class="nofn-watermark">NOFNWAY</span>
+                </div>
             </div>`;
         }
     });
     container.appendChild(fCardPage);
 
-    // === 2. Build Task Card Sheets ===
-    let allTasks = [...TASK_DATA];
-    let pageCount = 0;
+    // === 2. Task Card Sheets (9 per page) ===
     let currentPage = null;
-
-    allTasks.forEach((task, index) => {
-        // Create a new page every 9 cards
+    TASK_DATA.forEach((task, index) => {
         if (index % 9 === 0) {
-            pageCount++;
             currentPage = document.createElement('div');
             currentPage.className = 'print-page';
             container.appendChild(currentPage);
         }
         currentPage.innerHTML += buildTaskCardHtml(task);
     });
-    
-    // Fill in any blank spots on the last page
-    while (currentPage.childElementCount < 9) {
-        currentPage.innerHTML += '<div></div>'; // Empty div
+
+    // Fill any blank spots on the last page
+    while (currentPage && currentPage.childElementCount < 9) {
+        currentPage.innerHTML += '<div></div>';
     }
 
-
-    // === 3. Build Card Back Sheet ===
-    let backPage = document.createElement('div');
+    // === 3. Task Card Back Sheet ===
+    const backPage = document.createElement('div');
     backPage.className = 'print-page';
     for (let i = 0; i < 9; i++) {
-        backPage.innerHTML += '<div class="card card-back"></div>';
+        backPage.innerHTML += `
+        <div class="card card-back">
+            <div class="back-frame"></div>
+            <div class="back-content">
+                <div class="back-eyebrow">NOFNWAY</div>
+                <div class="back-divider"></div>
+                <div class="back-no">NO</div>
+                <div class="back-fs">Fs TO</div>
+                <div class="back-to-give">GIVE</div>
+                <div class="back-divider"></div>
+                <div class="back-tagline">Willpower vs. Wiring</div>
+            </div>
+        </div>`;
     }
     container.appendChild(backPage);
+
+    // === 4. F-Card Back Sheet ===
+    const fBackPage = document.createElement('div');
+    fBackPage.className = 'print-page';
+    for (let i = 0; i < 9; i++) {
+        fBackPage.innerHTML += `
+        <div class="card f-card-back">
+            <div class="back-frame"></div>
+            <div class="f-back-content">
+                <div class="f-back-letter">F</div>
+                <div class="f-back-label">NOFNWAY</div>
+            </div>
+        </div>`;
+    }
+    container.appendChild(fBackPage);
 });
