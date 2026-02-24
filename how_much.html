@@ -5,78 +5,105 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>NOFNWAY | HOW MUCH?</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@900&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="theme.css">
     <style>
         :root {
-            --bg: #0f172a; --card-bg: #1e293b; --text-main: #f8fafc; --text-dim: #94a3b8;
-            --border: #334155; --brand: #3b82f6; --accent-blue: #3b82f6; 
-            --accent-yellow: #facc15; --accent-green: #4ade80; --accent-orange: #f97316; --danger: #ef4444;
-            --transition: all 0.2s ease;
+            --accent-yellow: #facc15;
+            --accent-green:  #4ade80;
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-        body { font-family: 'Roboto', sans-serif; background: var(--bg); color: var(--text-main); height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+        body { height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
 
-        .navbar { background: #000; padding: 10px 30px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--brand); flex-shrink: 0; }
-        .brand { font-family: 'Montserrat', sans-serif; font-weight: 900; font-size: 1.5rem; text-decoration: none; color: white; }
-        .brand span { color: var(--brand); }
-        #unit-indicator { font-size: 0.7rem; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: var(--text-dim); }
+        .brand { text-decoration: none; }
 
-        .workspace { flex: 1; overflow-y: auto; padding: 1rem; display: flex; flex-direction: column; gap: 1rem; max-width: 600px; margin: 0 auto; width: 100%; }
+        #unit-indicator {
+            font-size: 0.7rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--text-dim);
+        }
+
+        .workspace {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            max-width: 600px;
+            margin: 0 auto;
+            width: 100%;
+        }
 
         .hero-title { padding: 1rem 0; text-align: center; }
-        #dynamic-title { 
-            font-family: 'Montserrat', sans-serif; 
-            font-weight: 900; 
-            font-size: 3rem; 
-            letter-spacing: -2px; 
-            margin: 0; 
+        #dynamic-title {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 900;
+            font-size: 3rem;
+            letter-spacing: -2px;
+            margin: 0;
             text-transform: uppercase;
             line-height: 1;
+            color: var(--text-main);
+            transition: color 0.2s;
         }
 
-        .input-container { 
-            background: var(--card-bg); 
-            border: 3px solid var(--border); 
-            border-radius: 1rem; 
-            padding: 1rem; 
-            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
-            transition: var(--transition);
+        .input-container {
+            background: var(--card-bg);
+            border: 3px solid var(--border);
+            border-radius: 1rem;
+            padding: 1rem;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            transition: border-color 0.2s;
         }
-        .main-input { 
-            background: transparent; 
-            border: none; 
-            color: white; 
-            font-size: 2.5rem; 
-            font-weight: 800; 
-            width: 100%; 
-            outline: none; 
-            font-family: 'Montserrat'; 
+        .input-container.active { border-color: var(--brand); }
+
+        .main-input {
+            background: transparent;
+            border: none;
+            color: var(--text-main);
+            font-size: 2.5rem;
+            font-weight: 800;
+            width: 100%;
+            outline: none;
+            font-family: 'Montserrat', sans-serif;
             text-align: center;
             caret-color: var(--accent-yellow);
         }
-        .main-input::placeholder { color: #334155; }
+        .main-input::placeholder { color: var(--border); }
 
-        .results-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 10px; }
-        .result-card { 
-            background: var(--card-bg); 
-            padding: 1.2rem; 
-            border-radius: 0.75rem; 
-            border-left: 5px solid var(--accent-blue);
+        .results-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+        .result-card {
+            background: var(--card-bg);
+            padding: 1.2rem;
+            border-radius: 0.75rem;
+            border: 1px solid var(--border);
+            border-left: 5px solid var(--brand);
             transition: var(--transition);
             cursor: pointer;
         }
-        .result-card:active { transform: scale(0.95); background: #2d3748; }
-        .res-unit { font-size: 0.65rem; color: var(--accent-yellow); font-weight: 900; text-transform: uppercase; letter-spacing: 1px; }
-        .res-val { font-size: 1.6rem; font-weight: 800; color: var(--text-main); margin-top: 4px; font-family: monospace; }
+        .result-card:hover  { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        .result-card:active { transform: scale(0.95); filter: brightness(0.9); }
 
-        .empty-state { text-align: center; color: var(--text-dim); margin-top: 2rem; font-size: 0.9rem; line-height: 1.6; }
+        .res-unit { font-size: 0.65rem; color: var(--accent-yellow); font-weight: 900; text-transform: uppercase; letter-spacing: 1px; }
+        .res-val  { font-size: 1.6rem; font-weight: 800; color: var(--text-main); margin-top: 4px; font-family: monospace; }
+
+        .empty-state { text-align: center; color: var(--text-dim); margin-top: 2rem; font-size: 0.9rem; line-height: 1.8; }
         .empty-state b { color: var(--accent-yellow); }
-        
+
         .toast {
             position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
-            background: var(--accent-green); color: black; padding: 10px 20px;
+            background: var(--accent-green); color: #000; padding: 10px 20px;
             border-radius: 5px; font-weight: bold; font-size: 0.8rem;
-            display: none; z-index: 1000;
+            display: none; z-index: 1000; white-space: nowrap;
+        }
+
+        @media (max-width: 400px) {
+            #dynamic-title  { font-size: 2rem; }
+            .main-input     { font-size: 1.8rem; }
+            .results-grid   { grid-template-columns: 1fr; }
         }
     </style>
 </head>
@@ -84,7 +111,10 @@
 
 <nav class="navbar">
     <a href="index.html" class="brand">NO<span>FN</span>WAY</a>
-    <div id="unit-indicator">Awaiting Input...</div>
+    <div class="nav-controls">
+        <div id="unit-indicator">Awaiting input…</div>
+        <button class="theme-toggle" id="themeBtn" onclick="toggleTheme()">🌙 Dark</button>
+    </div>
 </nav>
 
 <main class="workspace">
@@ -93,73 +123,125 @@
     </div>
 
     <div class="input-container" id="box">
-        <input type="text" id="userInput" class="main-input" placeholder="e.g. 10kg" autofocus oninput="convert()">
+        <input type="text" id="userInput" class="main-input"
+               placeholder="e.g. 10kg"
+               autofocus
+               autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
+               oninput="convert()">
     </div>
 
     <div id="results" class="results-grid"></div>
 
     <div id="empty" class="empty-state">
         Type a value and unit to begin.<br>
-        Try <b>"180c"</b>, <b>"32psi"</b>, <b>"12lb"</b>, or <b>"6ft"</b>.
+        Try <b>180c</b>, <b>32psi</b>, <b>12lb</b>, <b>6ft</b>, <b>100km</b>, or <b>3tsp</b>.<br>
+        <span style="font-size:0.8rem; opacity:0.7;">Press Esc to clear. Click any result to copy.</span>
     </div>
 </main>
 
-<div id="toast" class="toast">COPIED TO CLIPBOARD</div>
+<div id="toast" class="toast">COPIED</div>
 
 <script>
+
+    // ── Theme ─────────────────────────────────────────────────────────────────
+
+    function initTheme() {
+        const saved = localStorage.getItem('nofnway-theme') || 'light';
+        if (saved === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+            document.getElementById('themeBtn').textContent = '☀️ Light';
+        }
+    }
+
+    function toggleTheme() {
+        const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+        document.documentElement.setAttribute('data-theme', isDark ? '' : 'dark');
+        localStorage.setItem('nofnway-theme', isDark ? 'light' : 'dark');
+        document.getElementById('themeBtn').textContent = isDark ? '🌙 Dark' : '☀️ Light';
+    }
+
+    initTheme();
+
+
+    // ── Unit Data ─────────────────────────────────────────────────────────────
+    // Rate = how many of THIS unit per base unit
+    // Base units: lb (weight), in (length), cup (volume), psi (pressure)
+
     const UnitData = {
         weight: {
-            lb: { name: 'Pounds', rate: 1 },
-            kg: { name: 'Kilograms', rate: 0.453592 },
-            oz: { name: 'Ounces', rate: 16 },
-            g: { name: 'Grams', rate: 453.592 },
-            st: { name: 'Stone', rate: 0.0714286 }
+            lb:  { name: 'Pounds',      rate: 1          },
+            kg:  { name: 'Kilograms',   rate: 0.453592   },
+            oz:  { name: 'Ounces',      rate: 16         },
+            g:   { name: 'Grams',       rate: 453.592    },
+            st:  { name: 'Stone',       rate: 0.0714286  }
         },
         length: {
-            in: { name: 'Inches', rate: 1 },
-            ft: { name: 'Feet', rate: 1/12 },
-            cm: { name: 'Centimeters', rate: 2.54 },
-            m: { name: 'Meters', rate: 0.0254 },
-            mm: { name: 'Millimeters', rate: 25.4 },
-            yd: { name: 'Yards', rate: 0.0277778 }
+            in:  { name: 'Inches',      rate: 1              },
+            ft:  { name: 'Feet',        rate: 1/12           },
+            yd:  { name: 'Yards',       rate: 1/36           },
+            mi:  { name: 'Miles',       rate: 1/63360        },
+            mm:  { name: 'Millimeters', rate: 25.4           },
+            cm:  { name: 'Centimeters', rate: 2.54           },
+            m:   { name: 'Meters',      rate: 0.0254         },
+            km:  { name: 'Kilometers',  rate: 1/39370.0787   }
         },
         temp: {
-            c: { name: 'Celsius' },
-            f: { name: 'Fahrenheit' },
-            k: { name: 'Kelvin' }
+            c:   { name: 'Celsius'     },
+            f:   { name: 'Fahrenheit'  },
+            k:   { name: 'Kelvin'      }
         },
         volume: {
-            cup: { name: 'Cups', rate: 1 },
-            ml: { name: 'Milliliters', rate: 236.588 },
-            l: { name: 'Liters', rate: 0.236588 },
-            floz: { name: 'Fl. Ounces', rate: 8 },
-            tbsp: { name: 'Tablespoons', rate: 16 },
-            gal: { name: 'Gallons', rate: 0.0625 }
+            tsp:  { name: 'Teaspoons',   rate: 48       },
+            tbsp: { name: 'Tablespoons', rate: 16       },
+            floz: { name: 'Fl. Ounces',  rate: 8        },
+            cup:  { name: 'Cups',        rate: 1        },
+            pt:   { name: 'Pints',       rate: 0.5      },
+            qt:   { name: 'Quarts',      rate: 0.25     },
+            gal:  { name: 'Gallons',     rate: 0.0625   },
+            ml:   { name: 'Milliliters', rate: 236.588  },
+            l:    { name: 'Liters',      rate: 0.236588 }
         },
         pressure: {
-            psi: { name: 'PSI', rate: 1 },
-            bar: { name: 'Bar', rate: 0.0689476 },
-            kpa: { name: 'kPa', rate: 6.89476 }
+            psi:  { name: 'PSI',  rate: 1         },
+            bar:  { name: 'Bar',  rate: 0.0689476 },
+            kpa:  { name: 'kPa',  rate: 6.89476   }
         }
     };
 
+
+    // ── Number Formatting ─────────────────────────────────────────────────────
+
+    function formatNumber(val) {
+        if (val === 0) return '0';
+        const abs = Math.abs(val);
+        if (abs < 0.0001) return val.toExponential(2);
+        if (abs < 1)      return val.toFixed(4);
+        if (abs < 100)    return val.toFixed(2);
+        if (abs < 10000)  return val.toFixed(1);
+        return Math.round(val).toLocaleString();
+    }
+
+
+    // ── Conversion Logic ──────────────────────────────────────────────────────
+
     function convert() {
-        const input = document.getElementById('userInput').value.toLowerCase().replace(/\s/g, '');
-        const val = parseFloat(input);
-        const unit = input.replace(/[0-9.-]/g, '');
-        
+        const raw  = document.getElementById('userInput').value.toLowerCase().replace(/\s/g, '');
+        const val  = parseFloat(raw);
+        const unit = raw.replace(/[\d.\-]/g, '');
+
         const resultsDiv = document.getElementById('results');
-        const emptyDiv = document.getElementById('empty');
-        const titleEl = document.getElementById('dynamic-title');
-        const indicator = document.getElementById('unit-indicator');
-        const box = document.getElementById('box');
+        const emptyDiv   = document.getElementById('empty');
+        const titleEl    = document.getElementById('dynamic-title');
+        const indicator  = document.getElementById('unit-indicator');
+        const box        = document.getElementById('box');
 
         if (isNaN(val) || !unit) {
             resultsDiv.innerHTML = '';
             emptyDiv.style.display = 'block';
             titleEl.innerHTML = 'HOW <span style="color:var(--brand)">MUCH?</span>';
-            indicator.innerText = 'Awaiting Input...';
-            box.style.borderColor = 'var(--border)';
+            titleEl.style.color = '';
+            indicator.textContent = 'Awaiting input…';
+            box.classList.remove('active');
             return;
         }
 
@@ -169,16 +251,17 @@
         }
 
         if (!foundCat) {
-            indicator.innerText = 'Unknown Unit';
+            indicator.textContent = `Unknown: "${unit}"`;
+            box.classList.remove('active');
+            resultsDiv.innerHTML = '';
             return;
         }
 
-        // Update UI State
         emptyDiv.style.display = 'none';
-        titleEl.innerHTML = `${foundCat.toUpperCase()}?`;
+        titleEl.innerHTML = foundCat.toUpperCase() + '?';
         titleEl.style.color = 'var(--accent-yellow)';
-        indicator.innerText = `Converting ${foundCat}...`;
-        box.style.borderColor = 'var(--accent-blue)';
+        indicator.textContent = foundCat.charAt(0).toUpperCase() + foundCat.slice(1);
+        box.classList.add('active');
 
         let html = '';
         if (foundCat === 'temp') {
@@ -187,8 +270,7 @@
             const base = val / UnitData[foundCat][unit].rate;
             for (const u in UnitData[foundCat]) {
                 if (u === unit) continue;
-                const converted = base * UnitData[foundCat][u].rate;
-                html += createCard(UnitData[foundCat][u].name, converted);
+                html += createCard(UnitData[foundCat][u].name, base * UnitData[foundCat][u].rate);
             }
         }
         resultsDiv.innerHTML = html;
@@ -197,35 +279,68 @@
     function renderTemp(val, unit) {
         let c;
         if (unit === 'c') c = val;
-        else if (unit === 'f') c = (val - 32) * 5/9;
+        else if (unit === 'f') c = (val - 32) * 5 / 9;
         else if (unit === 'k') c = val - 273.15;
 
-        const f = (c * 9/5) + 32;
+        const f = (c * 9 / 5) + 32;
         const k = c + 273.15;
 
-        let output = '';
-        if (unit !== 'f') output += createCard('Fahrenheit', f);
-        if (unit !== 'c') output += createCard('Celsius', c);
-        if (unit !== 'k') output += createCard('Kelvin', k);
-        return output;
+        let out = '';
+        if (unit !== 'f') out += createCard('Fahrenheit', f);
+        if (unit !== 'c') out += createCard('Celsius', c);
+        if (unit !== 'k') out += createCard('Kelvin', k);
+        return out;
     }
 
     function createCard(label, val) {
-        const displayVal = Number.isInteger(val) ? val : val.toFixed(2);
+        const displayVal = formatNumber(val);
+        const copyVal    = +val.toPrecision(8);
         return `
-            <div class="result-card" onclick="copyToClipboard('${displayVal}')">
+            <div class="result-card" onclick="copyToClipboard('${copyVal}')">
                 <div class="res-unit">${label}</div>
                 <div class="res-val">${displayVal}</div>
             </div>`;
     }
 
+
+    // ── Clipboard ─────────────────────────────────────────────────────────────
+
     function copyToClipboard(text) {
-        navigator.clipboard.writeText(text).then(() => {
+        const showToast = () => {
             const toast = document.getElementById('toast');
             toast.style.display = 'block';
-            setTimeout(() => { toast.style.display = 'none'; }, 2000);
-        });
+            setTimeout(() => { toast.style.display = 'none'; }, 1800);
+        };
+
+        if (navigator.clipboard && window.isSecureContext) {
+            navigator.clipboard.writeText(text).then(showToast).catch(() => fallbackCopy(text, showToast));
+        } else {
+            fallbackCopy(text, showToast);
+        }
     }
+
+    function fallbackCopy(text, cb) {
+        const el = document.createElement('textarea');
+        el.value = text;
+        el.style.cssText = 'position:fixed;opacity:0;pointer-events:none;';
+        document.body.appendChild(el);
+        el.select();
+        try { document.execCommand('copy'); cb(); } catch (e) {}
+        document.body.removeChild(el);
+    }
+
+
+    // ── Keyboard Shortcuts ────────────────────────────────────────────────────
+
+    document.addEventListener('keydown', e => {
+        if (e.key === 'Escape') {
+            const input = document.getElementById('userInput');
+            input.value = '';
+            convert();
+            input.focus();
+        }
+    });
+
 </script>
 </body>
 </html>
