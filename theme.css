@@ -176,6 +176,21 @@ body {
 .working { background-color: var(--working); }
 .dev { background-color: var(--dev); color: #fff; }
 
+/* Connectivity disclaimer on hub cards */
+.net-badge {
+    font-size: 0.65rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-dim);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 3px 8px;
+    display: inline-block;
+    margin-top: 8px;
+    opacity: 0.75;
+}
+
 /* Footer & Terminal */
 footer { 
     text-align: center; 
