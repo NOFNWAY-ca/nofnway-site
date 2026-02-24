@@ -1,238 +1,234 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>NOFNWAY | JPEGer</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@900&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
-    <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script>document.documentElement.setAttribute('data-theme', localStorage.getItem('nofnway-theme') || 'light');</script>
+    <link rel="stylesheet" href="theme.css">
     <style>
-        :root { --brand: #3b82f6; --bg: #000000; --card: #0f172a; --border: #1e293b; }
-        body { background: var(--bg); color: #f1f5f9; font-family: 'Roboto', sans-serif; overflow: hidden; height: 100vh; display: flex; flex-direction: column; margin: 0; }
-        .brand { font-family: 'Montserrat', sans-serif; font-weight: 900; }
+        body { height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
 
-        .drop-zone { border: 2px dashed var(--border); transition: border-color 0.15s, background 0.15s; cursor: pointer; }
-        .drop-zone:hover, .drop-zone.drag-over { border-color: var(--brand); background: #020617; }
-        .drop-zone.drag-over { border-style: solid; }
+        .hidden { display: none !important; }
 
-        .loading-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.95); display: none; place-items: center; z-index: 3000; }
-        .custom-scroll::-webkit-scrollbar { width: 4px; }
-        .custom-scroll::-webkit-scrollbar-thumb { background: var(--brand); }
+        .nav-btn { background: transparent; color: var(--text-dim); border: 1px solid var(--border); padding: 5px 12px; border-radius: 4px; cursor: pointer; font-size: 0.75rem; font-weight: bold; text-transform: uppercase; text-decoration: none; display: inline-flex; align-items: center; transition: color 0.15s, border-color 0.15s; }
+        .nav-btn:hover { color: var(--text-main); border-color: var(--text-dim); }
 
-        .filename-input {
-            background: #0f172a;
-            border: 1px solid #334155;
-            color: #f1f5f9;
-            padding: 6px 10px;
-            border-radius: 4px;
-            font-family: 'Roboto', sans-serif;
-            font-size: 0.8rem;
-            width: 200px;
-            transition: border-color 0.15s;
-        }
+        #filenameGroup { display: flex; align-items: center; gap: 8px; }
+        .filename-label { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.1em; font-weight: bold; color: var(--text-dim); white-space: nowrap; }
+        .filename-input { background: var(--card-bg); border: 1px solid var(--border); color: var(--text-main); padding: 6px 10px; border-radius: 4px; font-family: 'Roboto', sans-serif; font-size: 0.8rem; width: 180px; transition: border-color 0.15s; }
         .filename-input:focus { outline: none; border-color: var(--brand); }
 
-        #errorBanner {
-            display: none;
-            background: #450a0a;
-            border: 1px solid #7f1d1d;
-            color: #fca5a5;
-            padding: 10px 20px;
-            border-radius: 6px;
-            margin: 0 auto 16px;
-            max-width: 640px;
-            width: 100%;
-            text-align: center;
-            font-size: 0.85rem;
-            box-sizing: border-box;
-        }
+        .btn-primary { background: var(--brand); color: white; border: none; padding: 6px 18px; border-radius: 4px; font-weight: bold; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; cursor: pointer; transition: filter 0.15s; }
+        .btn-primary:hover { filter: brightness(1.1); }
+        .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; }
+
+        .workspace { flex: 1; overflow-y: auto; display: flex; flex-direction: column; align-items: center; padding: 1rem; }
+        .workspace::-webkit-scrollbar { width: 4px; }
+        .workspace::-webkit-scrollbar-thumb { background: var(--brand); border-radius: 4px; }
+
+        .drop-zone { border: 2px dashed var(--border); border-radius: 0.5rem; padding: 5rem 2rem; text-align: center; width: 100%; max-width: 640px; cursor: pointer; transition: border-color 0.15s, background 0.15s; }
+        .drop-zone:hover, .drop-zone.drag-over { border-color: var(--brand); background: rgba(52,152,219,0.05); }
+        .drop-zone.drag-over { border-style: solid; }
+        .drop-title { font-family: 'Montserrat', sans-serif; font-weight: 900; font-size: 1.2rem; text-transform: uppercase; letter-spacing: -0.5px; color: var(--text-dim); }
+        .drop-sub { font-size: 0.7rem; color: var(--text-dim); margin-top: 8px; text-transform: uppercase; letter-spacing: 0.1em; opacity: 0.6; }
+
+        .preview-grid { width: 100%; display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; margin-top: 1rem; }
+        @media (min-width: 640px)  { .preview-grid { grid-template-columns: repeat(3, 1fr); } }
+        @media (min-width: 1024px) { .preview-grid { grid-template-columns: repeat(5, 1fr); } }
+        .preview-grid img { width: 100%; display: block; border-radius: 4px; border: 1px solid var(--border); box-shadow: 0 4px 12px rgba(0,0,0,0.1); cursor: pointer; transition: border-color 0.15s; }
+        .preview-grid img:hover { border-color: var(--brand); }
+
+        .loading-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.92); display: none; place-items: center; z-index: 3000; }
+        .load-text { font-family: 'Montserrat', sans-serif; font-weight: 900; color: var(--brand); font-size: 1.5rem; text-transform: uppercase; animation: pulse 1.5s ease-in-out infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+
+        #errorBanner { display: none; background: rgba(220,38,38,0.1); border: 1px solid rgba(220,38,38,0.4); color: #fca5a5; padding: 10px 20px; border-radius: 6px; margin: 0 auto 16px; max-width: 640px; width: 100%; text-align: center; font-size: 0.85rem; box-sizing: border-box; }
     </style>
 </head>
-<body class="p-4 md:p-8">
+<body>
 
-    <div id="loader" class="loading-overlay">
-        <div class="text-center">
-            <p id="loadText" class="brand text-blue-500 animate-pulse text-2xl uppercase">Rendering...</p>
+<div id="loader" class="loading-overlay">
+    <div style="text-align:center">
+        <p id="loadText" class="load-text">Rendering...</p>
+    </div>
+</div>
+
+<nav class="navbar">
+    <a href="index.html" class="brand">NO<span>FN</span>WAY // JPEGer</a>
+    <div class="nav-controls">
+        <button id="resetBtn" class="nav-btn hidden" onclick="location.reload()">Reset</button>
+        <div id="filenameGroup" class="hidden">
+            <label class="filename-label">Base Name</label>
+            <input type="text" id="filenameInput" class="filename-input" placeholder="filename">
         </div>
+        <button id="dlBtn" onclick="downloadQueue()" class="btn-primary hidden">Save All JPEGs</button>
+        <a href="index.html" class="nav-btn">← Hub</a>
+    </div>
+</nav>
+
+<main class="workspace">
+    <div id="errorBanner"></div>
+
+    <div id="setup" class="drop-zone">
+        <p class="drop-title">Drop or Click to Load PDF</p>
+        <p class="drop-sub">2.5× Scale &bull; QDoc Ordered Export</p>
+        <input type="file" id="fileInput" class="hidden" accept="application/pdf">
     </div>
 
-    <header class="flex justify-between items-center mb-4 bg-black p-4 border-b-2 border-blue-600 gap-4 flex-wrap">
-        <div class="flex items-center gap-6">
-            <a href="index.html" class="text-slate-500 hover:text-white text-[10px] font-bold uppercase tracking-widest transition-colors whitespace-nowrap">← Hub</a>
-            <h1 class="brand text-2xl tracking-tighter">NO<span class="text-blue-500">FN</span>WAY // JPEGer</h1>
-        </div>
-        <div class="flex items-center gap-3 flex-wrap">
-            <button onclick="location.reload()" id="resetBtn" class="hidden text-slate-500 hover:text-white text-[10px] font-bold uppercase tracking-widest transition-colors">Reset</button>
-            <div id="filenameGroup" class="hidden items-center gap-2 flex">
-                <label class="text-slate-500 text-[10px] uppercase tracking-widest font-bold whitespace-nowrap">Base Name</label>
-                <input type="text" id="filenameInput" class="filename-input" placeholder="filename" />
-            </div>
-            <button id="dlBtn" onclick="downloadQueue()" class="hidden bg-blue-600 hover:bg-blue-500 px-6 py-2 rounded font-bold uppercase text-xs tracking-widest transition-all">Save All JPEGs</button>
-        </div>
-    </header>
+    <div id="previewGrid" class="preview-grid"></div>
+</main>
 
-    <main class="flex-1 overflow-y-auto flex flex-col items-center custom-scroll px-0">
-        <div id="errorBanner"></div>
+<script>
+    const pdfjsLib = window['pdfjs-dist/build/pdf'];
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
-        <div id="setup" class="drop-zone w-full max-w-2xl p-20 rounded-lg text-center">
-            <p class="brand text-xl text-slate-400 uppercase tracking-tighter">Drop or Click to Load PDF</p>
-            <p class="text-[10px] text-slate-600 mt-2 uppercase tracking-widest">2.5x Scale &bull; QDoc Ordered Export</p>
-            <input type="file" id="fileInput" class="hidden" accept="application/pdf">
-        </div>
+    const setup         = document.getElementById('setup'),
+          fileInput     = document.getElementById('fileInput'),
+          grid          = document.getElementById('previewGrid'),
+          dlBtn         = document.getElementById('dlBtn'),
+          resetBtn      = document.getElementById('resetBtn'),
+          loader        = document.getElementById('loader'),
+          loadText      = document.getElementById('loadText'),
+          filenameGroup = document.getElementById('filenameGroup'),
+          filenameInput = document.getElementById('filenameInput'),
+          errorBanner   = document.getElementById('errorBanner');
 
-        <div id="previewGrid" class="w-full grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 mt-4"></div>
-    </main>
+    let exportList = [];
+    let errorTimer = null;
 
-    <script>
-        const pdfjsLib = window['pdfjs-dist/build/pdf'];
-        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+    /* --- PREVENT BROWSER NAVIGATION ON ACCIDENTAL DROPS --- */
+    window.addEventListener('dragover', e => e.preventDefault());
+    window.addEventListener('drop',     e => e.preventDefault());
 
-        const setup        = document.getElementById('setup'),
-              fileInput    = document.getElementById('fileInput'),
-              grid         = document.getElementById('previewGrid'),
-              dlBtn        = document.getElementById('dlBtn'),
-              resetBtn     = document.getElementById('resetBtn'),
-              loader       = document.getElementById('loader'),
-              loadText     = document.getElementById('loadText'),
-              filenameGroup = document.getElementById('filenameGroup'),
-              filenameInput = document.getElementById('filenameInput'),
-              errorBanner  = document.getElementById('errorBanner');
+    /* --- FILE INPUT --- */
+    setup.addEventListener('click', () => fileInput.click());
+    fileInput.addEventListener('change', e => processPdf(e.target.files[0]));
 
-        let exportList = [];
-        let errorTimer = null;
-
-        /* --- PREVENT BROWSER NAVIGATION ON ACCIDENTAL DROPS --- */
-        window.addEventListener('dragover', e => e.preventDefault());
-        window.addEventListener('drop',     e => e.preventDefault());
-
-        /* --- FILE INPUT --- */
-        setup.addEventListener('click', () => fileInput.click());
-        fileInput.addEventListener('change', e => processPdf(e.target.files[0]));
-
-        /* --- DRAG AND DROP --- */
-        setup.addEventListener('dragover', e => {
-            e.preventDefault();
-            setup.classList.add('drag-over');
-        });
-        setup.addEventListener('dragleave', e => {
-            if (!setup.contains(e.relatedTarget)) setup.classList.remove('drag-over');
-        });
-        setup.addEventListener('drop', e => {
-            e.preventDefault();
-            setup.classList.remove('drag-over');
-            const file = e.dataTransfer.files[0];
-            if (file?.type === 'application/pdf') {
-                processPdf(file);
-            } else {
-                showError("That doesn't look like a PDF. Drop a .pdf file and try again.");
-            }
-        });
-
-        /* --- ERROR DISPLAY --- */
-        function showError(msg) {
-            clearTimeout(errorTimer);
-            errorBanner.textContent = msg;
-            errorBanner.style.display = 'block';
-            errorTimer = setTimeout(() => { errorBanner.style.display = 'none'; }, 6000);
+    /* --- DRAG AND DROP --- */
+    setup.addEventListener('dragover', e => {
+        e.preventDefault();
+        setup.classList.add('drag-over');
+    });
+    setup.addEventListener('dragleave', e => {
+        if (!setup.contains(e.relatedTarget)) setup.classList.remove('drag-over');
+    });
+    setup.addEventListener('drop', e => {
+        e.preventDefault();
+        setup.classList.remove('drag-over');
+        const file = e.dataTransfer.files[0];
+        if (file?.type === 'application/pdf') {
+            processPdf(file);
+        } else {
+            showError("That doesn't look like a PDF. Drop a .pdf file and try again.");
         }
+    });
 
-        /* --- CORE PROCESSOR --- */
-        async function processPdf(file) {
-            if (!file) return;
+    /* --- ERROR DISPLAY --- */
+    function showError(msg) {
+        clearTimeout(errorTimer);
+        errorBanner.textContent = msg;
+        errorBanner.style.display = 'block';
+        errorTimer = setTimeout(() => { errorBanner.style.display = 'none'; }, 6000);
+    }
 
-            errorBanner.style.display = 'none';
-            loader.style.display = 'grid';
-            grid.innerHTML = '';
+    /* --- CORE PROCESSOR --- */
+    async function processPdf(file) {
+        if (!file) return;
 
-            // Clean up any previous blob URLs
-            exportList.forEach(item => URL.revokeObjectURL(item.url));
-            exportList = [];
+        errorBanner.style.display = 'none';
+        loader.style.display = 'grid';
+        grid.innerHTML = '';
 
-            try {
-                const arrayBuffer = await file.arrayBuffer();
-                const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
-                const total = pdf.numPages;
-                const baseName = file.name.substring(0, file.name.lastIndexOf('.')) || file.name;
+        // Clean up any previous blob URLs
+        exportList.forEach(item => URL.revokeObjectURL(item.url));
+        exportList = [];
 
-                for (let i = 1; i <= total; i++) {
-                    loadText.innerText = `Baking P${i} / ${total}`;
-                    const page = await pdf.getPage(i);
-                    const viewport = page.getViewport({ scale: 2.5, rotation: page.rotate });
-                    const canvas = document.createElement('canvas');
-                    canvas.width = viewport.width;
-                    canvas.height = viewport.height;
+        try {
+            const arrayBuffer = await file.arrayBuffer();
+            const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+            const total = pdf.numPages;
+            const baseName = file.name.substring(0, file.name.lastIndexOf('.')) || file.name;
 
-                    await page.render({ canvasContext: canvas.getContext('2d'), viewport }).promise;
+            for (let i = 1; i <= total; i++) {
+                loadText.innerText = `Baking P${i} / ${total}`;
+                const page = await pdf.getPage(i);
+                const viewport = page.getViewport({ scale: 2.5, rotation: page.rotate });
+                const canvas = document.createElement('canvas');
+                canvas.width = viewport.width;
+                canvas.height = viewport.height;
 
-                    const blob = await new Promise(res => canvas.toBlob(res, 'image/jpeg', 0.92));
-                    const url = URL.createObjectURL(blob);
+                await page.render({ canvasContext: canvas.getContext('2d'), viewport }).promise;
 
-                    // Free the canvas memory immediately
-                    canvas.width = 0;
-                    canvas.height = 0;
+                const blob = await new Promise(res => canvas.toBlob(res, 'image/jpeg', 0.92));
+                const url = URL.createObjectURL(blob);
 
-                    const pageIndex = i; // capture for click handler closure
-                    const img = document.createElement('img');
-                    img.src = url;
-                    img.className = 'w-full rounded border border-slate-800 shadow-lg hover:border-blue-500 transition-colors cursor-pointer';
-                    img.title = `Click to download page ${pageIndex}`;
-                    img.addEventListener('click', () => triggerDownload(url, buildName(pageIndex, total)));
-                    grid.appendChild(img);
+                // Free canvas memory immediately
+                canvas.width = 0;
+                canvas.height = 0;
 
-                    exportList.push({ url });
-                }
+                const pageIndex = i;
+                const img = document.createElement('img');
+                img.src = url;
+                img.title = `Click to download page ${pageIndex}`;
+                img.addEventListener('click', () => triggerDownload(url, buildName(pageIndex, total)));
+                grid.appendChild(img);
 
-                filenameInput.value = baseName;
-                setup.classList.add('hidden');
-                filenameGroup.classList.remove('hidden');
-                dlBtn.classList.remove('hidden');
-                resetBtn.classList.remove('hidden');
-
-            } catch (err) {
-                console.error(err);
-                showError('Could not read that PDF — it may be encrypted or damaged.');
-            } finally {
-                loader.style.display = 'none';
-            }
-        }
-
-        /* --- HELPERS --- */
-        function buildName(page, total) {
-            const base = filenameInput.value.trim() || 'export';
-            return `${base}_Page_${page}_of_${total}.jpg`;
-        }
-
-        function triggerDownload(url, filename) {
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = filename;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-        }
-
-        /* --- BATCH DOWNLOAD --- */
-        async function downloadQueue() {
-            const total = exportList.length;
-            if (total === 0) return;
-
-            dlBtn.disabled = true;
-
-            for (let i = 0; i < total; i++) {
-                dlBtn.innerText = `SAVING ${i + 1} / ${total}`;
-                triggerDownload(exportList[i].url, buildName(i + 1, total));
-                // Throttle to prevent browser .bin bug on rapid downloads
-                await new Promise(r => setTimeout(r, 400));
+                exportList.push({ url });
             }
 
-            // Clean up blob URLs — no longer needed after download
-            exportList.forEach(item => URL.revokeObjectURL(item.url));
-            exportList = [];
+            filenameInput.value = baseName;
+            setup.classList.add('hidden');
+            filenameGroup.classList.remove('hidden');
+            dlBtn.classList.remove('hidden');
+            resetBtn.classList.remove('hidden');
 
-            dlBtn.disabled = false;
-            dlBtn.innerText = 'Save All JPEGs';
+        } catch (err) {
+            console.error(err);
+            showError('Could not read that PDF — it may be encrypted or damaged.');
+        } finally {
+            loader.style.display = 'none';
         }
-    </script>
+    }
+
+    /* --- HELPERS --- */
+    function buildName(page, total) {
+        const base = filenameInput.value.trim() || 'export';
+        return `${base}_Page_${page}_of_${total}.jpg`;
+    }
+
+    function triggerDownload(url, filename) {
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+    }
+
+    /* --- BATCH DOWNLOAD --- */
+    async function downloadQueue() {
+        const total = exportList.length;
+        if (total === 0) return;
+
+        dlBtn.disabled = true;
+
+        for (let i = 0; i < total; i++) {
+            dlBtn.innerText = `SAVING ${i + 1} / ${total}`;
+            triggerDownload(exportList[i].url, buildName(i + 1, total));
+            // Throttle to prevent browser .bin bug on rapid downloads
+            await new Promise(r => setTimeout(r, 400));
+        }
+
+        // Clean up blob URLs — no longer needed after download
+        exportList.forEach(item => URL.revokeObjectURL(item.url));
+        exportList = [];
+
+        dlBtn.disabled = false;
+        dlBtn.innerText = 'Save All JPEGs';
+    }
+</script>
 </body>
 </html>
