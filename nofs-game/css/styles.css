@@ -443,32 +443,11 @@ button.secondary:hover:not(:disabled) {
     line-height: 1.4; 
 }
 
-/* ===================================
-   AGREEMENT CHECKBOX
-   =================================== */
-.agreement { 
-    margin: 20px 0; 
-    padding: 15px; 
-    border: 1px solid #4CAF50; 
-    border-radius: 6px; 
-    font-size: 13px; 
-    background: #1a3a1a; 
-    display: flex; 
-    align-items: flex-start; 
-    gap: 10px; 
-    text-align: left; 
-}
-
-.agreement input[type="checkbox"] { 
-    margin-top: 2px; 
-    cursor: pointer; 
-    flex-shrink: 0;
-    width: 18px;
-    height: 18px;
-}
-
-.agreement label {
-    cursor: pointer;
+.copyright {
+    margin-top: 20px;
+    font-size: 0.72rem;
+    color: rgba(255,255,255,0.3);
+    text-align: center;
 }
 
 .footer-note { 

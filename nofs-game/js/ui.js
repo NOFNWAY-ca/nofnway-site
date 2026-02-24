@@ -5,7 +5,6 @@
 
 let game = null;
 let isProcessing = false;
-let hasAgreedToTerms = false;
 const selectedConditions = new Set();
 
 async function handleAction(actionFn) {
@@ -92,17 +91,11 @@ function setupScreen() {
                 </ul>
             </div>
 
-            <div class="agreement">
-                <input type="checkbox" id="agreementCheckbox" ${hasAgreedToTerms ? 'checked' : ''}
-                       onclick="hasAgreedToTerms = this.checked; render();">
-                <label for="agreementCheckbox">
-                    I acknowledge that "No Fs TO GIVE" and all NOFNWAY branding are proprietary intellectual property.
-                </label>
+            <div class="buttons">
+                <button onclick="handleAction(startGame)" id="startButton">START GAME</button>
             </div>
 
-            <div class="buttons">
-                <button onclick="handleAction(startGame)" id="startButton" ${!hasAgreedToTerms ? 'disabled' : ''}>START GAME</button>
-            </div>
+            <p class="copyright">NO Fs TO GIVE and all NOFNWAY branding are proprietary intellectual property. &copy; 2026 NOFNWAY</p>
         </div>`;
 }
 
