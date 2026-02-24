@@ -52,18 +52,20 @@
         .chip-row { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 5px; scrollbar-width: none; }
         .chip-row::-webkit-scrollbar { display: none; }
         
-        .chip { 
-            background: var(--bg); 
+        .chip {
+            background: var(--bg);
             color: var(--text-dim);
-            padding: 10px 14px; 
-            border-radius: 8px; 
-            font-size: 0.85rem; 
-            cursor: pointer; 
-            border: 2px solid var(--border); 
-            font-weight: bold; 
+            padding: 10px 14px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            border: 2px solid var(--border);
+            font-weight: bold;
             white-space: nowrap;
         }
         .chip.active { border-color: var(--brand); color: var(--brand); background: rgba(52, 152, 219, 0.1); }
+        .chip.pin-active { border-color: #e67e22; color: #e67e22; background: rgba(230, 126, 34, 0.1); animation: pulse-border 1s ease-in-out infinite; }
+        @keyframes pulse-border { 0%, 100% { border-color: #e67e22; } 50% { border-color: rgba(230,126,34,0.4); } }
         
         .btn-go { background: var(--brand); color: white; border: none; padding: 18px; border-radius: 8px; font-weight: 900; font-size: 1.1rem; cursor: pointer; text-transform: uppercase; margin-top: 5px; }
         
@@ -132,6 +134,12 @@
         This tool requires an internet connection for maps and routing.
     </div>
     
+    <div class="label">Custom Route <span style="opacity:0.5; font-weight:normal; text-transform:none;">(optional — tap a button, then tap the map)</span></div>
+    <div class="chip-row">
+        <div class="chip" id="pin-start-btn" onclick="setPinMode('start')">📍 Set Start</div>
+        <div class="chip" id="pin-end-btn"   onclick="setPinMode('end')">📍 Set End</div>
+    </div>
+
     <div class="label">Choose Vibe</div>
     <div class="chip-row" id="vibe-select">
         <div class="chip active" data-vibe="nature" onclick="selectChip(this, 'vibe')">SCENIC</div>
@@ -157,6 +165,7 @@
     let map, userMarker, routingControl, currentPos, startPin = null, endPin = null;
     let selectedVibe = 'nature';
     let selectedRadius = 1000;
+    let pinMode = null;
     
     // Tracker variables
     let isTracking = false;
@@ -198,6 +207,22 @@
             if (e.alpha !== null) { document.getElementById('compass').style.transform = `rotate(${e.alpha}deg)`; }
         }, true);
 
+        // Primary: tap-mode (mobile + desktop)
+        map.on('click', (e) => {
+            if (!pinMode) return;
+            if (pinMode === 'start') {
+                if (startPin) map.removeLayer(startPin);
+                startPin = L.marker(e.latlng, { draggable: true, icon: createIcon('var(--brand)') }).addTo(map);
+                updateStatus("START PIN SET.", "working");
+            } else {
+                if (endPin) map.removeLayer(endPin);
+                endPin = L.marker(e.latlng, { draggable: true, icon: createIcon('var(--working)') }).addTo(map);
+                updateStatus("END PIN SET. READY.", "ready");
+            }
+            clearPinMode();
+        });
+
+        // Bonus: right-click on desktop still works
         map.on('contextmenu', (e) => {
             if (!startPin) {
                 startPin = L.marker(e.latlng, { draggable: true, icon: createIcon('var(--brand)') }).addTo(map);
@@ -275,6 +300,19 @@
         return L.divIcon({ className: 'custom-icon', html: `<div style="background-color:${color}; width:20px; height:20px; border-radius:50%; border:3px solid white; box-shadow: 0 2px 10px rgba(0,0,0,0.4);"></div>`, iconSize: [20, 20] });
     }
 
+    function setPinMode(type) {
+        if (pinMode === type) { clearPinMode(); return; }
+        pinMode = type;
+        document.getElementById('pin-start-btn').classList.toggle('pin-active', type === 'start');
+        document.getElementById('pin-end-btn').classList.toggle('pin-active', type === 'end');
+        updateStatus(type === 'start' ? "TAP MAP TO SET START PIN." : "TAP MAP TO SET END PIN.", "working");
+    }
+    function clearPinMode() {
+        pinMode = null;
+        document.getElementById('pin-start-btn').classList.remove('pin-active');
+        document.getElementById('pin-end-btn').classList.remove('pin-active');
+    }
+
     function selectChip(el, type) {
         document.querySelectorAll(`#${type}-select .chip`).forEach(c => c.classList.remove('active'));
         el.classList.add('active');
@@ -287,6 +325,7 @@
         if (routingControl) map.removeControl(routingControl);
         startPin = null; endPin = null;
         isTracking = false;
+        clearPinMode();
         document.getElementById('tracker-hud').style.display = 'none';
         updateStatus("SYSTEM RESET.", "dev");
     }

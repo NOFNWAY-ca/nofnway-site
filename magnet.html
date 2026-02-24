@@ -122,7 +122,7 @@
         .circle.selected   { box-shadow: 0 0 0 4px rgba(52,152,219,0.6); z-index: 5; }
         .circle.drag-hover { background: #e8f6fd; border: 2px solid var(--brand); box-shadow: inset 0 0 10px rgba(52,152,219,0.3); }
         .circle:hover      { background: #f0f8ff; border-color: #bbb; }
-        .circle img        { position: absolute; width: 100%; height: auto; cursor: grab; pointer-events: none; transform-origin: center; }
+        .circle img        { position: absolute; width: 100%; height: auto; cursor: grab; pointer-events: none; transform-origin: center; touch-action: none; }
         .circle.has-content img        { pointer-events: auto; }
         .circle.has-content img:active { cursor: grabbing; }
 
@@ -268,7 +268,7 @@
                     <div>
                         <span class="control-label">Zoom</span>
                         <input type="range" id="zoomSlider" min="0.2" max="3.0" step="0.1" value="1"
-                               onmousedown="pushHistory()" oninput="updateActiveZoom()" title="Zoom Image">
+                               onpointerdown="pushHistory()" oninput="updateActiveZoom()" title="Zoom Image">
                     </div>
                     <div>
                         <span class="control-label">Tools</span>
@@ -303,7 +303,7 @@
                         <input type="text"  id="labelInput" placeholder="Label…" onfocus="pushHistory()" oninput="updateActiveLabel()" style="width:80px;">
                         <input type="color" id="labelColorPicker" value="#ffffff" onchange="pushHistory(); updateActiveLabel();">
                         <input type="range" id="labelSizeSlider" min="0.5" max="1.5" step="0.1" value="0.8"
-                               onmousedown="pushHistory()" oninput="updateActiveLabel()" style="width:40px;">
+                               onpointerdown="pushHistory()" oninput="updateActiveLabel()" style="width:40px;">
                     </div>
                 </div>
             </div>
@@ -699,42 +699,38 @@
     function setupDragZoom(img) {
         let isDown = false, startX, startY, initLeft, initTop;
 
-        img.onmousedown  = startDrag;
-        img.ontouchstart = startDrag;
-        window.addEventListener('mousemove', doDrag);
-        window.addEventListener('mouseup',   endDrag);
-        window.addEventListener('touchmove', doDrag, { passive: false });
-        window.addEventListener('touchend',  endDrag);
+        img.addEventListener('pointerdown', startDrag);
+        img.addEventListener('pointermove', doDrag);
+        img.addEventListener('pointerup',     endDrag);
+        img.addEventListener('pointercancel', endDrag);
 
-        img.parentElement.onwheel = e => {
+        img.parentElement.addEventListener('wheel', e => {
             e.preventDefault();
             pushHistory();
             let scale = parseFloat(img.getAttribute('data-scale') || '1');
             scale = Math.max(0.2, Math.min(3.0, scale + (e.deltaY < 0 ? 0.1 : -0.1)));
             document.getElementById('zoomSlider').value = scale;
             updateActiveZoom();
-        };
+        }, { passive: false });
 
-        function getXY(e) { return e.touches ? { x: e.touches[0].clientX, y: e.touches[0].clientY } : { x: e.clientX, y: e.clientY }; }
         function startDrag(e) {
-            if (e.type === 'touchstart' && e.touches.length > 1) return;
+            if (!e.isPrimary) return;
             e.preventDefault();
             isDown = true;
             pushHistory();
-            const xy = getXY(e);
-            startX = xy.x; startY = xy.y;
+            startX = e.clientX; startY = e.clientY;
             initLeft = img.offsetLeft; initTop = img.offsetTop;
+            img.setPointerCapture(e.pointerId);
             img.parentElement.setAttribute('data-dragging', 'true');
         }
         function doDrag(e) {
-            if (!isDown) return;
-            if (e.type === 'touchmove') e.preventDefault();
-            const xy = getXY(e);
-            img.style.left = `${initLeft + (xy.x - startX)}px`;
-            img.style.top  = `${initTop  + (xy.y - startY)}px`;
+            if (!isDown || !e.isPrimary) return;
+            img.style.left = `${initLeft + (e.clientX - startX)}px`;
+            img.style.top  = `${initTop  + (e.clientY - startY)}px`;
             markDirty();
         }
         function endDrag() {
+            if (!isDown) return;
             isDown = false;
             setTimeout(() => { if (img.parentElement) img.parentElement.removeAttribute('data-dragging'); }, 100);
         }
