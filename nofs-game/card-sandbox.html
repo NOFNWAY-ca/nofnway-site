@@ -3,8 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NO Fs TO GIVE — Card Design Sandbox</title>
+    <title>NOFNWAY | Card Sandbox</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&family=Roboto:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    <script>document.documentElement.setAttribute('data-theme', localStorage.getItem('nofnway-theme') || 'light');</script>
+    <link rel="stylesheet" href="../theme.css">
     <style>
 
         /* ═══════════════════════════════════════
@@ -15,25 +17,7 @@
         body {
             font-family: 'Roboto', sans-serif;
             background: #d0d4d8;
-            padding: 40px 24px;
-            color: #2c3e50;
-        }
-
-        .sandbox-header {
-            text-align: center;
-            margin-bottom: 48px;
-        }
-        .sandbox-header h1 {
-            font-family: 'Montserrat', sans-serif;
-            font-weight: 900;
-            font-size: 1.8rem;
-            letter-spacing: -0.5px;
-        }
-        .sandbox-header h1 span { color: #3498db; }
-        .sandbox-header p {
-            color: #7f8c8d;
-            font-size: 0.85rem;
-            margin-top: 6px;
+            padding: 24px 24px 40px;
         }
 
         .card-section { margin-bottom: 52px; }
@@ -522,7 +506,7 @@
         ═══════════════════════════════════════ */
         @media print {
             body { background: white; padding: 0; }
-            .sandbox-header, .section-label, .print-note { display: none; }
+            .navbar, .section-label, .print-note { display: none; }
             .card-section { margin: 0; }
             .card-row {
                 gap: 0.15in;
@@ -537,10 +521,13 @@
 </head>
 <body>
 
-<div class="sandbox-header">
-    <h1>NO <span>Fs</span> TO GIVE — Card Design Sandbox</h1>
-    <p>Cards render at actual print size (2.5" × 3.5"). Dashed border = cut line.</p>
-</div>
+<nav class="navbar">
+    <a href="../index.html" class="brand">NO<span>FN</span>WAY</a>
+    <div class="nav-controls">
+        <span style="font-size:0.75rem; color:rgba(255,255,255,0.5); font-weight:bold; text-transform:uppercase; letter-spacing:1px;">Card Sandbox — 2.5"×3.5" actual size</span>
+        <a href="index.html" class="share-btn" style="text-decoration:none;">← Game</a>
+    </div>
+</nav>
 
 
 <!-- ══════════════════════════════════════════
