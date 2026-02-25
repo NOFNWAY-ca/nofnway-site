@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NOFNWAY | Command Center</title>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@900&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <title>NOFNWAY</title>
+    <script>document.documentElement.setAttribute('data-theme', localStorage.getItem('nofnway-theme') || 'light');</script>
+    <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Montserrat:wght@900&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="theme.css">
 </head>
 <body>
@@ -17,26 +18,59 @@
         </div>
     </nav>
 
+    <section class="hero">
+        <div class="hero-inner">
+            <div class="hero-emblem-wrap" aria-hidden="true">
+                <div class="hero-emblem"><span>FN</span></div>
+            </div>
+            <div class="hero-copy">
+                <p class="hero-callout">You've been called lazy. Told to try harder.<br>
+                Handed "solutions" with seventeen steps and a subscription fee.</p>
+                <h1 class="hero-headline">This isn't that.</h1>
+                <p class="hero-sub">No accounts. No uploads. No cost. No <strong>[FN]</strong> strings.</p>
+            </div>
+        </div>
+    </section>
+
     <div class="container">
-        <div class="intro-box">
-            <h2>Frictionless Tools for Brains Wired Differently</h2>
-            <p>
-                I have severe executive dysfunction. Small annoyances derail my day, so I build tools to remove the friction. 
-                <strong>No accounts. No uploads. No cost.</strong> 
-            </p>
+        <div id="main-content"></div>
+
+        <div class="about-strip">
+            <p class="about-text">I grew up on farms, drove trucks, rode rodeo. Nobody called me lazy to my face — but the world found other ways to say it. At 40, I got diagnosed with ADHD and anxiety. At 40, I learned that enjoying a chore was possible. AI gave me the ability to finally build the things I could always see in my head. So now I build tools — for myself first, and then for everyone the system decided wasn't worth accommodating.</p>
+            <p class="about-manifesto">If a group keeps struggling, it's the system that needs fixing. Not the people.</p>
         </div>
 
-        <div id="main-content"></div>
+        <div class="faq-section">
+            <h2 class="category-title">Questions You Might Have</h2>
+            <div class="faq-grid">
+                <div class="faq-item">
+                    <h3>Why is everything free?</h3>
+                    <p>Because I've been the person who couldn't afford the tool that would've helped. That's not happening here.</p>
+                </div>
+                <div class="faq-item">
+                    <h3>Why no accounts or uploads?</h3>
+                    <p>Because you shouldn't have to hand over your data just to get something done. Everything runs in your browser. I never see it.</p>
+                </div>
+                <div class="faq-item">
+                    <h3>Who is this for?</h3>
+                    <p>Anyone who's ever been excluded from "this is for people who…" — ADHD, anxiety, autism, or just wired differently than the world expected. If the system failed you, you're in the right place.</p>
+                </div>
+                <div class="faq-item">
+                    <h3>Is this actually finished?</h3>
+                    <p>Some of it. I'm building as fast as my brain and medication allow. Check back — I'm not stopping.</p>
+                </div>
+            </div>
+        </div>
     </div>
 
     <footer>
         <div class="terminal-container">
             <span id="terminal-text"></span><span class="cursor">&nbsp;</span>
         </div>
-        
+
         <div class="disclaimer">
-            I know some stuff is still broken. I'm fixing as fast as my brain vs. medication will allow. 
-            Keep checking back—I'll keep building until I get bored or the drugs stop working.
+            I know some stuff is still broken. I'm fixing as fast as my brain vs. medication will allow.
+            Keep checking back — I'll keep building until I get bored or the drugs stop working.
         </div>
 
         <a href="https://ko-fi.com/nofnway" target="_blank" class="kofi-link">
@@ -48,25 +82,19 @@
 
     <script>
         /* --- THEME CONTROLLER --- */
-        function applyTheme() {
-            const theme = localStorage.getItem('nofnway-theme') || 'light';
-            document.documentElement.setAttribute('data-theme', theme);
-        }
-
         function toggleTheme() {
             const current = document.documentElement.getAttribute('data-theme');
             const next = current === 'dark' ? 'light' : 'dark';
             localStorage.setItem('nofnway-theme', next);
             document.documentElement.setAttribute('data-theme', next);
         }
-        applyTheme();
 
         /* --- SHARE LOGIC --- */
         function shareSite() {
             if (navigator.share) {
                 navigator.share({
-                    title: 'NOFNWAY | Command Center',
-                    text: 'Frictionless tools for executive dysfunction.',
+                    title: 'NOFNWAY',
+                    text: 'Frictionless tools for brains wired differently.',
                     url: window.location.href
                 }).catch(() => {});
             } else {
@@ -80,7 +108,6 @@
         }
 
         /* --- DATA MODEL --- */
-        // Prioritized [FN] JPEGer as "Live" and updated categories for better scanning
         const apps = [
             { name: "[FN] JPEGer",        desc: "You filled the PDF, but they want a JPEG. Privacy-first conversion.", link: "jpeger.html", status: "Live", type: "ready", cat: "Ready for Use", offline: true },
             { name: "[FN] PDFer",         desc: "Photos of receipts → redact what you want → one clean PDF. No uploads.", link: "pdfer.html", status: "Live", type: "ready", cat: "Ready for Use", offline: true },
@@ -101,7 +128,7 @@
             "Yes, I get bored easily. Also often.",
             "This is a message from the past. Time travel is real. 🤯"
         ];
-        
+
         let sloganIdx = 0;
         let charIdx = 0;
         let isDeleting = false;
@@ -121,7 +148,7 @@
 
             if (!isDeleting && charIdx === current.length) {
                 isDeleting = true;
-                speed = 6000; // 6-second pause so people actually read it
+                speed = 6000;
             } else if (isDeleting && charIdx === 0) {
                 isDeleting = false;
                 sloganIdx = (sloganIdx + 1) % slogans.length;
@@ -133,10 +160,9 @@
         /* --- CORE RENDERER --- */
         function render() {
             const container = document.getElementById('main-content');
-            // Hard-coded order to ensure "Ready for Use" is always at the top
             const categories = ["Ready for Use", "Under Construction"];
             container.innerHTML = '';
-            
+
             categories.forEach(cat => {
                 const filteredApps = apps.filter(a => a.cat === cat);
                 if (filteredApps.length === 0) return;
@@ -144,7 +170,7 @@
                 const section = document.createElement('div');
                 section.innerHTML = `<h2 class="category-title">${cat}</h2><div class="grid"></div>`;
                 const grid = section.querySelector('.grid');
-                
+
                 filteredApps.forEach(app => {
                     const netBadge = app.offline === false
                         ? `<div class="net-badge">Requires internet</div>`
