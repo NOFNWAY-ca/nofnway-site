@@ -342,6 +342,44 @@
             .save-toggle-wrap { margin-left: 0; }
             .controls-bar { gap: 8px; }
         }
+
+        /* ── How it works ─────────────────────── */
+        .how-it-works {
+            max-width: 800px;
+            margin: 20px auto 0;
+            padding: 20px 28px;
+            background: var(--card-bg);
+            border: 2px solid var(--border);
+            border-left: 5px solid var(--brand);
+            border-radius: 8px;
+            font-size: 0.9rem;
+            color: var(--text-dim);
+            line-height: 1.75;
+        }
+        .how-it-works p { margin: 0 0 8px; }
+        .how-it-works p:last-child { margin: 0; }
+        .how-it-works ul { margin: 4px 0 10px; padding-left: 18px; }
+        .how-it-works li { margin-bottom: 4px; }
+        .how-it-works strong { color: var(--text-main); }
+        .how-it-works kbd {
+            display: inline-block;
+            padding: 1px 7px;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            font-family: 'Roboto', sans-serif;
+            font-size: 0.82rem;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+        .bookmark-tip {
+            background: var(--bg);
+            border-radius: 5px;
+            padding: 8px 12px;
+            font-size: 0.85rem;
+            margin: 8px 0 0 !important;
+            color: var(--text-dim);
+        }
     </style>
 </head>
 <body>
@@ -358,6 +396,16 @@
     <h2>[FN] Copy That</h2>
     <p>Your info. One tap. Fill forms without re-typing the same things seventeen times.</p>
     <span class="privacy-note">🔒 Everything stays in your browser — nothing is sent anywhere, ever.</span>
+</div>
+
+<div class="how-it-works">
+    <p><strong>Fill in once. Copy on demand.</strong> Type your info into the fields below, then hit <kbd>Copy</kbd> next to whatever you need — it goes straight to your clipboard, ready to paste.</p>
+    <ul>
+        <li><strong>Session</strong> (default) — your info disappears when you close the tab. Nothing lingers.</li>
+        <li><strong>Save to device</strong> — flip the toggle and it survives between visits. Only on your own device, please.</li>
+        <li>There's no server. Nothing is ever sent anywhere. It's just you and your browser.</li>
+    </ul>
+    <p class="bookmark-tip">💡 <strong>Tip:</strong> Bookmark this page (or any tool on the site) for one-tap access whenever you need it.</p>
 </div>
 
 <div class="tool-body">

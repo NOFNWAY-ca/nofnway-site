@@ -355,6 +355,63 @@ body {
 
 
 /* ═══════════════════════════════════════
+   EXTERNAL LINKS GRID
+═══════════════════════════════════════ */
+.ext-section { margin-top: 60px; }
+
+.ext-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 24px;
+    margin-bottom: 20px;
+}
+
+.ext-card {
+    background: var(--card-bg);
+    border: 2px solid var(--border);
+    border-radius: 10px;
+    padding: 24px 28px;
+    text-decoration: none;
+    color: inherit;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    box-shadow: 3px 3px 0 var(--border);
+    transition: var(--transition);
+}
+
+.ext-card:hover {
+    border-color: var(--gold);
+    transform: translate(-3px, -3px);
+    box-shadow: 6px 6px 0 var(--gold);
+}
+
+.ext-name {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 900;
+    font-size: 1.15rem;
+    color: var(--text-main);
+}
+
+.ext-card p {
+    color: var(--text-dim);
+    font-size: 0.92rem;
+    line-height: 1.6;
+    flex: 1;
+    margin: 0;
+}
+
+.ext-arrow {
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--gold);
+    margin-top: 4px;
+}
+
+
+/* ═══════════════════════════════════════
    FOOTER & TERMINAL
 ═══════════════════════════════════════ */
 footer {
