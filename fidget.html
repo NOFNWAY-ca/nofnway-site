@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NOFNWAY | Fidget</title>
+    <meta name="description" content="Pop bubbles, tap a counter, paint a grid, make ripples. Zero stakes, zero save state — close it the moment your name gets called.">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <script>document.documentElement.setAttribute('data-theme', localStorage.getItem('nofnway-theme') || 'light');</script>
+    <link href="https://fonts.googleapis.com/css2?family=Bangers&family=Montserrat:wght@900&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="theme.css">
+    <style>
+        html, body { height: 100%; overflow: hidden; }
+        body { display: flex; flex-direction: column; }
+        .navbar { position: relative; flex-shrink: 0; }
+
+        /* ── Sub-header ── */
+        .fidget-bar {
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 6px 16px;
+            border-bottom: 1px solid var(--border);
+            background: var(--card-bg);
+        }
+        .fidget-bar-hint {
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            color: var(--text-dim);
+        }
+        .sound-btn {
+            background: transparent;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 5px 12px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            cursor: pointer;
+            color: var(--text-dim);
+            transition: var(--transition);
+        }
+        .sound-btn.on { color: var(--brand); border-color: var(--brand); }
+
+        /* ── Content area ── */
+        .fidget-main { flex: 1; min-height: 0; position: relative; overflow: hidden; }
+
+        .fidget-tab {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        .fidget-tab.hidden { display: none; }
+
+        .tab-scroll {
+            flex: 1;
+            min-height: 0;
+            overflow: auto;
+            padding: 16px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .tab-footer {
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 14px;
+            padding: 10px 16px;
+            border-top: 1px solid var(--border);
+            background: var(--card-bg);
+        }
+        .tab-hint {
+            font-size: 0.75rem;
+            color: var(--text-dim);
+            font-weight: 700;
+        }
+        .small-btn {
+            background: transparent;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 7px 16px;
+            font-size: 0.72rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            cursor: pointer;
+            color: var(--text-dim);
+            transition: var(--transition);
+        }
+        .small-btn:hover { border-color: var(--brand); color: var(--brand); }
+
+        /* ── Bottom tab bar ── */
+        .tab-bar {
+            flex-shrink: 0;
+            display: flex;
+            border-top: 2px solid var(--border);
+            background: var(--card-bg);
+        }
+        .tab-btn {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 2px;
+            padding: 10px 4px 12px;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            color: var(--text-dim);
+            font-size: 0.58rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            transition: color 0.15s;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .tab-icon { font-size: 1.5rem; line-height: 1; }
+        .tab-btn.active { color: var(--brand); }
+
+
+        /* ════════════════════════════════
+           BUBBLE WRAP
+        ════════════════════════════════ */
+        .bubble-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(52px, 1fr));
+            gap: 10px;
+            width: 100%;
+            align-content: start;
+        }
+        .bubble {
+            aspect-ratio: 1;
+            border-radius: 50%;
+            background: radial-gradient(circle at 35% 30%, #7fc5ff, var(--brand));
+            box-shadow: 3px 3px 8px rgba(0,0,0,0.2), inset 1px 1px 4px rgba(255,255,255,0.3);
+            cursor: pointer;
+            transition: transform 0.12s ease, opacity 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+            touch-action: manipulation;
+        }
+        .bubble:hover:not(.popped)  { transform: scale(1.1); }
+        .bubble:active:not(.popped) { transform: scale(0.9); }
+        .bubble.popped {
+            background: var(--border) !important;
+            transform: scale(0.62) !important;
+            opacity: 0.3;
+            box-shadow: none;
+            cursor: default;
+            pointer-events: none;
+        }
+        [data-theme="dark"] .bubble {
+            background: radial-gradient(circle at 35% 30%, #5ba3ff, #003f8a);
+        }
+
+
+        /* ════════════════════════════════
+           COUNTER
+        ════════════════════════════════ */
+        .counter-wrap {
+            flex: 1;
+            min-height: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+        }
+        .counter-num {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 900;
+            font-size: clamp(4rem, 20vw, 8rem);
+            color: var(--brand);
+            line-height: 1;
+            font-variant-numeric: tabular-nums;
+            transition: color 0.2s;
+        }
+        .counter-num.bump {
+            animation: bump 0.12s ease-out;
+        }
+        .counter-num.milestone { color: var(--gold); }
+        @keyframes bump {
+            0%   { transform: scale(1); }
+            50%  { transform: scale(1.18); }
+            100% { transform: scale(1); }
+        }
+        .counter-sub {
+            margin-top: 14px;
+            font-size: 0.78rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-dim);
+        }
+
+
+        /* ════════════════════════════════
+           PIXEL GRID
+        ════════════════════════════════ */
+        .pixel-grid {
+            display: grid;
+            grid-template-columns: repeat(10, 1fr);
+            gap: 4px;
+            width: 100%;
+            max-width: 540px;
+            align-content: start;
+            touch-action: none;
+        }
+        .pixel-cell {
+            aspect-ratio: 1;
+            border-radius: 3px;
+            background: transparent;
+            border: 1.5px solid var(--border);
+            cursor: crosshair;
+            transition: background 0.07s, border-color 0.07s;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .pixel-cell.on {
+            background: var(--brand);
+            border-color: var(--brand);
+        }
+        [data-theme="dark"] .pixel-cell.on {
+            background: #4d9eff;
+            border-color: #4d9eff;
+        }
+
+
+        /* ════════════════════════════════
+           RIPPLE CANVAS
+        ════════════════════════════════ */
+        #ripple-canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+            cursor: crosshair;
+            touch-action: none;
+        }
+    </style>
+</head>
+<body>
+
+<nav class="navbar">
+    <a href="index.html" class="brand">NO<span>FN</span>WAY</a>
+    <div class="nav-controls">
+        <a href="index.html" class="share-btn" style="text-decoration:none;">← All Tools</a>
+        <button class="theme-toggle" onclick="toggleTheme()">Light/Dark</button>
+    </div>
+</nav>
+
+<div class="fidget-bar">
+    <span class="fidget-bar-hint">Close it the moment your name gets called.</span>
+    <button class="sound-btn" id="sound-btn" onclick="toggleSound()">🔇 Sound off</button>
+</div>
+
+<main class="fidget-main">
+
+    <!-- ── Bubbles ── -->
+    <section id="tab-bubbles" class="fidget-tab">
+        <div class="tab-scroll">
+            <div class="bubble-grid" id="bubble-grid"></div>
+        </div>
+        <div class="tab-footer">
+            <span class="tab-hint" id="bubble-count"></span>
+            <button class="small-btn" onclick="newSheet()">New sheet</button>
+        </div>
+    </section>
+
+    <!-- ── Counter ── -->
+    <section id="tab-counter" class="fidget-tab hidden">
+        <div class="counter-wrap" id="counter-wrap">
+            <div class="counter-num" id="counter-num">0</div>
+            <div class="counter-sub">Tap anywhere</div>
+        </div>
+        <div class="tab-footer">
+            <button class="small-btn" onclick="resetCounter()">Reset</button>
+        </div>
+    </section>
+
+    <!-- ── Grid ── -->
+    <section id="tab-grid" class="fidget-tab hidden">
+        <div class="tab-scroll">
+            <div class="pixel-grid" id="pixel-grid"></div>
+        </div>
+        <div class="tab-footer">
+            <button class="small-btn" onclick="clearGrid()">Clear</button>
+        </div>
+    </section>
+
+    <!-- ── Ripple ── -->
+    <section id="tab-ripple" class="fidget-tab hidden">
+        <canvas id="ripple-canvas"></canvas>
+    </section>
+
+</main>
+
+<nav class="tab-bar">
+    <button class="tab-btn active" data-tab="bubbles" onclick="switchTab('bubbles')">
+        <span class="tab-icon">🫧</span>
+        <span>Bubbles</span>
+    </button>
+    <button class="tab-btn" data-tab="counter" onclick="switchTab('counter')">
+        <span class="tab-icon">＋</span>
+        <span>Count</span>
+    </button>
+    <button class="tab-btn" data-tab="grid" onclick="switchTab('grid')">
+        <span class="tab-icon">⊞</span>
+        <span>Grid</span>
+    </button>
+    <button class="tab-btn" data-tab="ripple" onclick="switchTab('ripple')">
+        <span class="tab-icon">〜</span>
+        <span>Ripple</span>
+    </button>
+</nav>
+
+<script>
+// ─────────────────────────────────────────────
+// THEME
+// ─────────────────────────────────────────────
+function toggleTheme() {
+    const next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    localStorage.setItem('nofnway-theme', next);
+    document.documentElement.setAttribute('data-theme', next);
+}
+
+// ─────────────────────────────────────────────
+// SOUND — Web Audio, generated, no files
+// ─────────────────────────────────────────────
+let soundEnabled = false;
+let audioCtx = null;
+
+function toggleSound() {
+    soundEnabled = !soundEnabled;
+    const btn = document.getElementById('sound-btn');
+    btn.textContent = soundEnabled ? '🔊 Sound on' : '🔇 Sound off';
+    btn.classList.toggle('on', soundEnabled);
+}
+
+function audio() {
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+    return audioCtx;
+}
+
+function soundPop() {
+    if (!soundEnabled) return;
+    try {
+        const c = audio(), o = c.createOscillator(), g = c.createGain();
+        o.connect(g); g.connect(c.destination);
+        o.type = 'sine';
+        o.frequency.setValueAtTime(380, c.currentTime);
+        o.frequency.exponentialRampToValueAtTime(90, c.currentTime + 0.1);
+        g.gain.setValueAtTime(0.18, c.currentTime);
+        g.gain.exponentialRampToValueAtTime(0.001, c.currentTime + 0.12);
+        o.start(); o.stop(c.currentTime + 0.12);
+    } catch(e) {}
+}
+
+function soundTick() {
+    if (!soundEnabled) return;
+    try {
+        const c = audio(), o = c.createOscillator(), g = c.createGain();
+        o.connect(g); g.connect(c.destination);
+        o.type = 'sine'; o.frequency.value = 900;
+        g.gain.setValueAtTime(0.06, c.currentTime);
+        g.gain.exponentialRampToValueAtTime(0.001, c.currentTime + 0.04);
+        o.start(); o.stop(c.currentTime + 0.05);
+    } catch(e) {}
+}
+
+function soundMilestone() {
+    if (!soundEnabled) return;
+    try {
+        const c = audio();
+        [0, 0.12, 0.24].forEach((delay, i) => {
+            const o = c.createOscillator(), g = c.createGain();
+            o.connect(g); g.connect(c.destination);
+            o.type = 'sine';
+            o.frequency.value = [520, 660, 780][i];
+            g.gain.setValueAtTime(0, c.currentTime + delay);
+            g.gain.linearRampToValueAtTime(0.1, c.currentTime + delay + 0.02);
+            g.gain.exponentialRampToValueAtTime(0.001, c.currentTime + delay + 0.25);
+            o.start(c.currentTime + delay);
+            o.stop(c.currentTime + delay + 0.26);
+        });
+    } catch(e) {}
+}
+
+function soundBlip(high) {
+    if (!soundEnabled) return;
+    try {
+        const c = audio(), o = c.createOscillator(), g = c.createGain();
+        o.connect(g); g.connect(c.destination);
+        o.type = 'square'; o.frequency.value = high ? 660 : 330;
+        g.gain.setValueAtTime(0.04, c.currentTime);
+        g.gain.exponentialRampToValueAtTime(0.001, c.currentTime + 0.07);
+        o.start(); o.stop(c.currentTime + 0.08);
+    } catch(e) {}
+}
+
+function soundPing() {
+    if (!soundEnabled) return;
+    try {
+        const c = audio(), o = c.createOscillator(), g = c.createGain();
+        o.connect(g); g.connect(c.destination);
+        o.type = 'sine'; o.frequency.value = 480;
+        g.gain.setValueAtTime(0.09, c.currentTime);
+        g.gain.exponentialRampToValueAtTime(0.001, c.currentTime + 0.4);
+        o.start(); o.stop(c.currentTime + 0.42);
+    } catch(e) {}
+}
+
+// ─────────────────────────────────────────────
+// HAPTICS
+// ─────────────────────────────────────────────
+function haptic(ms) { try { navigator.vibrate?.(ms); } catch(e) {} }
+
+// ─────────────────────────────────────────────
+// TABS
+// ─────────────────────────────────────────────
+let activeTab = 'bubbles';
+
+function switchTab(tab) {
+    document.getElementById(`tab-${activeTab}`).classList.add('hidden');
+    document.querySelector(`.tab-btn[data-tab="${activeTab}"]`).classList.remove('active');
+    activeTab = tab;
+    document.getElementById(`tab-${tab}`).classList.remove('hidden');
+    document.querySelector(`.tab-btn[data-tab="${tab}"]`).classList.add('active');
+    if (tab === 'ripple') resizeCanvas();
+}
+
+// ─────────────────────────────────────────────
+// BUBBLE WRAP
+// ─────────────────────────────────────────────
+let poppedCount = 0;
+let totalBubbles = 0;
+
+function buildSheet() {
+    const grid = document.getElementById('bubble-grid');
+    grid.innerHTML = '';
+    poppedCount = 0;
+
+    const cols = Math.max(4, Math.floor((window.innerWidth - 32) / 62));
+    totalBubbles = cols * 8;
+
+    for (let i = 0; i < totalBubbles; i++) {
+        const b = document.createElement('div');
+        b.className = 'bubble';
+        b.addEventListener('pointerdown', e => { e.preventDefault(); popBubble(b); });
+        grid.appendChild(b);
+    }
+    updateBubbleCount();
+}
+
+function popBubble(b) {
+    if (b.classList.contains('popped')) return;
+    b.classList.add('popped');
+    poppedCount++;
+    soundPop();
+    haptic(8);
+    updateBubbleCount();
+}
+
+function updateBubbleCount() {
+    const left = totalBubbles - poppedCount;
+    document.getElementById('bubble-count').textContent =
+        left > 0 ? `${left} left` : '🎉 All done!';
+}
+
+function newSheet() { buildSheet(); }
+
+// ─────────────────────────────────────────────
+// COUNTER
+// ─────────────────────────────────────────────
+let count = 0;
+const MILESTONES = new Set([10, 25, 50, 100, 250, 500, 1000, 2000, 5000, 10000]);
+
+document.getElementById('counter-wrap').addEventListener('pointerdown', e => {
+    e.preventDefault();
+    count++;
+    const el = document.getElementById('counter-num');
+    el.textContent = count.toLocaleString();
+
+    el.classList.remove('bump', 'milestone');
+    void el.offsetWidth; // force reflow to restart animation
+
+    if (MILESTONES.has(count)) {
+        el.classList.add('milestone');
+        haptic(40);
+        soundMilestone();
+        setTimeout(() => el.classList.remove('milestone'), 900);
+    } else {
+        el.classList.add('bump');
+        haptic(5);
+        soundTick();
+        setTimeout(() => el.classList.remove('bump'), 120);
+    }
+});
+
+function resetCounter() {
+    count = 0;
+    const el = document.getElementById('counter-num');
+    el.classList.remove('bump', 'milestone');
+    el.textContent = '0';
+}
+
+// ─────────────────────────────────────────────
+// PIXEL GRID
+// ─────────────────────────────────────────────
+let isPainting = false;
+let paintFill  = true;
+
+function buildGrid() {
+    const grid = document.getElementById('pixel-grid');
+    for (let i = 0; i < 120; i++) {
+        const cell = document.createElement('div');
+        cell.className = 'pixel-cell';
+        grid.appendChild(cell);
+    }
+}
+
+function paintCell(cell) {
+    if (!cell?.classList.contains('pixel-cell')) return;
+    const isOn = cell.classList.contains('on');
+    if (paintFill && !isOn)  { cell.classList.add('on');    soundBlip(true);  haptic(4); }
+    if (!paintFill && isOn)  { cell.classList.remove('on'); soundBlip(false); haptic(4); }
+}
+
+const pixelGrid = document.getElementById('pixel-grid');
+pixelGrid.addEventListener('pointerdown', e => {
+    e.preventDefault();
+    isPainting = true;
+    const cell = e.target.closest('.pixel-cell');
+    paintFill = !cell?.classList.contains('on');
+    paintCell(cell);
+    pixelGrid.setPointerCapture(e.pointerId);
+});
+pixelGrid.addEventListener('pointermove', e => {
+    if (!isPainting) return;
+    paintCell(document.elementFromPoint(e.clientX, e.clientY));
+});
+document.addEventListener('pointerup', () => { isPainting = false; });
+
+function clearGrid() {
+    document.querySelectorAll('.pixel-cell.on').forEach(c => c.classList.remove('on'));
+}
+
+// ─────────────────────────────────────────────
+// RIPPLE
+// ─────────────────────────────────────────────
+const canvas   = document.getElementById('ripple-canvas');
+const rctx     = canvas.getContext('2d');
+const PALETTE  = ['#4d9eff', '#c62828', '#f9a825', '#4caf7d', '#9c27b0', '#00bcd4'];
+let colorIdx   = 0;
+let ripples    = [];
+let rafId      = null;
+
+function resizeCanvas() {
+    const p = canvas.parentElement;
+    canvas.width  = p.offsetWidth;
+    canvas.height = p.offsetHeight;
+}
+
+function addRipple(x, y) {
+    ripples.push({
+        x, y, r: 0,
+        maxR:    Math.hypot(canvas.width, canvas.height) * 0.5,
+        color:   PALETTE[colorIdx++ % PALETTE.length],
+        opacity: 0.9,
+    });
+    soundPing();
+    haptic(10);
+    if (!rafId) raf();
+}
+
+function raf() {
+    rctx.clearRect(0, 0, canvas.width, canvas.height);
+    ripples = ripples.filter(r => {
+        r.r      += 4;
+        r.opacity = 0.9 * (1 - r.r / r.maxR);
+        if (r.opacity < 0.01) return false;
+        rctx.beginPath();
+        rctx.arc(r.x, r.y, r.r, 0, Math.PI * 2);
+        rctx.strokeStyle = r.color;
+        rctx.lineWidth   = 2.5;
+        rctx.globalAlpha = r.opacity;
+        rctx.stroke();
+        rctx.globalAlpha = 1;
+        return true;
+    });
+    rafId = ripples.length ? requestAnimationFrame(raf) : null;
+}
+
+canvas.addEventListener('pointerdown', e => {
+    const r = canvas.getBoundingClientRect();
+    addRipple(e.clientX - r.left, e.clientY - r.top);
+    e.preventDefault();
+});
+
+window.addEventListener('resize', () => { if (activeTab === 'ripple') resizeCanvas(); });
+
+// ─────────────────────────────────────────────
+// INIT
+// ─────────────────────────────────────────────
+buildSheet();
+buildGrid();
+resizeCanvas();
+</script>
+</body>
+</html>
