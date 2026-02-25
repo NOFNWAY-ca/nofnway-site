@@ -21,6 +21,7 @@
 }
 
 [data-theme="dark"] {
+    --brand:    #4d9eff;   /* lighter for legibility on dark bg */
     --bg: #121212;
     --card-bg: #1e1e1e;
     --text-main: #e0e0e0;
