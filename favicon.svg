@@ -1,11 +1,10 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
-  <rect x="19" y="19" width="62" height="62" rx="7" fill="#0057B8" transform="rotate(45 50 50)"/>
-  <text x="50" y="50"
+  <!-- Diamond shape: points at top/right/bottom/left edges with padding -->
+  <polygon points="50,4 96,50 50,96 4,50" fill="#0057B8"/>
+  <!-- FN: Impact, baseline set so cap-height visually centres at y=50 -->
+  <text x="50" y="64"
         text-anchor="middle"
-        dominant-baseline="central"
-        font-family="'Arial Black', Arial, sans-serif"
-        font-weight="900"
-        font-size="28"
-        fill="white"
-        letter-spacing="1">FN</text>
+        font-family="Impact, 'Arial Narrow', sans-serif"
+        font-size="40"
+        fill="white">FN</text>
 </svg>
