@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>NOFNWAY | Sleep Math</title>
+    <meta name="description" content="Tell it when you need to wake up, it tells you when to go to sleep. Or flip it: sleeping now, here are your best alarm times. Based on 90-minute sleep cycles.">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@900&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <script>document.documentElement.setAttribute('data-theme', localStorage.getItem('nofnway-theme') || 'light');</script>
+    <link rel="stylesheet" href="theme.css">
+    <style>
+        body { height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+
+        .workspace {
+            flex: 1;
+            min-height: 0;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem 1rem;
+            gap: 1.5rem;
+        }
+        .workspace::-webkit-scrollbar { width: 4px; }
+        .workspace::-webkit-scrollbar-thumb { background: var(--brand); border-radius: 4px; }
+
+        /* ── Mode chips ── */
+        .chip-row {
+            display: flex;
+            gap: 8px;
+        }
+        .chip {
+            background: var(--bg);
+            color: var(--text-dim);
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            border: 2px solid var(--border);
+            font-weight: bold;
+            white-space: nowrap;
+            transition: all 0.15s;
+            font-family: 'Roboto', sans-serif;
+        }
+        .chip.active {
+            border-color: var(--brand);
+            color: var(--brand);
+            background: rgba(0, 87, 184, 0.07);
+        }
+
+        /* ── Time input area ── */
+        .input-area {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .time-input {
+            background: transparent;
+            border: none;
+            border-bottom: 3px solid var(--brand);
+            outline: none;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 900;
+            font-size: clamp(2.5rem, 8vw, 4rem);
+            color: var(--text-main);
+            caret-color: var(--brand);
+            text-align: center;
+            padding: 4px 8px;
+            width: auto;
+            min-width: 220px;
+            cursor: pointer;
+        }
+        /* Style the time input's color scheme for dark mode */
+        [data-theme="dark"] .time-input {
+            color-scheme: dark;
+        }
+
+        .sleep-now-label {
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--text-dim);
+        }
+
+        .btn-refresh {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-dim);
+            padding: 6px 16px;
+            border-radius: 6px;
+            font-size: 0.72rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            cursor: pointer;
+            transition: border-color 0.15s, color 0.15s;
+            font-family: 'Roboto', sans-serif;
+        }
+        .btn-refresh:hover { border-color: var(--brand); color: var(--brand); }
+
+        /* ── Placeholder state ── */
+        .placeholder-hint {
+            font-size: 0.85rem;
+            color: var(--text-dim);
+            opacity: 0.6;
+            text-align: center;
+        }
+
+        /* ── Result cards ── */
+        .results-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            width: 100%;
+            max-width: 560px;
+        }
+        @media (min-width: 600px) {
+            .results-grid { grid-template-columns: repeat(4, 1fr); }
+        }
+
+        .result-card {
+            background: var(--card-bg);
+            padding: 1.1rem 0.8rem;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+            border-left: 5px solid var(--brand);
+            cursor: pointer;
+            transition: transform 0.12s, box-shadow 0.12s;
+            text-align: center;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .result-card:hover  { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0,0,0,0.1); }
+        .result-card:active { transform: scale(0.95); }
+        .result-card.emergency { border-left-color: var(--accent); }
+
+        .card-cycles {
+            font-size: 0.6rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--text-dim);
+            margin-bottom: 4px;
+        }
+        .card-time {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 900;
+            font-size: clamp(1.3rem, 4vw, 1.7rem);
+            color: var(--brand);
+            line-height: 1.1;
+        }
+        .result-card.emergency .card-time { color: var(--accent); }
+        .card-quality {
+            font-size: 0.6rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            margin-top: 5px;
+            color: var(--text-dim);
+        }
+        .result-card.emergency .card-quality { color: var(--accent); opacity: 0.8; }
+
+        /* ── How it works blurb ── */
+        .blurb {
+            max-width: 520px;
+            font-size: 0.78rem;
+            color: var(--text-dim);
+            text-align: center;
+            line-height: 1.7;
+            opacity: 0.75;
+        }
+
+        /* ── Toast ── */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--brand);
+            color: white;
+            padding: 10px 22px;
+            border-radius: 6px;
+            font-weight: 700;
+            font-size: 0.8rem;
+            display: none;
+            z-index: 1000;
+            white-space: nowrap;
+            letter-spacing: 0.05em;
+        }
+
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body>
+
+<nav class="navbar">
+    <a href="index.html" class="brand">NO<span>FN</span>WAY // Sleep Math</a>
+    <div class="nav-controls">
+        <a href="index.html" class="share-btn" style="text-decoration:none;">← All Tools</a>
+        <button class="theme-toggle" onclick="toggleTheme()">Light/Dark</button>
+        <button class="privacy-btn" onclick="togglePrivacy()" aria-label="Privacy information"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><text x="12" y="16.5" text-anchor="middle" font-size="9" fill="currentColor" stroke="none" font-weight="700" font-family="sans-serif">?</text></svg></button>
+    </div>
+</nav>
+
+<div class="privacy-panel" id="privacy-panel" hidden>
+    <div class="privacy-panel-hd">
+        <div class="privacy-panel-title"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> Privacy &amp; Data</div>
+        <button class="privacy-close" onclick="document.getElementById('privacy-panel').hidden=true" aria-label="Close">&#x2715;</button>
+    </div>
+    <p>This tool does math. Nothing is stored and nothing is sent anywhere. Close the tab and it's gone.</p>
+</div>
+
+<main class="workspace">
+
+    <!-- Mode chips -->
+    <div class="chip-row">
+        <div class="chip active" id="chip-wake" onclick="setMode('wake')">Wake up at...</div>
+        <div class="chip"        id="chip-now"  onclick="setMode('now')">Sleeping now</div>
+    </div>
+
+    <!-- Input area -->
+    <div class="input-area">
+        <!-- Wake mode -->
+        <div id="wake-input-wrap">
+            <input type="time" id="wake-time" class="time-input" oninput="update()" aria-label="Wake-up time">
+        </div>
+
+        <!-- Sleep-now mode -->
+        <div id="now-wrap" class="hidden" style="display:flex; flex-direction:column; align-items:center; gap:8px;">
+            <span class="sleep-now-label" id="now-label">Sleeping at —</span>
+            <button class="btn-refresh" onclick="refreshNow()">Refresh time</button>
+        </div>
+    </div>
+
+    <!-- Placeholder (wake mode, no time chosen yet) -->
+    <p class="placeholder-hint" id="placeholder">Pick a wake-up time above.</p>
+
+    <!-- Results -->
+    <div class="results-grid hidden" id="results"></div>
+
+    <!-- Explainer -->
+    <p class="blurb">Sleep runs in 90-minute cycles. Waking at the end of a cycle feels better than waking mid-cycle, regardless of total hours. The 14-minute offset accounts for the time it takes to actually fall asleep. Tap any result to copy the time.</p>
+
+</main>
+
+<div class="toast" id="toast">COPIED</div>
+
+<script>
+
+// ── Theme ──────────────────────────────────────────────────────────────────
+function toggleTheme() {
+    const next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    localStorage.setItem('nofnway-theme', next);
+    document.documentElement.setAttribute('data-theme', next);
+}
+
+// ── Constants ──────────────────────────────────────────────────────────────
+const CYCLE_MIN  = 90;
+const OFFSET_MIN = 14;  // average time to fall asleep
+
+const CYCLES = [
+    { n: 6, quality: 'Optimal',   emergency: false },
+    { n: 5, quality: 'Good',      emergency: false },
+    { n: 4, quality: 'Workable',  emergency: false },
+    { n: 3, quality: 'Emergency', emergency: true  },
+];
+
+// ── State ──────────────────────────────────────────────────────────────────
+let mode    = 'wake';   // 'wake' | 'now'
+let nowBase = null;     // Date used as sleep-now baseline
+
+// ── Mode switch ────────────────────────────────────────────────────────────
+function setMode(m) {
+    mode = m;
+
+    document.getElementById('chip-wake').classList.toggle('active', m === 'wake');
+    document.getElementById('chip-now').classList.toggle('active',  m === 'now');
+
+    document.getElementById('wake-input-wrap').classList.toggle('hidden', m !== 'wake');
+    document.getElementById('now-wrap').classList.toggle('hidden',        m !== 'now');
+
+    if (m === 'now') {
+        refreshNow();
+    } else {
+        update();
+    }
+}
+
+// ── Sleep-now: set baseline to current time ────────────────────────────────
+function refreshNow() {
+    nowBase = new Date();
+    document.getElementById('now-label').textContent = 'Sleeping at ' + formatTime(nowBase);
+    renderAlarms(nowBase);
+}
+
+// ── Wake-up mode: parse time input → calc bedtimes ────────────────────────
+function update() {
+    const val = document.getElementById('wake-time').value;  // "HH:MM"
+    if (!val) {
+        document.getElementById('placeholder').classList.remove('hidden');
+        document.getElementById('results').classList.add('hidden');
+        return;
+    }
+
+    document.getElementById('placeholder').classList.add('hidden');
+
+    const [h, m] = val.split(':').map(Number);
+    const wake = new Date();
+    wake.setHours(h, m, 0, 0);
+
+    renderBedtimes(wake);
+}
+
+// ── Calc: bedtimes from wake time ──────────────────────────────────────────
+function renderBedtimes(wakeDate) {
+    const times = CYCLES.map(c => {
+        const totalMin = OFFSET_MIN + c.n * CYCLE_MIN;
+        const bed = new Date(wakeDate.getTime() - totalMin * 60000);
+        return { ...c, date: bed, totalMin };
+    });
+    renderCards(times, 'sleep');
+}
+
+// ── Calc: alarm times from sleep time ─────────────────────────────────────
+function renderAlarms(sleepDate) {
+    // Show shortest-first for "sleeping now"
+    const ordered = [...CYCLES].reverse();
+    const times = ordered.map(c => {
+        const totalMin = OFFSET_MIN + c.n * CYCLE_MIN;
+        const alarm = new Date(sleepDate.getTime() + totalMin * 60000);
+        return { ...c, date: alarm, totalMin };
+    });
+    renderCards(times, 'wake');
+}
+
+// ── Render result cards ────────────────────────────────────────────────────
+function renderCards(times, cardType) {
+    const grid = document.getElementById('results');
+    grid.innerHTML = '';
+
+    times.forEach(t => {
+        const hoursSlept = (t.n * CYCLE_MIN) / 60;
+        const hLabel     = hoursSlept % 1 === 0 ? hoursSlept + ' hrs' : hoursSlept.toFixed(1) + ' hrs';
+        const timeStr    = formatTime(t.date);
+
+        const card = document.createElement('div');
+        card.className = 'result-card' + (t.emergency ? ' emergency' : '');
+        card.innerHTML =
+            '<div class="card-cycles">' + t.n + ' cycles \u00b7 ' + hLabel + '</div>' +
+            '<div class="card-time">'   + timeStr + '</div>' +
+            '<div class="card-quality">' + t.quality + '</div>';
+        card.addEventListener('click', () => copyTime(timeStr));
+        grid.appendChild(card);
+    });
+
+    grid.classList.remove('hidden');
+}
+
+// ── Time formatting ────────────────────────────────────────────────────────
+function formatTime(date) {
+    let h = date.getHours();
+    const m   = date.getMinutes();
+    const ampm = h >= 12 ? 'PM' : 'AM';
+    h = h % 12 || 12;
+    return h + ':' + String(m).padStart(2, '0') + ' ' + ampm;
+}
+
+// ── Clipboard ──────────────────────────────────────────────────────────────
+function copyTime(text) {
+    const showToast = () => {
+        const toast = document.getElementById('toast');
+        toast.style.display = 'block';
+        setTimeout(() => { toast.style.display = 'none'; }, 1600);
+    };
+
+    if (navigator.clipboard && window.isSecureContext) {
+        navigator.clipboard.writeText(text).then(showToast).catch(() => fallbackCopy(text, showToast));
+    } else {
+        fallbackCopy(text, showToast);
+    }
+}
+
+function fallbackCopy(text, cb) {
+    const el = document.createElement('textarea');
+    el.value = text;
+    el.style.cssText = 'position:fixed;opacity:0;pointer-events:none;top:0;left:0;';
+    document.body.appendChild(el);
+    el.select();
+    try { document.execCommand('copy'); cb(); } catch (e) {}
+    document.body.removeChild(el);
+}
+
+</script>
+<script src="privacy.js"></script>
+</body>
+</html>
