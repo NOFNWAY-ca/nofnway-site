@@ -462,8 +462,6 @@ function editThing() {
 function markDone() {
     state.screen = 'done';
     render();
-    // Auto-advance after animation completes
-    setTimeout(nextThing, 1800);
 }
 
 // ── Next thing (done → set) ────────────────────────────────────────────────
