@@ -355,8 +355,9 @@ const state = {
 };
 
 // ── Canvas setup ───────────────────────────────────────────────────────────
-const canvas = document.getElementById('wheel-canvas');
-const ctx    = canvas.getContext('2d');
+const canvas     = document.getElementById('wheel-canvas');
+const ctx        = canvas.getContext('2d');
+const emptyHint  = document.getElementById('options-empty-hint'); // cache before innerHTML='' can detach it
 
 function sizeCanvas() {
     const size = Math.min(300, window.innerWidth * 0.88);
@@ -540,16 +541,15 @@ function updateAll() {
 
 function renderOptionChips() {
     const container = document.getElementById('option-chips');
-    const hint      = document.getElementById('options-empty-hint');
     container.innerHTML = '';
 
     if (state.options.length === 0) {
-        container.appendChild(hint);
-        hint.classList.remove('hidden');
+        container.appendChild(emptyHint);
+        emptyHint.classList.remove('hidden');
         return;
     }
 
-    hint.classList.add('hidden');
+    emptyHint.classList.add('hidden');
 
     state.options.forEach((opt, i) => {
         const chip   = document.createElement('div');
