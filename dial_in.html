@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
     <title>NOFNWAY | Dial In</title>
-    <meta name="description" content="Pick the call. Fill in your name. Read the script out loud. A word-for-word phone script for when your brain freezes the moment someone picks up.">
+    <meta name="description" content="Fill in your info on the left. The beats you need to hit on the right. For when your brain blanks the moment someone picks up.">
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
     <!-- Block all network requests except fonts. No exfiltration possible. -->
     <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'self' https://fonts.googleapis.com 'unsafe-inline'; font-src https://fonts.gstatic.com; script-src 'self' 'unsafe-inline'; connect-src 'none'; img-src 'self'; frame-src 'none';">
@@ -13,7 +13,7 @@
     <link rel="stylesheet" href="theme.css">
     <style>
         .tool-wrap {
-            max-width: 800px;
+            max-width: 960px;
             margin: 0 auto;
             padding: 40px 20px 80px;
         }
@@ -27,11 +27,7 @@
             font-size: 1.8rem;
             margin: 0 0 6px;
         }
-        .tool-header p {
-            color: var(--text-dim);
-            font-size: 0.95rem;
-            margin: 0;
-        }
+        .tool-header p { color: var(--text-dim); font-size: 0.95rem; margin: 0; }
 
         /* ── Scenario picker ────────────────────── */
         .scenario-grid {
@@ -67,34 +63,61 @@
         }
         .scenario-desc { font-size: 0.88rem; color: var(--text-dim); line-height: 1.5; }
 
-        /* ── Back button ────────────────────────── */
-        .back-bar { margin-bottom: 24px; }
+        /* ── Active screen layout ───────────────── */
+        .active-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 28px;
+            flex-wrap: wrap;
+        }
         .btn-back {
             background: transparent;
             border: none;
             color: var(--text-dim);
-            font-size: 0.88rem;
+            font-size: 0.85rem;
             font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 0.5px;
             cursor: pointer;
             padding: 0;
             transition: color 0.15s;
+            flex-shrink: 0;
         }
         .btn-back:hover { color: var(--brand); }
-
-        /* ── Fill form ──────────────────────────── */
-        .fill-scenario-title {
+        .active-title {
             font-family: 'Montserrat', sans-serif;
             font-weight: 900;
-            font-size: 1.25rem;
-            color: var(--brand);
-            margin: 0 0 24px;
+            font-size: 1.1rem;
+            color: var(--text-main);
+            margin: 0;
         }
-        .fill-form { display: flex; flex-direction: column; gap: 16px; }
-        .fill-field { display: flex; flex-direction: column; gap: 6px; }
+
+        .active-wrap {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 32px;
+            align-items: start;
+        }
+
+        /* ── Column shared ──────────────────────── */
+        .col-head {
+            font-size: 0.68rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--text-dim);
+            margin: 0 0 16px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--border);
+        }
+
+        /* ── Fields column ──────────────────────── */
+        .fields-col { display: flex; flex-direction: column; }
+        .fill-form { display: flex; flex-direction: column; gap: 14px; }
+        .fill-field { display: flex; flex-direction: column; gap: 5px; }
         .fill-field label {
-            font-size: 0.75rem;
+            font-size: 0.72rem;
             font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 0.5px;
@@ -104,9 +127,9 @@
             background: var(--card-bg);
             border: 2px solid var(--border);
             border-radius: 7px;
-            padding: 12px 14px;
+            padding: 10px 12px;
             font-family: 'Roboto', sans-serif;
-            font-size: 1rem;
+            font-size: 0.97rem;
             color: var(--text-main);
             outline: none;
             transition: border-color 0.15s, box-shadow 0.15s;
@@ -118,28 +141,17 @@
             border-color: var(--brand);
             box-shadow: 2px 2px 0 var(--brand);
         }
-        .fill-field input[type="text"]::placeholder { color: var(--text-dim); opacity: 0.55; }
-        .fill-field.error input[type="text"] {
-            border-color: var(--accent);
-            box-shadow: 2px 2px 0 var(--accent);
-        }
-        .field-error-msg {
-            font-size: 0.75rem;
-            color: var(--accent);
-            font-weight: 700;
-            display: none;
-        }
-        .fill-field.error .field-error-msg { display: block; }
+        .fill-field input[type="text"]::placeholder { color: var(--text-dim); opacity: 0.5; }
 
-        /* ── Choice button group ────────────────── */
+        /* Choice button group */
         .choice-group { display: flex; gap: 8px; flex-wrap: wrap; }
         .choice-btn {
             background: var(--card-bg);
             border: 2px solid var(--border);
             border-radius: 6px;
-            padding: 9px 18px;
+            padding: 8px 16px;
             font-family: 'Roboto', sans-serif;
-            font-size: 0.9rem;
+            font-size: 0.88rem;
             font-weight: 700;
             color: var(--text-dim);
             cursor: pointer;
@@ -148,61 +160,28 @@
         .choice-btn:hover { border-color: var(--brand); color: var(--brand); }
         .choice-btn.active { background: var(--brand); border-color: var(--brand); color: white; }
 
-        /* ── Generate button ────────────────────── */
-        .btn-generate {
-            background: var(--brand);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            padding: 14px 24px;
-            font-family: 'Montserrat', sans-serif;
-            font-weight: 900;
-            font-size: 1rem;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            cursor: pointer;
-            margin-top: 8px;
-            transition: filter 0.15s, transform 0.15s;
-            box-shadow: 3px 3px 0 rgba(0,0,0,0.15);
-            align-self: flex-start;
-        }
-        .btn-generate:hover { filter: brightness(1.1); transform: translateY(-2px); }
-
-        /* ── Script view top controls ───────────── */
-        .script-top-controls {
+        /* Save toggle */
+        .save-toggle-wrap {
             display: flex;
             align-items: center;
-            gap: 12px;
-            flex-wrap: wrap;
-            margin-bottom: 28px;
-            padding-bottom: 20px;
-            border-bottom: 2px solid var(--border);
+            gap: 8px;
+            margin-top: 20px;
+            padding-top: 16px;
+            border-top: 1px solid var(--border);
         }
-        .script-scenario-label {
-            font-family: 'Montserrat', sans-serif;
-            font-weight: 900;
-            font-size: 0.75rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            color: var(--text-dim);
-            flex: 1;
-        }
-        .dim-toggle-wrap { display: flex; align-items: center; gap: 8px; }
-        .dim-toggle-label {
-            font-size: 0.75rem;
+        .toggle-label {
+            font-size: 0.72rem;
             font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 0.3px;
             color: var(--text-dim);
             white-space: nowrap;
         }
-
-        /* Toggle — same pattern as copy_that */
         .toggle-track {
-            width: 42px;
-            height: 22px;
+            width: 38px;
+            height: 20px;
             background: var(--border);
-            border-radius: 11px;
+            border-radius: 10px;
             cursor: pointer;
             position: relative;
             transition: background 0.2s;
@@ -211,8 +190,8 @@
         .toggle-track.on { background: var(--brand); }
         .toggle-thumb {
             position: absolute;
-            width: 16px;
-            height: 16px;
+            width: 14px;
+            height: 14px;
             background: white;
             border-radius: 50%;
             top: 3px;
@@ -220,112 +199,132 @@
             transition: left 0.2s;
             pointer-events: none;
         }
-        .toggle-track.on .toggle-thumb { left: 23px; }
+        .toggle-track.on .toggle-thumb { left: 21px; }
 
-        /* ── Script lines ───────────────────────── */
-        .script-body { display: flex; flex-direction: column; gap: 12px; }
-        .script-line {
+        /* ── Beats column ───────────────────────── */
+        .beats-col {
+            position: sticky;
+            top: 80px;
+        }
+        .beats-list { display: flex; flex-direction: column; gap: 6px; }
+
+        .beat-item {
             background: var(--card-bg);
             border: 2px solid var(--border);
-            border-left: 5px solid var(--brand);
             border-radius: 8px;
-            padding: 16px 18px;
-            font-size: 1.05rem;
-            line-height: 1.65;
-            color: var(--text-main);
-            transition: opacity 0.2s, border-left-color 0.2s;
+            overflow: hidden;
+            transition: border-color 0.15s;
         }
-        .script-line.tappable { cursor: pointer; }
-        .script-line.tappable:hover { border-left-color: var(--accent); }
-        .script-line.dimmed {
-            opacity: 0.28;
-            text-decoration: line-through;
-            text-decoration-color: var(--text-dim);
-        }
-        .script-cue {
-            font-size: 0.88rem;
-            color: var(--text-dim);
-            font-style: italic;
-            padding: 4px 14px;
+        .beat-item.covered { border-color: var(--border); opacity: 0.6; }
+
+        .beat-row {
             display: flex;
             align-items: center;
-            gap: 8px;
-        }
-        .script-cue::before {
-            content: '◉';
-            font-style: normal;
-            font-size: 0.7rem;
-            color: var(--brand);
-            opacity: 0.5;
-            flex-shrink: 0;
-        }
-        .dim-hint {
-            font-size: 0.78rem;
-            color: var(--text-dim);
-            font-style: italic;
-            text-align: center;
-            margin: 0 0 4px;
-            opacity: 0.7;
+            gap: 10px;
+            padding: 11px 12px;
         }
 
-        /* Copy button — matches copy_that */
-        .copy-btn {
-            background: var(--brand);
-            color: white;
-            border: none;
-            padding: 9px 18px;
-            border-radius: 6px;
-            font-weight: 700;
-            font-size: 0.82rem;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
+        /* Circle checkbox */
+        .beat-check {
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            border: 2px solid var(--border);
+            background: transparent;
             cursor: pointer;
-            white-space: nowrap;
-            transition: filter 0.1s, transform 0.1s;
-            min-width: 100px;
-        }
-        .copy-btn:hover { filter: brightness(1.12); }
-        .copy-btn:active { transform: scale(0.95); }
-        .copy-btn.copied { background: var(--ready); pointer-events: none; }
-
-        /* ── Script footer ──────────────────────── */
-        .script-footer {
-            margin-top: 36px;
-            padding-top: 24px;
-            border-top: 2px solid var(--border);
+            flex-shrink: 0;
             display: flex;
             align-items: center;
-            flex-wrap: wrap;
-            gap: 16px;
+            justify-content: center;
+            transition: border-color 0.15s, background 0.15s;
+            padding: 0;
         }
-        .save-toggle-wrap { display: flex; align-items: center; gap: 8px; }
-        .toggle-label {
-            font-size: 0.75rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.3px;
+        .beat-check:hover { border-color: var(--brand); }
+        .beat-item.covered .beat-check {
+            background: var(--brand);
+            border-color: var(--brand);
+        }
+        .beat-check-inner {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: white;
+            display: none;
+        }
+        .beat-item.covered .beat-check-inner { display: block; }
+
+        .beat-text {
+            flex: 1;
+            font-size: 0.93rem;
+            color: var(--text-main);
+            line-height: 1.4;
+            min-width: 0;
+        }
+        .beat-item.covered .beat-text { color: var(--text-dim); }
+
+        .beat-note-btn {
+            background: transparent;
+            border: none;
             color: var(--text-dim);
-            white-space: nowrap;
+            font-size: 1rem;
+            line-height: 1;
+            cursor: pointer;
+            padding: 2px 4px;
+            border-radius: 4px;
+            flex-shrink: 0;
+            transition: color 0.15s, background 0.15s;
         }
-        .btn-start-over {
+        .beat-note-btn:hover { color: var(--brand); background: var(--bg); }
+        .beat-note-btn.open { color: var(--brand); }
+
+        .beat-note-area {
+            display: none;
+            width: 100%;
+            box-sizing: border-box;
+            background: var(--bg);
+            border: none;
+            border-top: 1px solid var(--border);
+            padding: 10px 12px;
+            font-family: 'Roboto', sans-serif;
+            font-size: 0.88rem;
+            color: var(--text-main);
+            resize: none;
+            outline: none;
+            line-height: 1.5;
+            min-height: 60px;
+        }
+        .beat-note-area.open { display: block; }
+        .beat-note-area::placeholder { color: var(--text-dim); opacity: 0.55; }
+
+        /* Copy notes button */
+        .copy-notes-wrap {
+            margin-top: 12px;
+            display: flex;
+            justify-content: flex-end;
+        }
+        .btn-copy-notes {
             background: transparent;
             border: 2px solid var(--border);
             border-radius: 6px;
-            padding: 8px 16px;
+            padding: 7px 14px;
             font-weight: 700;
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             text-transform: uppercase;
             letter-spacing: 0.5px;
             color: var(--text-dim);
             cursor: pointer;
             transition: border-color 0.15s, color 0.15s;
-            margin-left: auto;
         }
-        .btn-start-over:hover { border-color: var(--accent); color: var(--accent); }
+        .btn-copy-notes:hover { border-color: var(--brand); color: var(--brand); }
+        .btn-copy-notes.copied { border-color: var(--ready); color: var(--ready); pointer-events: none; }
 
-        @media (max-width: 560px) {
+        @media (max-width: 680px) {
+            .active-wrap { grid-template-columns: 1fr; }
+            .beats-col { position: static; }
+            .tool-wrap { max-width: 800px; }
+        }
+        @media (max-width: 480px) {
             .scenario-grid { grid-template-columns: 1fr; }
-            .script-scenario-label { display: none; }
         }
     </style>
 </head>
@@ -345,7 +344,7 @@
         <div class="privacy-panel-title"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> Privacy &amp; Data</div>
         <button class="privacy-close" onclick="document.getElementById('privacy-panel').hidden=true" aria-label="Close">&#x2715;</button>
     </div>
-    <p>Nothing you type here is ever sent anywhere. Your script is built entirely in your browser. If you choose Save to device, your field values are stored in your browser's local storage on this device only — not on any server. To remove it, turn off Save to device and reload, or clear site data for nofnway.ca in your browser settings. Session mode (the default) clears everything when you close the tab.</p>
+    <p>Nothing you type here is ever sent anywhere. Your info is built entirely in your browser. If you choose Save to device, your field values are stored in your browser's local storage on this device only — not on any server. Session mode (the default) clears everything when you close the tab. Notes are never saved — they exist only while the page is open.</p>
 </div>
 
 <div class="tool-wrap">
@@ -354,25 +353,43 @@
     <div id="screen-pick">
         <div class="tool-header">
             <h2>[FN] DIAL IN</h2>
-            <p>Your brain freezes. The phone is ringing. Here's what to say.</p>
+            <p>Your brain blanks. The phone is ringing. Pick the call.</p>
         </div>
         <div id="scenario-grid" class="scenario-grid"></div>
     </div>
 
-    <!-- ═══ SCREEN 2: FILL ═══ -->
-    <div id="screen-fill" hidden>
-        <div class="back-bar">
-            <button class="btn-back" onclick="goBack('pick')">← Back</button>
+    <!-- ═══ SCREEN 2: ACTIVE ═══ -->
+    <div id="screen-active" hidden>
+        <div class="active-header">
+            <button class="btn-back" onclick="goBack()">← Back</button>
+            <h2 class="active-title" id="active-title"></h2>
         </div>
-        <div id="fill-content"></div>
-    </div>
-
-    <!-- ═══ SCREEN 3: SCRIPT ═══ -->
-    <div id="screen-script" hidden>
-        <div class="back-bar">
-            <button class="btn-back" onclick="goBack('fill')">← Edit fields</button>
+        <div class="active-wrap">
+            <div class="fields-col">
+                <p class="col-head">Your info</p>
+                <div id="fill-form" class="fill-form"></div>
+                <div class="save-toggle-wrap">
+                    <span class="toggle-label">Session</span>
+                    <div class="toggle-track"
+                         id="save-toggle"
+                         role="switch"
+                         aria-checked="false"
+                         tabindex="0"
+                         onclick="toggleSaveMode()"
+                         onkeydown="if(event.key===' '||event.key==='Enter'){event.preventDefault();toggleSaveMode();}">
+                        <div class="toggle-thumb"></div>
+                    </div>
+                    <span class="toggle-label">Save to device</span>
+                </div>
+            </div>
+            <div class="beats-col">
+                <p class="col-head">What to cover</p>
+                <div id="beats-list" class="beats-list"></div>
+                <div class="copy-notes-wrap">
+                    <button class="btn-copy-notes" id="copy-notes-btn" onclick="copyNotes()">Copy notes</button>
+                </div>
+            </div>
         </div>
-        <div id="script-content"></div>
     </div>
 
 </div>
@@ -393,23 +410,13 @@
                 { id: 'action',   label: 'What do you need?',     type: 'choice', options: ['Reschedule', 'Cancel'], defaultIdx: 0 },
             ],
             defaults: { name: '', who: '', datetime: '', action: 'Reschedule' },
-            buildScript(f) {
-                const lines = [];
-                lines.push({ type: 'line', text: 'Hi, my name is ' + f.name + ". I'm calling to " + f.action.toLowerCase() + ' an appointment with ' + f.who + '.' });
-                if (f.datetime.trim()) {
-                    lines.push({ type: 'line', text: 'My appointment is on ' + f.datetime + '.' });
-                }
-                if (f.action === 'Reschedule') {
-                    lines.push({ type: 'line', text: "I need to move it — could you let me know what times are available?" });
-                    lines.push({ type: 'cue',  text: 'Wait while they check availability.' });
-                    lines.push({ type: 'line', text: "I'll take that. And could you confirm my name is on the books for the new time?" });
-                } else {
-                    lines.push({ type: 'line', text: "Could you cancel it and confirm it's been removed from my file?" });
-                    lines.push({ type: 'cue',  text: 'Wait for confirmation.' });
-                }
-                lines.push({ type: 'line', text: 'Thanks so much for your help.' });
-                return lines;
-            },
+            beats: [
+                { id: 'intro',   label: f => f.name   ? 'Say your name — ' + f.name                  : 'Say your name' },
+                { id: 'who',     label: f => f.who    ? 'Calling about your appointment with ' + f.who : 'Say who you have an appointment with' },
+                { id: 'appt',    label: f => f.datetime ? 'Your appointment: ' + f.datetime           : 'Give your appointment date/time' },
+                { id: 'action',  label: f => f.action === 'Cancel' ? 'Ask them to cancel it'          : 'Ask what times are available' },
+                { id: 'confirm', label: f => f.action === 'Cancel' ? 'Confirm it\'s been cancelled'   : 'Confirm the new time is booked' },
+            ],
         },
 
         rx: {
@@ -417,30 +424,18 @@
             desc:  "Call the pharmacy or your doctor's office.",
             icon:  '💊',
             fields: [
-                { id: 'name',        label: 'Your name',      placeholder: 'e.g. Alex',                required: true,  type: 'text', maxlength: 100 },
-                { id: 'dob',         label: 'Date of birth',  placeholder: 'e.g. January 15, 1985',    required: true,  type: 'text', maxlength: 100 },
-                { id: 'medication',  label: 'Medication',     placeholder: 'e.g. metformin 500mg',     required: true,  type: 'text', maxlength: 200 },
+                { id: 'name',        label: 'Your name',      placeholder: 'e.g. Alex',              required: true,  type: 'text', maxlength: 100 },
+                { id: 'dob',         label: 'Date of birth',  placeholder: 'e.g. January 15, 1985',  required: true,  type: 'text', maxlength: 100 },
+                { id: 'medication',  label: 'Medication',     placeholder: 'e.g. metformin 500mg',   required: true,  type: 'text', maxlength: 200 },
                 { id: 'destination', label: 'Calling:',       type: 'choice', options: ['Pharmacy', "Doctor's office"], defaultIdx: 0 },
             ],
             defaults: { name: '', dob: '', medication: '', destination: 'Pharmacy' },
-            buildScript(f) {
-                const lines = [];
-                if (f.destination === 'Pharmacy') {
-                    lines.push({ type: 'line', text: "Hi, I'm calling to request a prescription refill." });
-                    lines.push({ type: 'line', text: 'My name is ' + f.name + ', date of birth ' + f.dob + '.' });
-                    lines.push({ type: 'line', text: 'The medication is ' + f.medication + '.' });
-                    lines.push({ type: 'cue',  text: 'They may ask you to confirm your address or insurance. Answer their questions.' });
-                    lines.push({ type: 'line', text: "Could you let me know when it'll be ready for pickup?" });
-                    lines.push({ type: 'cue',  text: 'Note the pickup time.' });
-                } else {
-                    lines.push({ type: 'line', text: 'Hi, my name is ' + f.name + ', date of birth ' + f.dob + ". I'm calling to request a prescription refill." });
-                    lines.push({ type: 'line', text: 'The medication is ' + f.medication + '.' });
-                    lines.push({ type: 'line', text: 'Is it possible to get that sent to my pharmacy?' });
-                    lines.push({ type: 'cue',  text: 'They may need to check with the doctor. Note any follow-up they mention.' });
-                }
-                lines.push({ type: 'line', text: 'Thank you.' });
-                return lines;
-            },
+            beats: [
+                { id: 'intro',      label: f => [f.name, f.dob ? 'DOB ' + f.dob : ''].filter(Boolean).join(' — ') || 'Your name and date of birth' },
+                { id: 'medication', label: f => f.medication ? 'Medication: ' + f.medication           : 'Name the medication' },
+                { id: 'action',     label: f => f.destination === 'Pharmacy' ? 'Ask when it\'ll be ready for pickup' : 'Ask to send it to your pharmacy' },
+                { id: 'confirm',    label: () => 'Note pickup time or next steps' },
+            ],
         },
 
         dispute: {
@@ -448,23 +443,19 @@
             desc:  "A charge on your bill that shouldn't be there.",
             icon:  '🧾',
             fields: [
-                { id: 'name',    label: 'Your name',       placeholder: 'e.g. Alex',                               required: true, type: 'text', maxlength: 100 },
-                { id: 'company', label: 'Company name',    placeholder: 'e.g. Netflix',                            required: true, type: 'text', maxlength: 100 },
-                { id: 'amount',  label: 'Amount',          placeholder: 'e.g. $47.99',                             required: true, type: 'text', maxlength: 50  },
+                { id: 'name',    label: 'Your name',       placeholder: 'e.g. Alex',                                required: true, type: 'text', maxlength: 100 },
+                { id: 'company', label: 'Company name',    placeholder: 'e.g. Netflix',                             required: true, type: 'text', maxlength: 100 },
+                { id: 'amount',  label: 'Amount',          placeholder: 'e.g. $47.99',                              required: true, type: 'text', maxlength: 50  },
                 { id: 'reason',  label: 'Reason (brief)',  placeholder: 'e.g. I cancelled before the billing date', required: true, type: 'text', maxlength: 200 },
             ],
             defaults: { name: '', company: '', amount: '', reason: '' },
-            buildScript(f) {
-                return [
-                    { type: 'line', text: "Hi, my name is " + f.name + ". I'm calling about a charge on my account." },
-                    { type: 'line', text: "I'm seeing a charge of " + f.amount + ' from ' + f.company + ', and ' + f.reason + '.' },
-                    { type: 'line', text: "I'd like to dispute this charge and get a refund. Can you help me with that?" },
-                    { type: 'cue',  text: 'They may ask for your account number, the charge date, or other details. Answer their questions.' },
-                    { type: 'line', text: 'Could I get a reference or confirmation number for this dispute?' },
-                    { type: 'cue',  text: 'Write down the reference number.' },
-                    { type: 'line', text: 'Thank you for your help.' },
-                ];
-            },
+            beats: [
+                { id: 'intro',  label: f => f.name    ? 'Your name: ' + f.name                              : 'Give your name' },
+                { id: 'charge', label: f => [f.amount, f.company].filter(Boolean).join(' — from ')           || 'State the charge amount and company' },
+                { id: 'reason', label: f => f.reason  ? f.reason                                            : 'Explain why it\'s wrong' },
+                { id: 'ask',    label: () => 'Ask for a refund' },
+                { id: 'refnum', label: () => 'Get a reference or confirmation number' },
+            ],
         },
 
         repair: {
@@ -472,33 +463,20 @@
             desc:  'Landlord, property manager, or maintenance line.',
             icon:  '🔧',
             fields: [
-                { id: 'name',    label: 'Your name',         placeholder: 'e.g. Alex',                                 required: true, type: 'text', maxlength: 100 },
-                { id: 'address', label: 'Your unit/address', placeholder: 'e.g. Unit 4B, 123 Main St',                 required: true, type: 'text', maxlength: 200 },
+                { id: 'name',    label: 'Your name',         placeholder: 'e.g. Alex',                                  required: true, type: 'text', maxlength: 100 },
+                { id: 'address', label: 'Your unit/address', placeholder: 'e.g. Unit 4B, 123 Main St',                  required: true, type: 'text', maxlength: 200 },
                 { id: 'issue',   label: 'What needs fixing', placeholder: 'e.g. the kitchen tap is dripping constantly', required: true, type: 'text', maxlength: 300 },
-                { id: 'urgency', label: 'How urgent is it?', type: 'choice', options: ['Not urgent', 'Urgent', 'Emergency'], defaultIdx: 0 },
+                { id: 'urgency', label: 'How urgent?',       type: 'choice', options: ['Not urgent', 'Urgent', 'Emergency'], defaultIdx: 0 },
             ],
             defaults: { name: '', address: '', issue: '', urgency: 'Not urgent' },
-            buildScript(f) {
-                const raw = f.issue.trim();
-                const issue = raw.charAt(0).toUpperCase() + raw.slice(1) + (raw.endsWith('.') ? '' : '.');
-                const lines = [];
-                if (f.urgency === 'Emergency') {
-                    lines.push({ type: 'line', text: "Hi, my name is " + f.name + ". I'm at " + f.address + " and I need to report an emergency." });
-                    lines.push({ type: 'line', text: issue });
-                    lines.push({ type: 'line', text: "I need someone here as soon as possible. What's the soonest you can get someone over?" });
-                } else if (f.urgency === 'Urgent') {
-                    lines.push({ type: 'line', text: "Hi, my name is " + f.name + ". I'm at " + f.address + " and I'm calling about a repair that needs attention fairly soon." });
-                    lines.push({ type: 'line', text: issue });
-                    lines.push({ type: 'line', text: "Could you let me know when someone could come by to take a look?" });
-                } else {
-                    lines.push({ type: 'line', text: "Hi, my name is " + f.name + ". I'm at " + f.address + " and I'm calling to report something that needs to be fixed." });
-                    lines.push({ type: 'line', text: issue });
-                    lines.push({ type: 'line', text: "I just wanted to get it on your radar. Could you let me know when someone might be able to come by?" });
-                }
-                lines.push({ type: 'cue',  text: 'They may ask for more details or give you a timeline.' });
-                lines.push({ type: 'line', text: 'Thank you.' });
-                return lines;
-            },
+            beats: [
+                { id: 'intro',   label: f => [f.name, f.address].filter(Boolean).join(' — ')            || 'Your name and address' },
+                { id: 'issue',   label: f => f.issue   ? f.issue                                        : 'Describe what needs fixing' },
+                { id: 'urgency', label: f => f.urgency === 'Emergency' ? 'Emergency — need someone now'
+                                         : f.urgency === 'Urgent'     ? 'Urgent — ask for a quick timeline'
+                                                                       : 'Ask when someone can come by' },
+                { id: 'confirm', label: () => 'Note the timeline or ticket number' },
+            ],
         },
     };
 
@@ -512,12 +490,11 @@
     // STATE
     // ============================================
     let state = {
-        screen:      'pick',
-        scenario:    null,
-        fields:      {},
-        dimMode:     false,
-        dimmedLines: new Set(),
-        saveMode:    'session',
+        screen:    'pick',
+        scenario:  null,
+        fields:    {},
+        beatState: {},   // { [beatId]: { checked: bool, note: string, noteOpen: bool } }
+        saveMode:  'session',
     };
 
     // ============================================
@@ -557,77 +534,64 @@
         } catch (e) {}
     }
 
+    function initBeatState(scenario) {
+        const bs = {};
+        SCENARIOS[scenario].beats.forEach(b => {
+            bs[b.id] = { checked: false, note: '', noteOpen: false };
+        });
+        return bs;
+    }
+
     // ============================================
     // NAVIGATION
     // ============================================
     function pickScenario(key) {
-        state.scenario    = key;
-        state.screen      = 'fill';
-        state.dimMode     = false;
-        state.dimmedLines = new Set();
+        state.scenario  = key;
+        state.screen    = 'active';
+        state.beatState = initBeatState(key);
         const saved = readFields(key);
         state.fields = saved || Object.assign({}, SCENARIOS[key].defaults);
         render();
     }
 
-    function goBack(screen) {
-        state.screen = screen;
-        if (screen === 'pick') {
-            state.scenario    = null;
-            state.fields      = {};
-            state.dimMode     = false;
-            state.dimmedLines = new Set();
-        }
+    function goBack() {
+        state.screen   = 'pick';
+        state.scenario = null;
+        state.fields   = {};
+        state.beatState = {};
         render();
     }
 
-    function generateScript() {
-        const config = SCENARIOS[state.scenario];
-        let valid = true;
-        config.fields.forEach(fd => {
-            if (fd.type === 'text' && fd.required) {
-                const el = document.getElementById('field-' + fd.id);
-                const wrap = el ? el.closest('.fill-field') : null;
-                if (!state.fields[fd.id] || !state.fields[fd.id].trim()) {
-                    if (wrap) wrap.classList.add('error');
-                    valid = false;
-                } else {
-                    if (wrap) wrap.classList.remove('error');
-                }
-            }
+    // ============================================
+    // BEAT INTERACTIONS
+    // ============================================
+    function toggleBeat(id) {
+        state.beatState[id].checked = !state.beatState[id].checked;
+        const item = document.getElementById('beat-' + id);
+        if (item) item.classList.toggle('covered', state.beatState[id].checked);
+    }
+
+    function toggleBeatNote(id) {
+        state.beatState[id].noteOpen = !state.beatState[id].noteOpen;
+        const btn  = document.getElementById('beat-note-btn-' + id);
+        const area = document.getElementById('beat-note-area-' + id);
+        if (!btn || !area) return;
+        const open = state.beatState[id].noteOpen;
+        btn.classList.toggle('open', open);
+        btn.textContent = open ? '−' : '+';
+        area.classList.toggle('open', open);
+        if (open) { area.focus(); }
+    }
+
+    // ============================================
+    // LIVE LABEL UPDATES
+    // ============================================
+    function updateBeatLabels() {
+        if (!state.scenario) return;
+        SCENARIOS[state.scenario].beats.forEach(beat => {
+            const el = document.getElementById('beat-text-' + beat.id);
+            if (el) el.textContent = beat.label(state.fields);
         });
-        if (!valid) return;
-        state.screen      = 'script';
-        state.dimmedLines = new Set();
-        render();
-    }
-
-    function startOver() {
-        state.screen      = 'pick';
-        state.scenario    = null;
-        state.fields      = {};
-        state.dimMode     = false;
-        state.dimmedLines = new Set();
-        render();
-    }
-
-    // ============================================
-    // DIM MODE
-    // ============================================
-    function toggleDimMode() {
-        state.dimMode     = !state.dimMode;
-        state.dimmedLines = new Set();
-        renderScriptScreen();
-    }
-
-    function toggleLine(index) {
-        if (!state.dimMode) return;
-        if (state.dimmedLines.has(index)) {
-            state.dimmedLines.delete(index);
-        } else {
-            state.dimmedLines.add(index);
-        }
-        renderScriptScreen();
     }
 
     // ============================================
@@ -644,10 +608,6 @@
             }
         } catch (e) {}
         writeFields();
-        updateSaveToggle();
-    }
-
-    function updateSaveToggle() {
         const track = document.getElementById('save-toggle');
         if (!track) return;
         const on = state.saveMode === 'device';
@@ -656,15 +616,24 @@
     }
 
     // ============================================
-    // CLIPBOARD
+    // COPY NOTES
     // ============================================
-    function doCopy(text, btn) {
-        if (!text.trim()) return;
-        const origText = btn.textContent;
+    function copyNotes() {
+        if (!state.scenario) return;
+        const lines = [];
+        SCENARIOS[state.scenario].beats.forEach(beat => {
+            const bs = state.beatState[beat.id];
+            const label = beat.label(state.fields);
+            const tick = bs.checked ? '✓' : '○';
+            lines.push(tick + ' ' + label);
+            if (bs.note.trim()) lines.push('  ' + bs.note.trim());
+        });
+        const text = lines.join('\n');
+        const btn = document.getElementById('copy-notes-btn');
         function flash() {
             btn.textContent = 'Copied!';
             btn.classList.add('copied');
-            setTimeout(() => { btn.textContent = origText; btn.classList.remove('copied'); }, 1600);
+            setTimeout(() => { btn.textContent = 'Copy notes'; btn.classList.remove('copied'); }, 1600);
         }
         if (navigator.clipboard && window.isSecureContext) {
             navigator.clipboard.writeText(text).then(flash).catch(() => fallbackCopy(text, flash));
@@ -683,36 +652,21 @@
         document.body.removeChild(el);
     }
 
-    function copyScript() {
-        const items = SCENARIOS[state.scenario].buildScript(state.fields);
-        const text = items.filter(i => i.type === 'line').map(i => i.text).join('\n\n');
-        doCopy(text, document.getElementById('copy-script-btn'));
-    }
-
     // ============================================
-    // RENDERING — FILL SCREEN
+    // RENDERING — FIELDS COLUMN
     // ============================================
-    function renderFillScreen() {
-        const container = document.getElementById('fill-content');
-        while (container.firstChild) container.removeChild(container.firstChild);
+    function renderFields() {
+        const form = document.getElementById('fill-form');
+        while (form.firstChild) form.removeChild(form.firstChild);
 
         const config = SCENARIOS[state.scenario];
-
-        const title = document.createElement('h3');
-        title.className = 'fill-scenario-title';
-        title.textContent = config.label;
-        container.appendChild(title);
-
-        const form = document.createElement('div');
-        form.className = 'fill-form';
-
         config.fields.forEach(fd => {
             const wrap = document.createElement('div');
             wrap.className = 'fill-field';
 
             const lbl = document.createElement('label');
             lbl.textContent = fd.label;
-            if (fd.id) lbl.setAttribute('for', 'field-' + fd.id);
+            if (fd.type === 'text') lbl.setAttribute('for', 'field-' + fd.id);
             wrap.appendChild(lbl);
 
             if (fd.type === 'text') {
@@ -725,23 +679,12 @@
                 input.setAttribute('autocomplete', 'off');
                 input.setAttribute('autocorrect', 'off');
                 input.setAttribute('spellcheck', 'false');
-                if (fd.required) input.setAttribute('aria-required', 'true');
                 input.addEventListener('input', () => {
                     state.fields[fd.id] = input.value;
-                    wrap.classList.remove('error');
                     writeFields();
-                });
-                input.addEventListener('keydown', e => {
-                    if (e.key === 'Enter') generateScript();
+                    updateBeatLabels();
                 });
                 wrap.appendChild(input);
-
-                if (fd.required) {
-                    const err = document.createElement('span');
-                    err.className = 'field-error-msg';
-                    err.textContent = 'This field is required.';
-                    wrap.appendChild(err);
-                }
 
             } else if (fd.type === 'choice') {
                 const group = document.createElement('div');
@@ -755,6 +698,7 @@
                         writeFields();
                         group.querySelectorAll('.choice-btn').forEach(b => b.classList.remove('active'));
                         btn.classList.add('active');
+                        updateBeatLabels();
                     });
                     group.appendChild(btn);
                 });
@@ -763,134 +707,67 @@
 
             form.appendChild(wrap);
         });
-
-        const genBtn = document.createElement('button');
-        genBtn.className = 'btn-generate';
-        genBtn.textContent = 'Generate my script →';
-        genBtn.addEventListener('click', generateScript);
-        form.appendChild(genBtn);
-
-        container.appendChild(form);
     }
 
     // ============================================
-    // RENDERING — SCRIPT SCREEN
+    // RENDERING — BEATS COLUMN
     // ============================================
-    function renderScriptScreen() {
-        const container = document.getElementById('script-content');
-        while (container.firstChild) container.removeChild(container.firstChild);
+    function renderBeats() {
+        const list = document.getElementById('beats-list');
+        while (list.firstChild) list.removeChild(list.firstChild);
 
-        const config = SCENARIOS[state.scenario];
-        const items  = config.buildScript(state.fields);
+        SCENARIOS[state.scenario].beats.forEach(beat => {
+            const bs = state.beatState[beat.id];
 
-        // Top controls
-        const top = document.createElement('div');
-        top.className = 'script-top-controls';
+            const item = document.createElement('div');
+            item.className = 'beat-item' + (bs.checked ? ' covered' : '');
+            item.id = 'beat-' + beat.id;
 
-        const scenLbl = document.createElement('span');
-        scenLbl.className = 'script-scenario-label';
-        scenLbl.textContent = config.label;
-        top.appendChild(scenLbl);
+            const row = document.createElement('div');
+            row.className = 'beat-row';
 
-        // Dim mode toggle
-        const dimWrap = document.createElement('div');
-        dimWrap.className = 'dim-toggle-wrap';
-        const dimLbl = document.createElement('span');
-        dimLbl.className = 'dim-toggle-label';
-        dimLbl.textContent = 'Dim as I go';
-        dimWrap.appendChild(dimLbl);
-        const dimTrack = document.createElement('div');
-        dimTrack.className = 'toggle-track' + (state.dimMode ? ' on' : '');
-        dimTrack.setAttribute('role', 'switch');
-        dimTrack.setAttribute('aria-checked', String(state.dimMode));
-        dimTrack.setAttribute('tabindex', '0');
-        dimTrack.addEventListener('click', toggleDimMode);
-        dimTrack.addEventListener('keydown', e => { if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); toggleDimMode(); } });
-        const dimThumb = document.createElement('div');
-        dimThumb.className = 'toggle-thumb';
-        dimTrack.appendChild(dimThumb);
-        dimWrap.appendChild(dimTrack);
-        top.appendChild(dimWrap);
+            // Circle check button
+            const check = document.createElement('button');
+            check.className = 'beat-check';
+            check.setAttribute('aria-label', 'Mark as covered');
+            const inner = document.createElement('div');
+            inner.className = 'beat-check-inner';
+            check.appendChild(inner);
+            check.addEventListener('click', () => toggleBeat(beat.id));
 
-        // Copy button
-        const copyBtn = document.createElement('button');
-        copyBtn.className = 'copy-btn';
-        copyBtn.id = 'copy-script-btn';
-        copyBtn.textContent = 'Copy script';
-        copyBtn.addEventListener('click', copyScript);
-        top.appendChild(copyBtn);
+            // Beat label
+            const text = document.createElement('span');
+            text.className = 'beat-text';
+            text.id = 'beat-text-' + beat.id;
+            text.textContent = beat.label(state.fields);
 
-        container.appendChild(top);
+            // Note toggle button
+            const noteBtn = document.createElement('button');
+            noteBtn.className = 'beat-note-btn' + (bs.noteOpen ? ' open' : '');
+            noteBtn.id = 'beat-note-btn-' + beat.id;
+            noteBtn.textContent = bs.noteOpen ? '−' : '+';
+            noteBtn.setAttribute('aria-label', 'Add note');
+            noteBtn.addEventListener('click', () => toggleBeatNote(beat.id));
 
-        // Script body
-        const body = document.createElement('div');
-        body.className = 'script-body';
+            row.appendChild(check);
+            row.appendChild(text);
+            row.appendChild(noteBtn);
+            item.appendChild(row);
 
-        if (state.dimMode) {
-            const hint = document.createElement('p');
-            hint.className = 'dim-hint';
-            hint.textContent = 'Tap a line to dim it as you say it.';
-            body.appendChild(hint);
-        }
+            // Note textarea
+            const area = document.createElement('textarea');
+            area.className = 'beat-note-area' + (bs.noteOpen ? ' open' : '');
+            area.id = 'beat-note-area-' + beat.id;
+            area.placeholder = 'Notes…';
+            area.rows = 2;
+            area.value = bs.note;
+            area.addEventListener('input', () => {
+                state.beatState[beat.id].note = area.value;
+            });
+            item.appendChild(area);
 
-        items.forEach((item, idx) => {
-            if (item.type === 'line') {
-                const el = document.createElement('div');
-                el.className = 'script-line'
-                    + (state.dimMode ? ' tappable' : '')
-                    + (state.dimmedLines.has(idx) ? ' dimmed' : '');
-                el.textContent = item.text;
-                if (state.dimMode) el.addEventListener('click', () => toggleLine(idx));
-                body.appendChild(el);
-            } else if (item.type === 'cue') {
-                const el = document.createElement('div');
-                el.className = 'script-cue';
-                el.textContent = item.text;
-                body.appendChild(el);
-            }
+            list.appendChild(item);
         });
-
-        container.appendChild(body);
-
-        // Footer — save toggle + start over
-        const footer = document.createElement('div');
-        footer.className = 'script-footer';
-
-        const saveWrap = document.createElement('div');
-        saveWrap.className = 'save-toggle-wrap';
-
-        const sessLbl = document.createElement('span');
-        sessLbl.className = 'toggle-label';
-        sessLbl.textContent = 'Session';
-        saveWrap.appendChild(sessLbl);
-
-        const saveTrack = document.createElement('div');
-        saveTrack.className = 'toggle-track' + (state.saveMode === 'device' ? ' on' : '');
-        saveTrack.id = 'save-toggle';
-        saveTrack.setAttribute('role', 'switch');
-        saveTrack.setAttribute('aria-checked', String(state.saveMode === 'device'));
-        saveTrack.setAttribute('tabindex', '0');
-        saveTrack.addEventListener('click', toggleSaveMode);
-        saveTrack.addEventListener('keydown', e => { if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); toggleSaveMode(); } });
-        const saveThumb = document.createElement('div');
-        saveThumb.className = 'toggle-thumb';
-        saveTrack.appendChild(saveThumb);
-        saveWrap.appendChild(saveTrack);
-
-        const devLbl = document.createElement('span');
-        devLbl.className = 'toggle-label';
-        devLbl.textContent = 'Save to device';
-        saveWrap.appendChild(devLbl);
-
-        footer.appendChild(saveWrap);
-
-        const startOverBtn = document.createElement('button');
-        startOverBtn.className = 'btn-start-over';
-        startOverBtn.textContent = 'Start over';
-        startOverBtn.addEventListener('click', startOver);
-        footer.appendChild(startOverBtn);
-
-        container.appendChild(footer);
     }
 
     // ============================================
@@ -898,10 +775,19 @@
     // ============================================
     function render() {
         document.getElementById('screen-pick').hidden   = state.screen !== 'pick';
-        document.getElementById('screen-fill').hidden   = state.screen !== 'fill';
-        document.getElementById('screen-script').hidden = state.screen !== 'script';
-        if (state.screen === 'fill')   renderFillScreen();
-        if (state.screen === 'script') renderScriptScreen();
+        document.getElementById('screen-active').hidden = state.screen !== 'active';
+
+        if (state.screen === 'active') {
+            document.getElementById('active-title').textContent = SCENARIOS[state.scenario].label;
+            const track = document.getElementById('save-toggle');
+            if (track) {
+                const on = state.saveMode === 'device';
+                track.classList.toggle('on', on);
+                track.setAttribute('aria-checked', String(on));
+            }
+            renderFields();
+            renderBeats();
+        }
     }
 
     // ============================================
@@ -913,19 +799,9 @@
             const card = document.createElement('button');
             card.className = 'scenario-card';
             card.addEventListener('click', () => pickScenario(key));
-
-            const icon = document.createElement('div');
-            icon.className = 'scenario-icon';
-            icon.textContent = sc.icon;
-
-            const title = document.createElement('div');
-            title.className = 'scenario-title';
-            title.textContent = sc.label;
-
-            const desc = document.createElement('div');
-            desc.className = 'scenario-desc';
-            desc.textContent = sc.desc;
-
+            const icon  = document.createElement('div'); icon.className  = 'scenario-icon';  icon.textContent  = sc.icon;
+            const title = document.createElement('div'); title.className = 'scenario-title'; title.textContent = sc.label;
+            const desc  = document.createElement('div'); desc.className  = 'scenario-desc';  desc.textContent  = sc.desc;
             card.appendChild(icon);
             card.appendChild(title);
             card.appendChild(desc);
