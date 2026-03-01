@@ -55,28 +55,69 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 10px;
+            gap: 14px;
         }
 
-        .time-input {
+        /* Custom time picker: hour : min  AM|PM */
+        .time-picker {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .time-part {
             background: transparent;
             border: none;
             border-bottom: 3px solid var(--brand);
             outline: none;
             font-family: 'Montserrat', sans-serif;
             font-weight: 900;
-            font-size: clamp(2.5rem, 8vw, 4rem);
+            font-size: clamp(2.2rem, 7vw, 3.6rem);
             color: var(--text-main);
             caret-color: var(--brand);
             text-align: center;
-            padding: 4px 8px;
-            width: auto;
-            min-width: 220px;
-            cursor: pointer;
+            width: 2.4ch;
+            padding: 2px 4px;
+            -moz-appearance: textfield;
         }
-        /* Style the time input's color scheme for dark mode */
-        [data-theme="dark"] .time-input {
-            color-scheme: dark;
+        .time-part::-webkit-inner-spin-button,
+        .time-part::-webkit-outer-spin-button { -webkit-appearance: none; }
+        .time-part::placeholder { color: var(--border); }
+
+        .time-sep {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 900;
+            font-size: clamp(2.2rem, 7vw, 3.6rem);
+            color: var(--text-dim);
+            line-height: 1;
+            padding-bottom: 3px;
+            user-select: none;
+        }
+
+        .ampm-wrap {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            margin-left: 10px;
+        }
+        .ampm-btn {
+            background: var(--bg);
+            border: 2px solid var(--border);
+            color: var(--text-dim);
+            border-radius: 5px;
+            padding: 4px 10px;
+            font-family: 'Roboto', sans-serif;
+            font-weight: 700;
+            font-size: 0.75rem;
+            cursor: pointer;
+            letter-spacing: 0.05em;
+            transition: all 0.12s;
+            line-height: 1.4;
+        }
+        .ampm-btn.active {
+            background: var(--brand);
+            border-color: var(--brand);
+            color: white;
         }
 
         .sleep-now-label {
@@ -226,8 +267,16 @@
     <!-- Input area -->
     <div class="input-area">
         <!-- Wake mode -->
-        <div id="wake-input-wrap">
-            <input type="time" id="wake-time" class="time-input" oninput="update()" aria-label="Wake-up time">
+        <div class="time-picker" id="wake-input-wrap">
+            <input type="number" id="wake-hour" class="time-part" min="1" max="12" placeholder="7"
+                   oninput="update()" aria-label="Hour">
+            <span class="time-sep">:</span>
+            <input type="number" id="wake-min" class="time-part" min="0" max="59" placeholder="00"
+                   oninput="update()" aria-label="Minutes">
+            <div class="ampm-wrap">
+                <button class="ampm-btn active" id="am-btn" onclick="setAmPm('AM')">AM</button>
+                <button class="ampm-btn"        id="pm-btn" onclick="setAmPm('PM')">PM</button>
+            </div>
         </div>
 
         <!-- Sleep-now mode -->
@@ -271,8 +320,9 @@ const CYCLES = [
 ];
 
 // ── State ──────────────────────────────────────────────────────────────────
-let mode    = 'wake';   // 'wake' | 'now'
-let nowBase = null;     // Date used as sleep-now baseline
+let mode      = 'wake';   // 'wake' | 'now'
+let nowBase   = null;     // Date used as sleep-now baseline
+let wakeAmPm  = 'AM';     // 'AM' | 'PM'
 
 // ── Mode switch ────────────────────────────────────────────────────────────
 function setMode(m) {
@@ -298,10 +348,20 @@ function refreshNow() {
     renderAlarms(nowBase);
 }
 
-// ── Wake-up mode: parse time input → calc bedtimes ────────────────────────
+// ── AM/PM toggle ───────────────────────────────────────────────────────────
+function setAmPm(val) {
+    wakeAmPm = val;
+    document.getElementById('am-btn').classList.toggle('active', val === 'AM');
+    document.getElementById('pm-btn').classList.toggle('active', val === 'PM');
+    update();
+}
+
+// ── Wake-up mode: read custom inputs → calc bedtimes ──────────────────────
 function update() {
-    const val = document.getElementById('wake-time').value;  // "HH:MM"
-    if (!val) {
+    const h12 = parseInt(document.getElementById('wake-hour').value, 10);
+    const min  = parseInt(document.getElementById('wake-min').value,  10) || 0;
+
+    if (isNaN(h12) || h12 < 1 || h12 > 12) {
         document.getElementById('placeholder').classList.remove('hidden');
         document.getElementById('results').classList.add('hidden');
         return;
@@ -309,9 +369,12 @@ function update() {
 
     document.getElementById('placeholder').classList.add('hidden');
 
-    const [h, m] = val.split(':').map(Number);
+    // Convert 12-hour + AM/PM to 24-hour
+    let h24 = h12 % 12;               // 12 AM → 0, 12 PM → 12
+    if (wakeAmPm === 'PM') h24 += 12;
+
     const wake = new Date();
-    wake.setHours(h, m, 0, 0);
+    wake.setHours(h24, Math.min(min, 59), 0, 0);
 
     renderBedtimes(wake);
 }
