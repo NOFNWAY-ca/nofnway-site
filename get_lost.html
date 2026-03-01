@@ -144,8 +144,12 @@
     <div style="font-size:0.7rem; color:var(--text-dim); text-align:center; margin-top:-4px; opacity:0.7;">
         This tool requires an internet connection for maps and routing.
     </div>
-    
-    <div class="label">Custom Route <span style="opacity:0.5; font-weight:normal; text-transform:none;">(optional — tap a button, then tap the map)</span></div>
+
+    <div style="font-size:0.75rem; color:var(--text-dim); line-height:1.6; padding:6px 0;">
+        Pick a vibe and a scale, then tap <strong>Go Get Lost</strong> to generate a walking loop from your location. Use the <strong>Home</strong> button at any time to get a route back. Optionally, set custom start and end pins by tapping the map.
+    </div>
+
+    <div class="label">Custom Route <span style="opacity:0.5; font-weight:normal; text-transform:none;">(optional: tap a button, then tap the map)</span></div>
     <div class="chip-row">
         <div class="chip" id="pin-start-btn" onclick="setPinMode('start')">📍 Set Start</div>
         <div class="chip" id="pin-end-btn"   onclick="setPinMode('end')">📍 Set End</div>

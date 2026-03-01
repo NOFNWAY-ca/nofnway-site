@@ -384,6 +384,39 @@ body {
 
 
 /* ═══════════════════════════════════════
+   HOW IT WORKS EXPLAINER BOX
+═══════════════════════════════════════ */
+.how-it-works {
+    margin-bottom: 36px;
+    padding: 20px 28px;
+    background: var(--card-bg);
+    border: 2px solid var(--border);
+    border-left: 5px solid var(--brand);
+    border-radius: 8px;
+    font-size: 0.9rem;
+    color: var(--text-dim);
+    line-height: 1.75;
+}
+.how-it-works p { margin: 0 0 8px; }
+.how-it-works p:last-child { margin: 0; }
+.how-it-works ul { margin: 4px 0 10px; padding-left: 18px; }
+.how-it-works ol  { margin: 4px 0 10px; padding-left: 18px; }
+.how-it-works li  { margin-bottom: 5px; }
+.how-it-works strong { color: var(--text-main); }
+.how-it-works kbd {
+    display: inline-block;
+    padding: 1px 7px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    font-family: 'Roboto', sans-serif;
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: var(--text-main);
+}
+
+
+/* ═══════════════════════════════════════
    FAQ SECTION
 ═══════════════════════════════════════ */
 .faq-grid {

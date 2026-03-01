@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>NOFNWAY | JPEGer</title>
-    <meta name="description" content="Free, private PDF to JPEG converter. Works entirely in your browser — no uploads, no accounts, nothing leaves your device.">
+    <meta name="description" content="Free, private PDF to JPEG converter. Works entirely in your browser. No uploads, no accounts, nothing leaves your device.">
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@900&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
     <script src="vendor/pdf.min.js"></script>
@@ -82,6 +82,16 @@
 
 <main class="workspace">
     <div id="errorBanner"></div>
+
+    <div class="how-it-works" style="max-width:680px;width:100%;margin-bottom:24px;">
+        <p><strong>Drop a PDF. Get one JPEG per page, ready to download.</strong></p>
+        <ul>
+            <li>Drop a PDF onto the page or click to select one.</li>
+            <li>Each page renders as a high-quality JPEG thumbnail. Download any page individually or hit <strong>Save All JPEGs</strong> to grab everything at once.</li>
+            <li>Use the <strong>filename prefix</strong> field to set what your files are called before saving.</li>
+            <li>Nothing is uploaded. Everything happens in your browser. Close the tab and it is gone.</li>
+        </ul>
+    </div>
 
     <div id="setup" class="drop-zone">
         <p class="drop-title">Drop or Click to Load PDF</p>
@@ -198,7 +208,7 @@
 
         } catch (err) {
             console.error(err);
-            showError('Could not read that PDF — it may be encrypted or damaged.');
+            showError('Could not read that PDF. It may be encrypted or damaged.');
         } finally {
             loader.style.display = 'none';
         }

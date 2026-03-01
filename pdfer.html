@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>NOFNWAY | PDFer</title>
-    <meta name="description" content="Convert photos to a single PDF and redact anything you don't want to share. Runs entirely in your browser — nothing is uploaded or stored.">
+    <meta name="description" content="Convert photos to a single PDF and redact anything you don't want to share. Runs entirely in your browser. Nothing is uploaded or stored.">
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@900&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
     <script src="vendor/jspdf.umd.min.js"></script>
@@ -120,6 +120,16 @@
 </div>
 
 <div class="workspace" id="stream">
+    <div class="how-it-works" style="max-width:560px;width:100%;margin-bottom:16px;">
+        <p><strong>Build a clean PDF from photos, with anything sensitive blacked out.</strong></p>
+        <ul>
+            <li><strong>Add Page</strong> to add a photo from your camera or files. Add as many as you need.</li>
+            <li>Tap a page to edit it: draw black redaction boxes over anything you don't want to share, or add a page title using the quick-tags (Receipt, Invoice, etc.).</li>
+            <li>Drag pages to reorder them.</li>
+            <li>Tap <strong>Make PDF</strong> when ready. Your document saves automatically as you work. Come back anytime and pick up where you left off.</li>
+            <li>Nothing is uploaded. Nothing leaves your browser.</li>
+        </ul>
+    </div>
     <div class="empty-state" id="emptyState">
         <h3>No Pages Yet</h3>
         <p>Tap <strong>ADD PAGE</strong> to add a photo.</p>
@@ -160,7 +170,7 @@
                 <button class="tool-btn" onclick="undoRedaction()">Undo</button>
                 <button class="tool-btn" onclick="clearRedactions()">Clear All</button>
             </div>
-            <div class="redact-hint" id="redactHint">Drag to black out sensitive info — burns in permanently</div>
+            <div class="redact-hint" id="redactHint">Drag to black out sensitive info. Burns in permanently.</div>
         </div>
         <div class="editor-footer">
             <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
@@ -286,7 +296,7 @@
     }
 
     function quickTag(t) {
-        document.getElementById('pageTitleInput').value = t + ' — ' + new Date().toLocaleDateString();
+        document.getElementById('pageTitleInput').value = t + ', ' + new Date().toLocaleDateString();
     }
 
     /* ------------------------------------------------------------------ */

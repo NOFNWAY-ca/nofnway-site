@@ -145,6 +145,17 @@
 
 <main class="workspace" id="workspace">
 
+    <div class="how-it-works" style="max-width:580px;width:100%;margin-bottom:16px;">
+        <p><strong>A measurement notebook for when you're tired of measuring the same boards twice.</strong></p>
+        <ul>
+            <li><strong>Create a project</strong> using the project bar at the top. Name it anything.</li>
+            <li>Pick a <strong>material type</strong> (lumber, pipe, trim, etc.), enter your measurement on the tape, add a description and quantity, then hit <strong>MARK</strong>.</li>
+            <li><strong>Cut List</strong> shows all your measurements grouped by material.</li>
+            <li><strong>Buy List</strong> calculates how many standard-length boards (8', 10', 12') you need to buy to cover everything on your cut list. Less guessing at the hardware store.</li>
+            <li>Everything saves automatically in your browser.</li>
+        </ul>
+    </div>
+
     <!-- Project bar -->
     <div class="project-bar" id="project-bar"></div>
 
@@ -533,7 +544,7 @@
             return;
         }
         if (proj.items.length === 0) {
-            container.innerHTML = `<div class="empty-list">No measurements yet — enter one and press MARK.</div>`;
+            container.innerHTML = `<div class="empty-list">No measurements yet. Enter one and press MARK.</div>`;
             return;
         }
 
@@ -576,7 +587,7 @@
             Object.keys(groups).forEach(mat => {
                 const hdr = document.createElement('div');
                 hdr.className = 'group-hdr';
-                hdr.textContent = mat + ' — Stock Needed';
+                hdr.textContent = mat + ': Stock Needed';
                 container.appendChild(hdr);
 
                 let pool = [];
