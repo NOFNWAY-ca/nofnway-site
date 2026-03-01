@@ -331,22 +331,6 @@ body {
     flex-grow: 1;
 }
 
-/* Status Badges */
-.status-badge {
-    position: absolute;
-    top: 0;
-    right: 0;
-    padding: 6px 18px;
-    font-size: 0.7rem;
-    font-weight: 900;
-    border-bottom-left-radius: 10px;
-    border-top-right-radius: 8px;
-    text-transform: uppercase;
-}
-.ready  { background-color: var(--ready);   color: #fff; }
-.working{ background-color: var(--working); color: #000; }
-.dev    { background-color: var(--dev);     color: #fff; }
-
 /* Connectivity disclaimer */
 .net-badge {
     font-size: 0.65rem;
