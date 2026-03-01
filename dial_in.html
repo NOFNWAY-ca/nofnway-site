@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
     <title>NOFNWAY | Dial In</title>
-    <meta name="description" content="Fill in your info on the left. The beats you need to hit on the right. For when your brain blanks the moment someone picks up.">
+    <meta name="description" content="For when your brain checks out the moment someone picks up. Fill in your details, get a live list of what to cover — your words, not a script. Check off beats, add notes on the fly.">
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
     <!-- Block all network requests except fonts. No exfiltration possible. -->
     <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'self' https://fonts.googleapis.com 'unsafe-inline'; font-src https://fonts.gstatic.com; script-src 'self' 'unsafe-inline'; connect-src 'none'; img-src 'self'; frame-src 'none';">
@@ -28,6 +28,23 @@
             margin: 0 0 6px;
         }
         .tool-header p { color: var(--text-dim); font-size: 0.95rem; margin: 0; }
+
+        /* ── How it works ──────────────────────── */
+        .how-it-works {
+            margin-bottom: 36px;
+            padding: 20px 28px;
+            background: var(--card-bg);
+            border: 2px solid var(--border);
+            border-left: 5px solid var(--brand);
+            border-radius: 8px;
+            font-size: 0.9rem;
+            color: var(--text-dim);
+            line-height: 1.75;
+        }
+        .how-it-works p { margin: 0 0 8px; }
+        .how-it-works ul { margin: 4px 0 0; padding-left: 18px; }
+        .how-it-works li { margin-bottom: 5px; }
+        .how-it-works strong { color: var(--text-main); }
 
         /* ── Scenario picker ────────────────────── */
         .scenario-grid {
@@ -354,6 +371,17 @@
         <div class="tool-header">
             <h2>[FN] DIAL IN</h2>
             <p>The phone rings, your brain suddenly checks out. Next time, bring backup.</p>
+        </div>
+        <div class="how-it-works">
+            <p><strong>Pick a call type. Fill in your details. Cover what matters.</strong></p>
+            <ul>
+                <li><strong>Your info on the left</strong> — fill in your name and a couple of details specific to the call. The list on the right updates as you type.</li>
+                <li><strong>What to cover on the right</strong> — not a script. Just the beats you need to hit, in your own words.</li>
+                <li><strong>During the call</strong> — tap the circle on a beat to check it off as you cover it.</li>
+                <li><strong>Tap +</strong> on any beat to open a note field. Good for reference numbers, what they said, next steps.</li>
+                <li><strong>Copy notes</strong> when you're done — plain text summary of everything, checked or not, with any notes attached.</li>
+                <li><strong>Save to device</strong> (toggle, bottom left of the form) — keeps your filled-in details between visits. Off by default.</li>
+            </ul>
         </div>
         <div id="scenario-grid" class="scenario-grid"></div>
     </div>
