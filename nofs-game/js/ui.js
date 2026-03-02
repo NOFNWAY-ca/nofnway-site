@@ -50,7 +50,7 @@ function setupScreen() {
             : `onclick="toggleCondition('${key}')"`;
 
         return `
-            <div class="condition-option ${isSelected ? 'selected' : ''}" id="cond-${key}" ${clickHandler}>
+            <div class="condition-option cond-${key} ${isSelected ? 'selected' : ''}" id="cond-${key}" ${clickHandler}>
                 <h3>${details.name}</h3>
                 ${details.penalty ? `<p class="condition-penalty">⚠️ ${details.penalty}</p>` : ''}
                 ${details.positive ? `<p class="condition-positive">✨ ${details.positive}</p>` : ''}
@@ -61,25 +61,28 @@ function setupScreen() {
         <div class="setup-screen">
             ${themeSelector}
 
-            <h2 style="color: var(--brand);">🎮 NO Fs TO GIVE</h2>
+            <div class="game-title-block">
+                <h1 class="game-title">NO <span>Fs</span> TO GIVE</h1>
+                <p class="game-tagline">Willpower vs. Wiring</p>
+            </div>
 
-            <p>Select a Game Mode:</p>
+            <div class="section-label">Choose your mode</div>
             <div class="mode-select">
-                <button class="condition-option ${selectedMode === 'day'  ? 'selected' : ''}" onclick="selectMode('day')">
+                <button class="mode-btn ${selectedMode === 'day'  ? 'selected' : ''}" onclick="selectMode('day')">
                     <h3>Single Day</h3>
                     <p>A quick 4-turn game.</p>
                 </button>
-                <button class="condition-option ${selectedMode === 'week' ? 'selected' : ''}" onclick="selectMode('week')">
+                <button class="mode-btn ${selectedMode === 'week' ? 'selected' : ''}" onclick="selectMode('week')">
                     <h3>Full Week</h3>
                     <p>Standard 7-day challenge.</p>
                 </button>
-                <button class="condition-option ${selectedMode === 'life' ? 'selected' : ''}" onclick="selectMode('life')">
+                <button class="mode-btn ${selectedMode === 'life' ? 'selected' : ''}" onclick="selectMode('life')">
                     <h3>Life Mode</h3>
                     <p>Survive as long as possible.</p>
                 </button>
             </div>
 
-            <p>Select a Condition (Willpower vs. Wiring):</p>
+            <div class="section-label">Choose your condition(s)</div>
             <div class="condition-select">
                 ${conditionCards}
             </div>
@@ -111,15 +114,16 @@ function gameOverScreen() {
     else if (game.message.includes('Overwhelmed')) title = '💔 Overwhelmed. (D)';
     else if (game.message.includes('BURNOUT'))     title = '😡 BURNOUT';
 
+    const burnoutClass = title.includes('BURNOUT') ? 'burnout' : '';
     return `
-        <div class="game-over">
-            <h2>${title}</h2>
-            <p style="margin-top: 20px;">${game.message}</p>
+        <div class="game-over ${burnoutClass}">
+            <h2 class="game-over-title">${title}</h2>
+            <p>${game.message}</p>
             <p><strong>Final Stress:</strong> ${game.stress}</p>
 
             <div class="buttons" style="justify-content: center; margin-top: 30px;">
-                <button onclick="handleAction(resetGame)">🔄 Play Again</button>
-                <button class="secondary" onclick="game = null; render();">⚙️ Settings</button>
+                <button onclick="handleAction(resetGame)">Play Again</button>
+                <button class="secondary" onclick="game = null; render();">Settings</button>
             </div>
         </div>`;
 }
