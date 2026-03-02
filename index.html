@@ -45,6 +45,45 @@
     <div class="container">
         <div id="main-content"></div>
 
+        <div class="games-section">
+            <h2 class="category-title">Games</h2>
+            <div class="game-feature-card">
+                <div class="game-card-graphic" aria-hidden="true">
+                    <svg viewBox="0 0 150 95" width="150" height="95" xmlns="http://www.w3.org/2000/svg">
+                        <!-- Left card: Physical (red), rotated left -->
+                        <g transform="rotate(-14, 32, 78)">
+                            <rect x="13" y="22" width="38" height="56" rx="4" fill="#16162a" stroke="rgba(231,76,60,0.45)" stroke-width="1.5"/>
+                            <rect x="13" y="22" width="38" height="7" rx="4" fill="#e74c3c"/>
+                            <rect x="13" y="26" width="38" height="3" fill="#e74c3c"/>
+                            <text x="32" y="61" text-anchor="middle" font-size="18" fill="rgba(255,255,255,0.8)">⚡</text>
+                        </g>
+                        <!-- Right card: Social (blue), rotated right -->
+                        <g transform="rotate(14, 118, 78)">
+                            <rect x="99" y="22" width="38" height="56" rx="4" fill="#16162a" stroke="rgba(52,152,219,0.45)" stroke-width="1.5"/>
+                            <rect x="99" y="22" width="38" height="7" rx="4" fill="#3498db"/>
+                            <rect x="99" y="26" width="38" height="3" fill="#3498db"/>
+                            <text x="118" y="61" text-anchor="middle" font-size="18" fill="rgba(255,255,255,0.8)">👥</text>
+                        </g>
+                        <!-- Middle card: Mental (orange), front -->
+                        <rect x="56" y="14" width="38" height="56" rx="4" fill="#16162a" stroke="rgba(230,126,34,0.55)" stroke-width="1.5"/>
+                        <rect x="56" y="14" width="38" height="7" rx="4" fill="#e67e22"/>
+                        <rect x="56" y="18" width="38" height="3" fill="#e67e22"/>
+                        <text x="75" y="53" text-anchor="middle" font-size="18" fill="rgba(255,255,255,0.8)">🧠</text>
+                    </svg>
+                </div>
+                <div class="game-card-content">
+                    <div class="game-card-badge">Card Game</div>
+                    <h3 class="game-card-title">NO <span>Fs</span> TO GIVE</h3>
+                    <p class="game-card-tagline">Willpower vs. Wiring</p>
+                    <p class="game-card-desc">A card game about what it actually costs to get through an ordinary day. Draw your Fs, match them to your tasks, manage your energy. Choose from 8 conditions that change the rules. Don't burn out.</p>
+                    <div class="game-card-actions">
+                        <a href="nofs-game/index.html" class="game-card-play-btn">Play Free &rarr;</a>
+                        <span class="game-card-print-note">Print &amp; play coming soon</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <div class="about-strip">
             <p class="about-text">I spent 40 years thinking (being told) I just needed to try harder. Turns out I needed a diagnosis and a better keyboard shortcut. I'm not a developer. I'm just someone who got tired of tools that were supposedly simple but weren't, and learned to build better ones. If they help me, they might help you too.</p>
         </div>
@@ -124,7 +163,6 @@
             { name: "[FN] HOW LONG?",     desc: "Project measurement notebook. Record once, buy right, stop re-measuring.", link: "how_long.html", status: "Live", type: "ready", cat: "Ready for Use", offline: true },
             { name: "[FN] HOW MUCH?",     desc: "Instant unit conversions. Type a number and unit, get results.", link: "how_much.html", status: "Live", type: "ready", cat: "Ready for Use", offline: true },
             { name: "[FN] GET LOST",      desc: "A jogging route generator for when you need to run away, but just for a bit.", link: "get_lost.html", status: "Live", type: "ready", cat: "Ready for Use", offline: false },
-            { name: "NO Fs TO GIVE",      desc: "Draw your Fs, complete your tasks, try not to burn out. A free card game about what it actually costs to get through an ordinary day — for brains wired differently. Play free in your browser, or print your own deck.", link: "nofs-game/index.html", status: "Live", type: "ready", cat: "Ready for Use", offline: true },
             { name: "[FN] MAGNET STUDIO", desc: "Custom-printed picture tiles for schedules, labels, and literacy. PECS-friendly.", link: "magnet.html", status: "Live", type: "ready", cat: "Ready for Use", offline: true },
             { name: "[FN] COPY THAT",    desc: "Your info, one tap. Fill forms without retyping the same things seventeen times. Nothing leaves your browser.", link: "copy_that.html", status: "Live", type: "ready", cat: "Ready for Use", offline: true },
             { name: "[FN] FIDGET",       desc: "Pop bubbles, tap a counter, paint a grid, make ripples. Zero stakes. Close it the moment your name gets called.", link: "fidget.html", status: "Live", type: "ready", cat: "Ready for Use", offline: true },
