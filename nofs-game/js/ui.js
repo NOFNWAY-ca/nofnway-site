@@ -66,7 +66,7 @@ function setupScreen() {
                 <p class="game-tagline">Willpower vs. Wiring</p>
             </div>
 
-            <p class="game-intro">Welcome to your brain. Your job: guide it through an ordinary day — shower, make lunch, answer an email, be a person. Each task costs F-Cards: ⚡&nbsp;Physical, 👥&nbsp;Social, or 🧠&nbsp;Mental energy. Draw a fresh hand each turn, spend them like currency. Four turns, four times of day, new tasks every round, some with special effects. Survive a day. Then a week. Then as long as you can before the dreaded BURNOUT.</p>
+            <p class="game-intro">Welcome to your brain. Your job: guide it through an ordinary day. Shower, make lunch, answer an email, be a person. Each task costs F-Cards: ⚡&nbsp;Physical, 👥&nbsp;Social, or 🧠&nbsp;Mental energy. Draw a fresh hand each turn, spend them like currency. Four turns, four times of day, new tasks every round, some with special effects. Survive a day. Then a week. Then as long as you can before the dreaded BURNOUT.</p>
 
             <div class="section-label">Choose your mode</div>
             <div class="mode-select">
