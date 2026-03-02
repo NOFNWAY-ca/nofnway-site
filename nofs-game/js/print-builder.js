@@ -108,7 +108,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 <div class="back-fs">Fs TO</div>
                 <div class="back-to-give">GIVE</div>
                 <div class="back-divider"></div>
-                <div class="back-tagline">Willpower vs. Wiring</div>
+                <div class="back-tagline">Same Shit, Different Brain</div>
             </div>
         </div>`;
     }

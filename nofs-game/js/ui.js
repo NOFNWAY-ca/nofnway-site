@@ -63,7 +63,7 @@ function setupScreen() {
 
             <div class="game-title-block">
                 <h1 class="game-title">NO <span>Fs</span> TO GIVE</h1>
-                <p class="game-tagline">Willpower vs. Wiring</p>
+                <p class="game-tagline">Same Shit, Different Brain</p>
             </div>
 
             <p class="game-intro">Welcome to your brain. Your job: guide it through an ordinary day. Shower, make lunch, answer an email, be a person. Each task costs F-Cards: ⚡&nbsp;Physical, 👥&nbsp;Social, or 🧠&nbsp;Mental energy. Draw a fresh hand each turn, spend them like currency. Four turns, four times of day, new tasks every round, some with special effects. Survive a day. Then a week. Then as long as you can before the dreaded BURNOUT.</p>
