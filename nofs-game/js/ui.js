@@ -66,6 +66,8 @@ function setupScreen() {
                 <p class="game-tagline">Willpower vs. Wiring</p>
             </div>
 
+            <p class="game-intro">Welcome to your brain. Your job: guide it through an ordinary day — shower, make lunch, answer an email, be a person. Each task costs F-Cards: ⚡&nbsp;Physical, 👥&nbsp;Social, or 🧠&nbsp;Mental energy. Draw a fresh hand each turn, spend them like currency. Four turns, four times of day, new tasks every round, some with special effects. Survive a day. Then a week. Then as long as you can before the dreaded BURNOUT.</p>
+
             <div class="section-label">Choose your mode</div>
             <div class="mode-select">
                 <button class="mode-btn ${selectedMode === 'day'  ? 'selected' : ''}" onclick="selectMode('day')">
@@ -83,6 +85,7 @@ function setupScreen() {
             </div>
 
             <div class="section-label">Choose your condition(s)</div>
+            <p class="conditions-note">These aren't clinical definitions. They're simplified game mechanics — a way to briefly experience the different rules a brain might be running, and to understand why some days cost more than others for some people. A window, not a diagnosis. Play as Neurotypical if you just want to learn the game.</p>
             <div class="condition-select">
                 ${conditionCards}
             </div>

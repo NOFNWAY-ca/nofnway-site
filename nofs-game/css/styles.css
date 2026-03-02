@@ -82,6 +82,27 @@ body {
     color: var(--text-dim);
 }
 
+.game-intro {
+    font-size: 0.88rem;
+    line-height: 1.75;
+    color: var(--text-mid);
+    margin: 20px 0 0;
+    text-align: center;
+    max-width: 640px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.conditions-note {
+    font-size: 0.75rem;
+    line-height: 1.65;
+    color: var(--text-dim);
+    margin-bottom: 12px;
+    font-style: italic;
+    border-left: 2px solid var(--border-mid);
+    padding-left: 12px;
+}
+
 /* ===================================
    SECTION LABELS (setup)
    =================================== */
