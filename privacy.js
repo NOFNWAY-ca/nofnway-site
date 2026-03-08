@@ -1,3 +1,12 @@
+// Bookmark tip — shared across all tool pages
+function showBookmarkTip(btn) {
+    var isMac = navigator.platform.toUpperCase().includes('MAC');
+    var key = isMac ? '⌘D' : 'Ctrl+D';
+    var orig = btn.textContent;
+    btn.textContent = 'Press ' + key;
+    setTimeout(function() { btn.textContent = orig; }, 3000);
+}
+
 // Privacy panel toggle — shared across all tool pages
 function togglePrivacy() {
     var p = document.getElementById('privacy-panel');
