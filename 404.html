@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="author" content="Gerry McMahon">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>404 – NOFNWAY</title>
+    <meta name="robots" content="noindex">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bangers&family=Montserrat:wght@900&family=Roboto:wght@400;700&display=swap" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bangers&family=Montserrat:wght@900&family=Roboto:wght@400;700&display=swap"></noscript>
+    <script>document.documentElement.setAttribute('data-theme', localStorage.getItem('nofnway-theme') || 'light');</script>
+    <link rel="stylesheet" href="theme.css">
+    <style>
+        body {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 2rem 1.5rem;
+        }
+
+        .err-emblem {
+            font-family: 'Bangers', cursive;
+            font-size: clamp(6rem, 22vw, 10rem);
+            line-height: 1;
+            color: var(--brand);
+            text-shadow: 5px 5px 0 var(--accent);
+            letter-spacing: 0.04em;
+            margin-bottom: 0.25em;
+        }
+
+        .err-headline {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 900;
+            font-size: clamp(1.3rem, 4vw, 2rem);
+            color: var(--text-main);
+            margin: 0 0 0.4em;
+        }
+
+        .err-sub {
+            font-family: 'Roboto', sans-serif;
+            font-size: 1rem;
+            color: var(--text-dim);
+            margin: 0 0 2rem;
+        }
+
+        .home-btn {
+            display: inline-block;
+            font-family: 'Bangers', cursive;
+            font-size: 1.3rem;
+            letter-spacing: 0.06em;
+            background: var(--brand);
+            color: #fff;
+            padding: 0.55em 1.6em 0.45em;
+            border-radius: 6px;
+            text-decoration: none;
+            box-shadow: 4px 4px 0 var(--accent);
+            transition: transform 0.1s, box-shadow 0.1s;
+        }
+
+        .home-btn:hover,
+        .home-btn:focus {
+            transform: translate(-2px, -2px);
+            box-shadow: 6px 6px 0 var(--accent);
+        }
+
+        .home-btn:active {
+            transform: translate(2px, 2px);
+            box-shadow: 2px 2px 0 var(--accent);
+        }
+    </style>
+</head>
+<body>
+    <div class="err-emblem" aria-label="404">404</div>
+    <h1 class="err-headline">That page doesn't exist.</h1>
+    <p class="err-sub">The tools do.</p>
+    <a href="/" class="home-btn">Back to the tools</a>
+</body>
+</html>

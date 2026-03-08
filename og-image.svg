@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <!-- Background -->
+  <rect width="1200" height="630" fill="#0057B8"/>
+
+  <!-- Red accent bar at bottom -->
+  <rect x="0" y="594" width="1200" height="36" fill="#C62828"/>
+
+  <!-- FN diamond emblem -->
+  <g transform="translate(600, 230)">
+    <!-- Diamond shape -->
+    <polygon points="0,-110 95,0 0,110 -95,0" fill="#C62828"/>
+    <!-- FN text -->
+    <text
+      x="0" y="16"
+      text-anchor="middle"
+      font-family="Impact, Arial Black, sans-serif"
+      font-weight="900"
+      font-size="72"
+      fill="#ffffff"
+      letter-spacing="2"
+    >FN</text>
+  </g>
+
+  <!-- NOFNWAY wordmark -->
+  <text
+    x="600" y="420"
+    text-anchor="middle"
+    font-family="Impact, Arial Black, sans-serif"
+    font-weight="900"
+    font-size="96"
+    fill="#ffffff"
+    letter-spacing="6"
+  >NOFNWAY</text>
+
+  <!-- Tagline -->
+  <text
+    x="600" y="480"
+    text-anchor="middle"
+    font-family="Arial, sans-serif"
+    font-weight="700"
+    font-size="28"
+    fill="rgba(255,255,255,0.72)"
+    letter-spacing="2"
+  >Free tools for brains that work differently.</text>
+</svg>
