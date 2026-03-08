@@ -174,18 +174,18 @@
 
         /* --- DATA MODEL --- */
         const apps = [
-            { name: "[FN] JPEGer",        desc: "You filled the PDF, but they want a JPEG. Privacy-first conversion.", link: "jpeger.html", status: "Live", type: "ready", cat: "Ready for Use", offline: true },
-            { name: "[FN] PDFer",         desc: "Photos of receipts → redact what you want → one clean PDF. Simple and private.", link: "pdfer.html", status: "Live", type: "ready", cat: "Ready for Use", offline: true },
-            { name: "[FN] HOW LONG?",     desc: "Project measurement notebook. Record once, buy right, stop re-measuring.", link: "how_long.html", status: "Live", type: "ready", cat: "Ready for Use", offline: true },
-            { name: "[FN] HOW MUCH?",     desc: "Instant unit conversions. Type a number and unit, get results.", link: "how_much.html", status: "Live", type: "ready", cat: "Ready for Use", offline: true },
-            { name: "[FN] GET LOST",      desc: "A jogging route generator for when you need to run away, but just for a bit.", link: "get_lost.html", status: "Live", type: "ready", cat: "Ready for Use", offline: false },
-            { name: "[FN] MAGNET STUDIO", desc: "Custom-printed picture tiles for schedules, labels, and literacy. PECS-friendly.", link: "magnet.html", status: "Live", type: "ready", cat: "Ready for Use", offline: true },
-            { name: "[FN] COPY THAT",    desc: "Your info, one tap. Fill forms without retyping the same things seventeen times. Nothing leaves your browser.", link: "copy_that.html", status: "Live", type: "ready", cat: "Ready for Use", offline: true },
-            { name: "[FN] FIDGET",       desc: "Pop bubbles, tap a counter, paint a grid, make ripples. Zero stakes. Close it the moment your name gets called.", link: "fidget.html", status: "Live", type: "ready", cat: "Ready for Use", offline: true },
-            { name: "[FN] DIAL IN",     desc: "For when your brain checks out the moment someone picks up. Fill in your details, get a live list of what to cover. Your words, not a script. Check off beats as you go, add notes on the fly.", link: "dial_in.html", status: "Live", type: "ready", cat: "Ready for Use", offline: true },
-            { name: "[FN] ONE THING",   desc: "Write the one thing you need to do today. It fills the screen. You do it. That's the whole plan.", link: "one_thing.html", status: "Live", type: "ready", cat: "Ready for Use", offline: true },
-            { name: "[FN] SLEEP MATH",  desc: "Tell it when you need to wake up, it tells you when to go to sleep. Or flip it: sleeping now, here are your best alarm times. Based on 90-minute sleep cycles.", link: "sleep_math.html", status: "Live", type: "ready", cat: "Ready for Use", offline: true },
-            { name: "[FN] JUST PICK",   desc: "Can't decide? Add your options, spin the wheel, live with it. Add the same option twice to give it better odds.", link: "just_pick.html", status: "Live", type: "ready", cat: "Ready for Use", offline: true },
+            { name: "[FN] JPEGer",        desc: "You filled the PDF, but they want a JPEG. Privacy-first conversion.", link: "jpeger.html", status: "Live", type: "ready", cat: "Tools", offline: true },
+            { name: "[FN] PDFer",         desc: "Photos of receipts → redact what you want → one clean PDF. Simple and private.", link: "pdfer.html", status: "Live", type: "ready", cat: "Tools", offline: true },
+            { name: "[FN] HOW LONG?",     desc: "You measured it. You forgot it. You measured it again. This is the notebook that fixes that.", link: "how_long.html", status: "Live", type: "ready", cat: "Tools", offline: true },
+            { name: "[FN] HOW MUCH?",     desc: "Type a number, type a unit, get the answer. Doesn't need the internet. Doesn't need a tab.", link: "how_much.html", status: "Live", type: "ready", cat: "Tools", offline: true },
+            { name: "[FN] GET LOST",      desc: "A jogging route generator for when you need to run away, but just for a bit.", link: "get_lost.html", status: "Live", type: "ready", cat: "Tools", offline: false },
+            { name: "[FN] MAGNET STUDIO", desc: "Design picture tiles for visual schedules, PECS boards, or labels. Print them. Stick them. Done.", link: "magnet.html", status: "Live", type: "ready", cat: "Tools", offline: true },
+            { name: "[FN] COPY THAT",    desc: "Your info, one tap. Fill forms without retyping the same things seventeen times. Nothing leaves your browser.", link: "copy_that.html", status: "Live", type: "ready", cat: "Tools", offline: true },
+            { name: "[FN] FIDGET",       desc: "Pop bubbles, tap a counter, paint a grid, make ripples. Zero stakes. Close it the moment your name gets called.", link: "fidget.html", status: "Live", type: "ready", cat: "Tools", offline: true },
+            { name: "[FN] DIAL IN",     desc: "For when your brain checks out the moment someone picks up. Fill in your details, get a live list of what to cover. Your words, not a script. Check off beats as you go, add notes on the fly.", link: "dial_in.html", status: "Live", type: "ready", cat: "Tools", offline: true },
+            { name: "[FN] ONE THING",   desc: "Write the one thing you need to do today. It fills the screen. You do it. That's the whole plan.", link: "one_thing.html", status: "Live", type: "ready", cat: "Tools", offline: true },
+            { name: "[FN] SLEEP MATH",  desc: "Tell it when you need to wake up, it tells you when to go to sleep. Or flip it: sleeping now, here are your best alarm times. Based on 90-minute sleep cycles.", link: "sleep_math.html", status: "Live", type: "ready", cat: "Tools", offline: true },
+            { name: "[FN] JUST PICK",   desc: "Can't decide? Add your options, spin the wheel, live with it. Add the same option twice to give it better odds.", link: "just_pick.html", status: "Live", type: "ready", cat: "Tools", offline: true },
         ];
 
         /* --- TERMINAL EFFECT ENGINE --- */
@@ -230,7 +230,7 @@
         /* --- CORE RENDERER --- */
         function render() {
             const container = document.getElementById('main-content');
-            const categories = ["Ready for Use", "Under Construction"];
+            const categories = ["Tools", "Under Construction"];
             container.innerHTML = '';
 
             categories.forEach(cat => {
