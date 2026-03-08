@@ -346,6 +346,26 @@ body {
     flex-grow: 1;
 }
 
+/* Coming Soon cards */
+.card.card-coming-soon {
+    opacity: 0.45;
+    cursor: default;
+    pointer-events: none;
+}
+
+.coming-soon-badge {
+    font-size: 0.65rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-dim);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 3px 8px;
+    display: inline-block;
+    margin-top: 8px;
+}
+
 /* Connectivity disclaimer */
 .net-badge {
     font-size: 0.65rem;

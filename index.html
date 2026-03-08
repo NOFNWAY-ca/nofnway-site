@@ -57,13 +57,75 @@
                 <p class="hero-callout">You've been called lazy. Told to try harder.<br>
                 Handed "solutions" with seventeen steps and a subscription fee.</p>
                 <h1 class="hero-headline">This isn't that.</h1>
-                <p class="hero-sub">No accounts. No uploads. No cost. No <strong>[FN]</strong> strings.</p>
             </div>
         </div>
     </section>
 
     <div class="container">
-        <div id="main-content"></div>
+        <div id="main-content">
+            <h2 class="category-title">Tools</h2>
+            <div class="grid">
+                <a href="jpeger.html" class="card">
+                    <h3>[FN] JPEGer</h3>
+                    <p>Converts a PDF to one JPEG per page. Runs in your browser, nothing uploaded.</p>
+                </a>
+                <a href="pdfer.html" class="card">
+                    <h3>[FN] PDFer</h3>
+                    <p>Turns photos into a redacted, ready-to-send PDF. Nothing uploaded, nothing stored.</p>
+                </a>
+                <a href="how_long.html" class="card">
+                    <h3>[FN] HOW LONG?</h3>
+                    <p>Records your project measurements once so you stop going back to re-measure.</p>
+                </a>
+                <a href="how_much.html" class="card">
+                    <h3>[FN] HOW MUCH?</h3>
+                    <p>Type a number and a unit, get instant conversions for the whole category. Works offline.</p>
+                </a>
+                <a href="get_lost.html" class="card">
+                    <h3>[FN] GET LOST</h3>
+                    <p>A jogging route generator for when you need to run away, but just for a bit.</p>
+                    <div class="net-badge">Requires internet</div>
+                </a>
+                <a href="magnet.html" class="card">
+                    <h3>[FN] MAGNET STUDIO</h3>
+                    <p>Designs and prints picture tiles for visual schedules, PECS boards, and custom labels.</p>
+                </a>
+                <a href="copy_that.html" class="card">
+                    <h3>[FN] COPY THAT</h3>
+                    <p>Stores name, address, phone, and custom fields. One tap to copy any of them.</p>
+                </a>
+                <a href="fidget.html" class="card">
+                    <h3>[FN] FIDGET</h3>
+                    <p>Pop bubbles, tap a counter, paint a grid, make ripples. Zero stakes. Close it the moment your name gets called.</p>
+                </a>
+                <a href="dial_in.html" class="card">
+                    <h3>[FN] DIAL IN</h3>
+                    <p>Generates a live call checklist from your details. Cover what matters, not a script.</p>
+                </a>
+                <a href="one_thing.html" class="card">
+                    <h3>[FN] ONE THING</h3>
+                    <p>Write the one thing you need to do today. It fills the screen. You do it. That's the whole plan.</p>
+                </a>
+                <a href="sleep_math.html" class="card">
+                    <h3>[FN] SLEEP MATH</h3>
+                    <p>Calculates bedtimes and wake times based on 90-minute sleep cycles.</p>
+                </a>
+                <a href="just_pick.html" class="card">
+                    <h3>[FN] JUST PICK</h3>
+                    <p>Spins a wheel to choose from your options. Add the same option twice to weight it.</p>
+                </a>
+                <div class="card card-coming-soon">
+                    <h3>[FN] ???</h3>
+                    <p>Something's coming.</p>
+                    <div class="coming-soon-badge">Coming Soon</div>
+                </div>
+                <div class="card card-coming-soon">
+                    <h3>[FN] ???</h3>
+                    <p>So is something else.</p>
+                    <div class="coming-soon-badge">Coming Soon</div>
+                </div>
+            </div>
+        </div>
 
         <div class="games-section">
             <h2 class="category-title">Games</h2>
@@ -185,21 +247,6 @@
             }
         }
 
-        /* --- DATA MODEL --- */
-        const apps = [
-            { name: "[FN] JPEGer",        desc: "You filled the PDF, but they want a JPEG. Privacy-first conversion.", link: "jpeger.html", status: "Live", type: "ready", cat: "Tools", offline: true },
-            { name: "[FN] PDFer",         desc: "Photos of receipts → redact what you want → one clean PDF. Simple and private.", link: "pdfer.html", status: "Live", type: "ready", cat: "Tools", offline: true },
-            { name: "[FN] HOW LONG?",     desc: "You measured it. You forgot it. You measured it again. This is the notebook that fixes that.", link: "how_long.html", status: "Live", type: "ready", cat: "Tools", offline: true },
-            { name: "[FN] HOW MUCH?",     desc: "Type a number, type a unit, get the answer. Doesn't need the internet. Doesn't need a tab.", link: "how_much.html", status: "Live", type: "ready", cat: "Tools", offline: true },
-            { name: "[FN] GET LOST",      desc: "A jogging route generator for when you need to run away, but just for a bit.", link: "get_lost.html", status: "Live", type: "ready", cat: "Tools", offline: false },
-            { name: "[FN] MAGNET STUDIO", desc: "Design picture tiles for visual schedules, PECS boards, or labels. Print them. Stick them. Done.", link: "magnet.html", status: "Live", type: "ready", cat: "Tools", offline: true },
-            { name: "[FN] COPY THAT",    desc: "Your info, one tap. Fill forms without retyping the same things seventeen times. Nothing leaves your browser.", link: "copy_that.html", status: "Live", type: "ready", cat: "Tools", offline: true },
-            { name: "[FN] FIDGET",       desc: "Pop bubbles, tap a counter, paint a grid, make ripples. Zero stakes. Close it the moment your name gets called.", link: "fidget.html", status: "Live", type: "ready", cat: "Tools", offline: true },
-            { name: "[FN] DIAL IN",     desc: "For when your brain checks out the moment someone picks up. Fill in your details, get a live list of what to cover. Your words, not a script. Check off beats as you go, add notes on the fly.", link: "dial_in.html", status: "Live", type: "ready", cat: "Tools", offline: true },
-            { name: "[FN] ONE THING",   desc: "Write the one thing you need to do today. It fills the screen. You do it. That's the whole plan.", link: "one_thing.html", status: "Live", type: "ready", cat: "Tools", offline: true },
-            { name: "[FN] SLEEP MATH",  desc: "Tell it when you need to wake up, it tells you when to go to sleep. Or flip it: sleeping now, here are your best alarm times. Based on 90-minute sleep cycles.", link: "sleep_math.html", status: "Live", type: "ready", cat: "Tools", offline: true },
-            { name: "[FN] JUST PICK",   desc: "Can't decide? Add your options, spin the wheel, live with it. Add the same option twice to give it better odds.", link: "just_pick.html", status: "Live", type: "ready", cat: "Tools", offline: true },
-        ];
 
         /* --- TERMINAL EFFECT ENGINE --- */
         const slogans = [
@@ -240,36 +287,6 @@
             setTimeout(typeSlogan, speed);
         }
 
-        /* --- CORE RENDERER --- */
-        function render() {
-            const container = document.getElementById('main-content');
-            const categories = ["Tools", "Under Construction"];
-            container.innerHTML = '';
-
-            categories.forEach(cat => {
-                const filteredApps = apps.filter(a => a.cat === cat);
-                if (filteredApps.length === 0) return;
-
-                const section = document.createElement('div');
-                section.innerHTML = `<h2 class="category-title">${cat}</h2><div class="grid"></div>`;
-                const grid = section.querySelector('.grid');
-
-                filteredApps.forEach(app => {
-                    const netBadge = app.offline === false
-                        ? `<div class="net-badge">Requires internet</div>`
-                        : '';
-                    grid.innerHTML += `
-                        <a href="${app.link}" class="card">
-                            <h3>${app.name}</h3>
-                            <p>${app.desc}</p>
-                            ${netBadge}
-                        </a>`;
-                });
-                container.appendChild(section);
-            });
-        }
-
-        render();
         typeSlogan();
     </script>
 </body>
