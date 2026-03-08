@@ -43,6 +43,7 @@
         <div class="brand">NO<span>FN</span>WAY</div>
         <div class="nav-controls">
             <button class="share-btn" onclick="shareSite()">You know who might like this?</button>
+            <button class="bookmark-btn" onclick="showBookmarkTip(this)">Bookmark this</button>
             <button class="theme-toggle" onclick="toggleTheme()">Light/Dark Mode</button>
         </div>
     </nav>
@@ -155,6 +156,15 @@
             const next = current === 'dark' ? 'light' : 'dark';
             localStorage.setItem('nofnway-theme', next);
             document.documentElement.setAttribute('data-theme', next);
+        }
+
+        /* --- BOOKMARK TIP --- */
+        function showBookmarkTip(btn) {
+            const isMac = navigator.platform.toUpperCase().includes('MAC');
+            const key = isMac ? '⌘D' : 'Ctrl+D';
+            const orig = btn.textContent;
+            btn.textContent = `Press ${key}`;
+            setTimeout(() => { btn.textContent = orig; }, 3000);
         }
 
         /* --- SHARE LOGIC --- */
