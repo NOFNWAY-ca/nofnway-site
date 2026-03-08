@@ -4,7 +4,7 @@
    updates to users: e.g. nofnway-v1 → nofnway-v2
    ============================================================ */
 
-const CACHE_NAME = 'nofnway-v4';
+const CACHE_NAME = 'nofnway-v5';
 
 /* Pre-cached on install — all HTML, CSS, JS, SVG.
    Images are cached on first access (see fetch handler). */
@@ -99,26 +99,34 @@ self.addEventListener('fetch', event => {
         return;
     }
 
-    /* External requests (maps, routing APIs for get_lost): network only */
+    /* External requests: pass through */
     if (url.origin !== self.location.origin) return;
 
-    /* Same-origin: cache-first, falling back to network + cache */
+    /* HTML navigation: network-first so pages are always fresh.
+       Falls back to cache when offline, then to 404.html. */
+    if (request.mode === 'navigate') {
+        event.respondWith(
+            fetch(request).then(response => {
+                if (response.ok) {
+                    caches.open(CACHE_NAME).then(cache => cache.put(request, response.clone()));
+                }
+                return response;
+            }).catch(() =>
+                caches.match(request).then(cached => cached || caches.match('/404.html'))
+            )
+        );
+        return;
+    }
+
+    /* Static assets (CSS, JS, images): cache-first, network fallback */
     event.respondWith(
         caches.match(request).then(cached => {
             if (cached) return cached;
-
             return fetch(request).then(response => {
-                /* Cache valid responses (images included) */
                 if (response && response.ok) {
-                    const clone = response.clone();
-                    caches.open(CACHE_NAME).then(cache => cache.put(request, clone));
+                    caches.open(CACHE_NAME).then(cache => cache.put(request, response.clone()));
                 }
                 return response;
-            }).catch(() => {
-                /* Offline fallback for navigation requests */
-                if (request.mode === 'navigate') {
-                    return caches.match('/404.html');
-                }
             });
         })
     );
