@@ -49,8 +49,7 @@
         <div class="brand">NO<span>FN</span>WAY</div>
         <div class="nav-controls">
             <button class="share-btn" onclick="shareSite()">You know who might like this?</button>
-            <button class="bookmark-btn" onclick="showBookmarkTip(this)">I'll need this again</button>
-            <button class="theme-toggle" onclick="toggleTheme()">Light/Dark Mode</button>
+<button class="theme-toggle" onclick="toggleTheme()">Light/Dark Mode</button>
         </div>
     </nav>
 
@@ -192,6 +191,10 @@
                     <p>Anyone who's ever been excluded from "this is for people who..." ADHD, anxiety, autism, wired differently than the world expected. If you need help with the so called "easy" stuff, you're in the right place.</p>
                 </div>
                 <div class="faq-item">
+                    <h3>How do I get back to this?</h3>
+                    <p>Bookmark it. Ctrl+D on Windows or Linux, ⌘D on a Mac. On your phone, use Share → Add to Home Screen and it'll sit on your home screen like an app. No account, no install, just a shortcut.</p>
+                </div>
+                <div class="faq-item">
                     <h3>Is this actually finished?</h3>
                     <p>Some of it. I have an idea, I build it, break it, fix it, lather, rinse, repeat until it just works. Check back in, I'm not stopping.</p>
                 </div>
@@ -224,15 +227,6 @@
             const next = current === 'dark' ? 'light' : 'dark';
             localStorage.setItem('nofnway-theme', next);
             document.documentElement.setAttribute('data-theme', next);
-        }
-
-        /* --- BOOKMARK TIP --- */
-        function showBookmarkTip(btn) {
-            const isMac = navigator.platform.toUpperCase().includes('MAC');
-            const key = isMac ? '⌘D' : 'Ctrl+D';
-            const orig = btn.textContent;
-            btn.textContent = `Press ${key}`;
-            setTimeout(() => { btn.textContent = orig; }, 3000);
         }
 
         /* --- SHARE LOGIC --- */
