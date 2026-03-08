@@ -7,8 +7,10 @@
     <title>NOFNWAY™ | JPEGer</title>
     <meta name="description" content="Free, private PDF to JPEG converter. Works entirely in your browser. No uploads, no accounts, nothing leaves your device.">
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@900&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
-    <script src="vendor/pdf.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@900&family=Roboto:wght@400;700&display=swap" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@900&family=Roboto:wght@400;700&display=swap"></noscript>
     <script>document.documentElement.setAttribute('data-theme', localStorage.getItem('nofnway-theme') || 'light');</script>
     <link rel="stylesheet" href="theme.css">
     <style>
@@ -134,6 +136,7 @@
     <div id="previewGrid" class="preview-grid"></div>
 </main>
 
+<script src="vendor/pdf.min.js"></script>
 <script>
     const pdfjsLib = window['pdfjs-dist/build/pdf'];
     pdfjsLib.GlobalWorkerOptions.workerSrc = 'vendor/pdf.worker.min.js';
