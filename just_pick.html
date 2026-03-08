@@ -324,6 +324,7 @@
 </div>
 
 <main class="workspace">
+<h1 class="sr-only">[FN] Just Pick</h1>
 
     <div class="how-it-works" style="max-width:540px;width:100%;">
         <p><strong>Add your options. Spin. Live with it.</strong></p>
@@ -353,6 +354,7 @@
     <!-- Add option -->
     <div class="option-input-row">
         <input type="text" id="option-input" class="option-text-input"
+               aria-label="Add an option"
                placeholder="Add an option..."
                autocomplete="off" autocorrect="off" spellcheck="false"
                maxlength="64">
@@ -370,6 +372,7 @@
     <div class="save-row">
         <span class="save-label">Save list</span>
         <input type="text" id="save-name-input" class="save-name-input"
+               aria-label="List name"
                placeholder="List name..."
                autocomplete="off" maxlength="48">
         <button class="btn-save" onclick="saveList()">Save</button>
