@@ -6,6 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 - **Deploy:** `bash sync.sh` — runs `git add . && git commit -m "FN_SYNC" && git push -u origin main`
 - **Before deploying content changes:** bump `CACHE_NAME` in `sw.js` (e.g. `nofnway-v1` → `nofnway-v2`) so the service worker pushes fresh assets to all users
+- **After any `sw.js` change:** open the live site, go to DevTools → Application → Service Workers, confirm the new SW activated, then click at least two tool links to verify navigation works. Also check Application → Cache Storage to confirm cached responses are actual HTML. Do this before moving on.
 - **Preview locally:** Open any `.html` file directly in a browser — no build step needed
 - **No test suite, no linter, no package manager** — this is pure static HTML/CSS/JS
 
