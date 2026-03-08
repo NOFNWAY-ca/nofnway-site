@@ -251,15 +251,6 @@ body {
     text-shadow: 4px 4px 0 var(--brand);
 }
 
-.hero-sub {
-    font-size: 0.95rem;
-    color: #666;
-    letter-spacing: 0.3px;
-    margin: 0;
-}
-
-.hero-sub strong { color: var(--brand); }
-
 @media (max-width: 640px) {
     .hero-inner { flex-direction: column; gap: 32px; text-align: center; }
     .hero-headline { font-size: 3.5rem; }
