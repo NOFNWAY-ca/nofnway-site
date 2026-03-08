@@ -5,6 +5,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Commands
 
 - **Deploy:** `bash sync.sh` — runs `git add . && git commit -m "FN_SYNC" && git push -u origin main`
+- **Before deploying content changes:** bump `CACHE_NAME` in `sw.js` (e.g. `nofnway-v1` → `nofnway-v2`) so the service worker pushes fresh assets to all users
 - **Preview locally:** Open any `.html` file directly in a browser — no build step needed
 - **No test suite, no linter, no package manager** — this is pure static HTML/CSS/JS
 
@@ -25,7 +26,10 @@ Every page must include this in `<head>` before any stylesheet to prevent flash-
 Theme is toggled via `localStorage.setItem('nofnway-theme', next)` + `data-theme` attribute on `<html>`. Dark mode overrides are in `theme.css` under `[data-theme="dark"]`.
 
 ### Homepage (`index.html`)
-Tools are declared in a JS array (`apps[]`) and rendered by `render()` into `#main-content`. To add or change a tool, edit the `apps[]` array — don't touch the renderer. Fields: `name`, `desc`, `link`, `status`, `type` (`ready`/`working`/`dev`), `cat` (`"Ready for Use"` or `"Under Construction"`), `offline` (boolean).
+Tool cards are static HTML in `#main-content` — no JS renderer. To add a tool, add a `<a href="..." class="card">` block directly in the grid. Coming Soon placeholders use `<div class="card card-coming-soon">` (non-clickable, dimmed). The `GET LOST` card includes `<div class="net-badge">Requires internet</div>`.
+
+### Service Worker (`sw.js`)
+Registered on all 14 public pages via `<script>if ('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js').catch(() => {});</script>` in `<head>`. Pre-caches all HTML/CSS/JS/SVG on install; caches images on first access. Google Fonts use stale-while-revalidate. External API calls (get_lost routing) pass through unmodified. **Bump `CACHE_NAME` on every deploy** — this is the only mechanism for pushing updates to cached users.
 
 ### Privacy Shield Pattern
 Every tool page needs:
