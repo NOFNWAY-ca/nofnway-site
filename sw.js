@@ -4,7 +4,7 @@
    updates to users: e.g. nofnway-v1 → nofnway-v2
    ============================================================ */
 
-const CACHE_NAME = 'nofnway-v6';
+const CACHE_NAME = 'nofnway-v7';
 
 /* Pre-cached on install — all HTML, CSS, JS, SVG.
    Images are cached on first access (see fetch handler). */
@@ -48,7 +48,6 @@ const PRECACHE = [
     '/nofs-game/js/ui.js',
     '/nofs-game/js/main.js',
     '/nofs-game/js/ai.js',
-    '/nofs-game/js/sim.js',
     '/nofs-game/js/data/rules.js',
     '/nofs-game/js/data/tasks.js',
     '/nofs-game/js/print-builder.js',
