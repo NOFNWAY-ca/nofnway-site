@@ -925,7 +925,7 @@ function renderNotesTab() {
         empty.className = 'empty-state';
         const p = document.createElement('p');
         const hasAny = getAllNotes().length > 0;
-        p.textContent = hasAny ? 'No notes match those filters.' : 'Nothing here yet. That\'s temporary.';
+        p.textContent = hasAny ? 'No notes match those filters.' : 'Tell me something interesting.';
         empty.appendChild(p);
         container.appendChild(empty);
         return;
