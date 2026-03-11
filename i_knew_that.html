@@ -1,0 +1,1250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="author" content="Gerry McMahon">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>[FN] I KNEW THAT – Quiz & Card Deck Generator – NOFNWAY</title>
+    <meta name="description" content="Turn your notes into a self-judged quiz or a printable card deck. Import from Duly Noted or build a set here. Nothing leaves your browser.">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <script>document.documentElement.setAttribute('data-theme', localStorage.getItem('nofnway-theme') || 'light');</script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bangers&family=Montserrat:wght@900&family=Roboto:wght@400;700&display=swap" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bangers&family=Montserrat:wght@900&family=Roboto:wght@400;700&display=swap"></noscript>
+    <link rel="stylesheet" href="theme.css">
+    <style>
+        body { display:flex; flex-direction:column; min-height:100vh; margin:0; }
+        main { flex:1; }
+        .tool-wrap { max-width:780px; margin:0 auto; padding:0 20px 60px; }
+
+        /* Screen management */
+        .ikt-screen { display:none; }
+        .ikt-screen.active { display:block; }
+
+        /* Screen back nav */
+        .screen-back { margin:32px 0 20px; }
+        .btn-back { background:none; border:none; color:var(--text-dim); font-family:'Roboto',sans-serif; font-size:.85rem; font-weight:700; cursor:pointer; padding:0; text-transform:uppercase; letter-spacing:.5px; }
+        .btn-back:hover { color:var(--brand); }
+
+        /* ── Landing ── */
+        .landing-wrap { max-width:520px; margin:60px auto 0; text-align:center; }
+        .landing-title { font-family:'Montserrat',sans-serif; font-weight:900; color:var(--brand); font-size:2rem; margin:0 0 10px; }
+        .landing-sub { color:var(--text-dim); font-size:.95rem; margin:0 0 36px; line-height:1.55; }
+        .resume-notice { background:var(--card-bg); border:2px solid var(--border); border-radius:8px; padding:16px 20px; margin-bottom:28px; text-align:left; }
+        .resume-notice p { margin:0 0 12px; font-size:.9rem; color:var(--text-main); }
+        .resume-btns { display:flex; gap:10px; flex-wrap:wrap; }
+        .landing-btns { display:flex; flex-direction:column; gap:14px; }
+        .btn-landing { padding:20px 24px; background:var(--card-bg); border:2px solid var(--border); border-radius:8px; cursor:pointer; text-align:left; font-family:'Roboto',sans-serif; transition:border-color .15s,box-shadow .15s; box-shadow:3px 3px 0 var(--border); width:100%; }
+        .btn-landing:hover { border-color:var(--brand); box-shadow:3px 3px 0 var(--brand); }
+        .landing-btn-title { display:block; font-size:1.1rem; font-weight:700; color:var(--text-main); margin-bottom:4px; }
+        .landing-btn-sub { display:block; font-size:.85rem; color:var(--text-dim); }
+
+        /* ── Shared form styles ── */
+        .form-group { margin-bottom:16px; }
+        .form-label { display:block; font-size:.78rem; font-weight:700; text-transform:uppercase; letter-spacing:.5px; color:var(--text-dim); margin-bottom:5px; }
+        .form-input, .form-textarea { width:100%; padding:10px 12px; background:var(--card-bg); border:2px solid var(--border); border-radius:6px; font-family:'Roboto',sans-serif; font-size:.9rem; color:var(--text-main); box-sizing:border-box; transition:border-color .15s; }
+        .form-input:focus, .form-textarea:focus { outline:none; border-color:var(--brand); }
+        .form-textarea { resize:vertical; line-height:1.5; min-height:100px; }
+        .opt-label { font-size:.7rem; font-weight:400; text-transform:none; letter-spacing:0; margin-left:4px; opacity:.7; }
+        .required-star { color:var(--accent); margin-left:2px; }
+        .fields-row { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; }
+        @media(max-width:520px){ .fields-row { grid-template-columns:1fr; } }
+
+        /* Template picker */
+        .tpl-picker { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:24px; padding:14px; background:var(--card-bg); border:2px solid var(--border); border-radius:8px; }
+        .tpl-picker-label { width:100%; font-size:.78rem; font-weight:700; text-transform:uppercase; letter-spacing:.5px; color:var(--text-dim); margin-bottom:6px; }
+        .tpl-btn { padding:7px 14px; border:2px solid var(--border); border-radius:4px; background:var(--bg); color:var(--text-dim); font-family:'Roboto',sans-serif; font-weight:700; font-size:.82rem; cursor:pointer; transition:var(--transition,all .15s ease); text-transform:uppercase; letter-spacing:.4px; }
+        .tpl-btn.active { background:var(--accent); color:#fff; border-color:var(--accent); }
+        .tpl-btn:hover:not(.active) { border-color:var(--accent); color:var(--accent); }
+        .tpl-fields { display:none; }
+        .tpl-fields.active { display:block; }
+        .tpl-divider { border:none; border-top:2px solid var(--border); margin:20px 0; }
+        #ikt-common { display:none; }
+        #ikt-common.visible { display:block; }
+
+        /* Save row */
+        .save-row { display:flex; align-items:center; gap:14px; margin-top:16px; }
+        .btn-save { background:var(--brand); color:#fff; border:none; padding:10px 24px; font-family:'Roboto',sans-serif; font-weight:700; font-size:.9rem; text-transform:uppercase; letter-spacing:.5px; border-radius:4px; cursor:pointer; box-shadow:3px 3px 0 rgba(0,0,0,.15); transition:opacity .15s; }
+        .btn-save:hover { opacity:.88; }
+        .save-toast { font-size:.82rem; font-weight:700; color:#2E7D32; opacity:0; transition:opacity .3s; }
+        .save-toast.show { opacity:1; }
+
+        /* Notes summary */
+        .notes-summary { margin:28px 0 20px; border:2px solid var(--border); border-radius:8px; overflow:hidden; }
+        .notes-summary summary { padding:12px 16px; cursor:pointer; font-size:.85rem; font-weight:700; text-transform:uppercase; letter-spacing:.5px; color:var(--text-dim); background:var(--card-bg); list-style:none; display:flex; align-items:center; justify-content:space-between; }
+        .notes-summary summary::-webkit-details-marker { display:none; }
+        .notes-summary summary::after { content:'▾'; font-size:.9rem; }
+        details[open] summary::after { content:'▴'; }
+        .notes-list-inner { padding:8px 0; }
+        .note-row { display:flex; align-items:center; gap:10px; padding:8px 16px; border-bottom:1px solid var(--border); font-size:.87rem; }
+        .note-row:last-child { border-bottom:none; }
+        .note-row-subject { font-size:.72rem; font-weight:700; text-transform:uppercase; color:var(--brand); flex-shrink:0; }
+        .note-row-title { flex:1; color:var(--text-main); min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+        .note-row-delete { background:none; border:none; color:var(--text-dim); cursor:pointer; font-size:1rem; padding:0 4px; flex-shrink:0; line-height:1; }
+        .note-row-delete:hover { color:var(--accent); }
+        .empty-msg { color:var(--text-dim); font-size:.9rem; padding:20px 0; }
+
+        /* Entry actions bar */
+        .entry-actions { display:flex; gap:10px; flex-wrap:wrap; margin-top:8px; padding-top:20px; border-top:2px solid var(--border); }
+        .btn-primary { padding:10px 22px; background:var(--brand); color:#fff; border:none; border-radius:4px; font-family:'Roboto',sans-serif; font-weight:700; font-size:.88rem; text-transform:uppercase; letter-spacing:.5px; cursor:pointer; box-shadow:3px 3px 0 rgba(0,0,0,.15); transition:opacity .15s; }
+        .btn-primary:hover { opacity:.88; }
+        .btn-secondary { padding:10px 22px; background:var(--card-bg); border:2px solid var(--brand); color:var(--brand); border-radius:4px; font-family:'Roboto',sans-serif; font-weight:700; font-size:.88rem; text-transform:uppercase; letter-spacing:.5px; cursor:pointer; transition:var(--transition,all .15s ease); }
+        .btn-secondary:hover { background:var(--brand); color:#fff; }
+        .btn-ghost { padding:10px 22px; background:none; border:2px solid var(--border); color:var(--text-dim); border-radius:4px; font-family:'Roboto',sans-serif; font-weight:700; font-size:.88rem; text-transform:uppercase; letter-spacing:.5px; cursor:pointer; transition:var(--transition,all .15s ease); }
+        .btn-ghost:hover { border-color:var(--brand); color:var(--brand); }
+        .import-feedback { font-size:.82rem; font-weight:700; color:#2E7D32; align-self:center; }
+
+        /* ── Setup screens (quiz + card) ── */
+        .setup-section { margin-bottom:24px; }
+        .setup-section h3 { font-family:'Montserrat',sans-serif; font-weight:900; font-size:.85rem; text-transform:uppercase; letter-spacing:1px; color:var(--brand); margin:0 0 12px; }
+        .filter-row { display:flex; gap:8px; flex-wrap:wrap; }
+        .filter-select, .filter-tag-input { padding:8px 10px; background:var(--card-bg); border:2px solid var(--border); border-radius:6px; font-family:'Roboto',sans-serif; font-size:.87rem; color:var(--text-main); transition:border-color .15s; }
+        .filter-select:focus, .filter-tag-input:focus { outline:none; border-color:var(--brand); }
+        .filter-select { min-width:130px; }
+        .filter-tag-input { min-width:120px; flex:1; }
+        .available-line { font-size:.85rem; color:var(--text-dim); margin:10px 0 0; min-height:1.4em; }
+        .count-row { display:flex; align-items:center; gap:12px; flex-wrap:wrap; }
+        .count-input { width:80px; padding:8px 12px; background:var(--card-bg); border:2px solid var(--border); border-radius:6px; font-family:'Roboto',sans-serif; font-size:.9rem; color:var(--text-main); text-align:center; }
+        .count-input:focus { outline:none; border-color:var(--brand); }
+        .count-label { font-size:.87rem; color:var(--text-dim); font-weight:700; }
+        .repeat-prompt { background:var(--card-bg); border:2px solid var(--border); border-radius:8px; padding:14px 16px; margin-top:12px; }
+        .repeat-prompt p { font-size:.88rem; color:var(--text-main); margin:0 0 10px; }
+        .repeat-btns { display:flex; gap:8px; flex-wrap:wrap; }
+        .toggle-row { display:flex; align-items:center; gap:12px; }
+        .toggle-label { font-size:.87rem; color:var(--text-dim); font-weight:700; }
+        .toggle-check { width:18px; height:18px; accent-color:var(--brand); cursor:pointer; }
+        .start-row { margin-top:28px; }
+
+        /* Card size / paper pickers */
+        .picker-row { display:flex; gap:8px; flex-wrap:wrap; margin-bottom:4px; }
+        .picker-btn { padding:8px 18px; border:2px solid var(--border); border-radius:4px; background:var(--card-bg); color:var(--text-dim); font-family:'Roboto',sans-serif; font-weight:700; font-size:.82rem; cursor:pointer; text-transform:uppercase; letter-spacing:.4px; transition:var(--transition,all .15s ease); }
+        .picker-btn.active { background:var(--brand); color:#fff; border-color:var(--brand); }
+        .picker-btn:hover:not(.active) { border-color:var(--brand); color:var(--brand); }
+        .card-count-line { font-size:.82rem; color:var(--text-dim); margin-top:8px; }
+
+        /* ── Active quiz ── */
+        .quiz-wrap { max-width:580px; margin:0 auto; padding-top:32px; }
+        .quiz-progress { font-size:.85rem; font-weight:700; color:var(--text-dim); text-transform:uppercase; letter-spacing:.5px; margin-bottom:20px; }
+        .quiz-subject { display:inline-block; font-size:.72rem; font-weight:700; text-transform:uppercase; letter-spacing:.5px; color:#fff; background:var(--brand); padding:3px 10px; border-radius:10px; margin-bottom:14px; }
+        .quiz-question { font-family:'Montserrat',sans-serif; font-weight:900; font-size:1.35rem; color:var(--text-main); margin-bottom:24px; line-height:1.35; }
+        .quiz-answer-input { display:none; width:100%; padding:10px 12px; background:var(--card-bg); border:2px solid var(--border); border-radius:6px; font-family:'Roboto',sans-serif; font-size:.9rem; color:var(--text-main); box-sizing:border-box; margin-bottom:20px; }
+        @media(min-width:640px){ .quiz-answer-input { display:block; } }
+        .quiz-answer-input:focus { outline:none; border-color:var(--brand); }
+        .btn-show-answer { padding:12px 32px; background:var(--brand); color:#fff; border:none; border-radius:4px; font-family:'Roboto',sans-serif; font-weight:700; font-size:.95rem; text-transform:uppercase; letter-spacing:.5px; cursor:pointer; box-shadow:3px 3px 0 rgba(0,0,0,.15); transition:opacity .15s; }
+        .btn-show-answer:hover { opacity:.88; }
+        .quiz-reveal { margin-top:24px; }
+        .quiz-divider { text-align:center; font-size:1.1rem; color:var(--text-dim); padding:8px 0; border-top:2px solid var(--border); margin:0 0 12px; }
+        .quiz-you-said { font-size:.85rem; color:var(--text-dim); margin-bottom:10px; }
+        .quiz-you-said .qlabel { font-weight:700; }
+        .quiz-answer-text { font-size:1rem; color:var(--text-main); line-height:1.55; margin-bottom:24px; font-weight:700; }
+        .quiz-judgement { display:flex; gap:12px; flex-wrap:wrap; }
+        .btn-knew { padding:11px 28px; background:#2E7D32; color:#fff; border:none; border-radius:4px; font-family:'Roboto',sans-serif; font-weight:700; font-size:.95rem; text-transform:uppercase; cursor:pointer; box-shadow:3px 3px 0 rgba(0,0,0,.15); transition:opacity .15s; }
+        .btn-knew:hover { opacity:.88; }
+        .btn-not-yet { padding:11px 28px; background:none; border:2px solid var(--accent); color:var(--accent); border-radius:4px; font-family:'Roboto',sans-serif; font-weight:700; font-size:.95rem; text-transform:uppercase; cursor:pointer; transition:var(--transition,all .15s ease); }
+        .btn-not-yet:hover { background:var(--accent); color:#fff; }
+        .quiz-quit { margin-top:28px; }
+        .btn-quit-link { background:none; border:none; color:var(--text-dim); font-size:.8rem; cursor:pointer; text-decoration:underline; font-family:'Roboto',sans-serif; }
+        .btn-quit-link:hover { color:var(--accent); }
+
+        /* ── End screen ── */
+        .end-wrap { max-width:640px; margin:40px auto 0; }
+        .end-score { font-family:'Montserrat',sans-serif; font-weight:900; font-size:1.6rem; color:var(--brand); margin:0 0 8px; }
+        .end-message { font-size:1rem; color:var(--text-dim); margin:0 0 32px; }
+        .missed-header { font-family:'Montserrat',sans-serif; font-weight:900; font-size:.9rem; text-transform:uppercase; letter-spacing:1px; color:var(--text-main); margin:0 0 12px; padding-bottom:8px; border-bottom:2px solid var(--border); }
+        .missed-card-row { display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; padding:12px 0; border-bottom:1px solid var(--border); }
+        @media(max-width:600px){ .missed-card-row { grid-template-columns:1fr; } }
+        .missed-col-label { font-size:.7rem; font-weight:700; text-transform:uppercase; letter-spacing:.5px; color:var(--text-dim); margin-bottom:3px; }
+        .missed-col-value { font-size:.88rem; color:var(--text-main); line-height:1.4; }
+        .end-actions { display:flex; gap:12px; flex-wrap:wrap; margin-top:28px; }
+
+        /* Screen section title */
+        .screen-title { font-family:'Montserrat',sans-serif; font-weight:900; color:var(--brand); font-size:1.4rem; margin:0 0 6px; }
+        .screen-sub { color:var(--text-dim); font-size:.9rem; margin:0 0 24px; }
+    </style>
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://nofnway.ca/i_knew_that.html">
+    <meta property="og:title" content="[FN] I KNEW THAT – NOFNWAY">
+    <meta property="og:description" content="Turn your notes into a self-judged quiz or a printable card deck. Import from Duly Noted or build a set here.">
+    <meta property="og:site_name" content="NOFNWAY">
+    <meta property="og:image" content="https://nofnway.ca/og-image.png">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="[FN] I KNEW THAT – NOFNWAY">
+    <meta name="twitter:description" content="Turn your notes into a self-judged quiz or a printable card deck.">
+    <meta name="twitter:image" content="https://nofnway.ca/og-image.png">
+    <link rel="canonical" href="https://nofnway.ca/i_knew_that.html">
+    <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebApplication","name":"[FN] I KNEW THAT","url":"https://nofnway.ca/i_knew_that.html","description":"Turn your notes into a self-judged quiz or a printable card deck.","applicationCategory":"EducationApplication","operatingSystem":"Any","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"creator":{"@type":"Organization","name":"NOFNWAY","url":"https://nofnway.ca"}}</script>
+    <script>if ('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js').catch(() => {});</script>
+</head>
+<body>
+
+<nav class="navbar">
+    <a href="index.html" class="brand">NO<span>FN</span>WAY</a>
+    <div class="nav-controls">
+        <a href="index.html" class="share-btn" style="text-decoration:none;">← All Tools</a>
+        <button class="theme-toggle" onclick="toggleTheme()">Light/Dark</button>
+        <button class="privacy-btn" onclick="togglePrivacy()" aria-label="Privacy information">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                <text x="12" y="16.5" text-anchor="middle" font-size="9" fill="currentColor" stroke="none" font-weight="700" font-family="sans-serif">?</text>
+            </svg>
+        </button>
+    </div>
+</nav>
+
+<div class="privacy-panel" id="privacy-panel" hidden>
+    <div class="privacy-panel-hd">
+        <div class="privacy-panel-title">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            Privacy &amp; Data
+        </div>
+        <button class="privacy-close" onclick="document.getElementById('privacy-panel').hidden=true" aria-label="Close">&#x2715;</button>
+    </div>
+    <p>Notes you add or import are stored in this browser's local storage only — nothing is sent anywhere. To remove them, delete them in the notes list or clear site data in your browser settings.</p>
+</div>
+
+<main>
+<div class="tool-wrap">
+
+    <!-- ══ SCREEN: Landing ══ -->
+    <div class="ikt-screen active" id="screen-landing">
+        <div class="landing-wrap">
+            <div class="landing-title">[FN] I KNEW THAT</div>
+            <p class="landing-sub">Turn your notes into a quiz or a printable card deck. Self-judged. No pressure. Nothing leaves your browser.</p>
+
+            <div class="resume-notice" id="resume-notice" style="display:none">
+                <p>Looks like you were mid-quiz.</p>
+                <div class="resume-btns">
+                    <button class="btn-primary" onclick="resumeSession()">Resume</button>
+                    <button class="btn-ghost" onclick="clearSessionAndStart()">Start fresh</button>
+                </div>
+            </div>
+
+            <div class="landing-btns">
+                <button class="btn-landing" onclick="document.getElementById('load-input').click()">
+                    <span class="landing-btn-title">Load a note set</span>
+                    <span class="landing-btn-sub">Import a Duly Noted export (.json)</span>
+                </button>
+                <input type="file" id="load-input" accept=".json" onchange="loadNoteSet(this)" hidden>
+
+                <button class="btn-landing" onclick="showScreen('entry')">
+                    <span class="landing-btn-title">Build one here</span>
+                    <span class="landing-btn-sub">Add notes using templates, then quiz yourself</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ══ SCREEN: Entry ══ -->
+    <div class="ikt-screen" id="screen-entry">
+        <div class="screen-back"><button class="btn-back" onclick="showScreen('landing')">← Back</button></div>
+        <p class="screen-title">[FN] I KNEW THAT</p>
+        <p class="screen-sub">Add a note. Pick a template and fill it in. What you put in is what gets quizzed.</p>
+
+        <!-- Template picker -->
+        <div class="tpl-picker">
+            <div class="tpl-picker-label">Pick a template</div>
+            <button class="tpl-btn" data-tpl="thing"   onclick="selectTemplate('thing')">Thing</button>
+            <button class="tpl-btn" data-tpl="person"  onclick="selectTemplate('person')">Person</button>
+            <button class="tpl-btn" data-tpl="event"   onclick="selectTemplate('event')">Event</button>
+            <button class="tpl-btn" data-tpl="place"   onclick="selectTemplate('place')">Place</button>
+            <button class="tpl-btn" data-tpl="process" onclick="selectTemplate('process')">Process</button>
+            <button class="tpl-btn" data-tpl="qa"      onclick="selectTemplate('qa')">Q&amp;A</button>
+        </div>
+
+        <!-- Thing -->
+        <div class="tpl-fields" id="tpl-thing">
+            <div class="form-group"><label class="form-label" for="ikt-thing-name">Name<span class="required-star">*</span></label><input type="text" class="form-input" id="ikt-thing-name" placeholder="What is it called?"></div>
+            <div class="form-group"><label class="form-label" for="ikt-thing-def">What it is / means<span class="required-star">*</span></label><textarea class="form-textarea" id="ikt-thing-def" placeholder="Define it in your own words."></textarea></div>
+            <div class="form-group"><label class="form-label" for="ikt-thing-ex">Example <span class="opt-label">optional</span></label><textarea class="form-textarea" id="ikt-thing-ex" placeholder="An example that makes it click."></textarea></div>
+        </div>
+
+        <!-- Person -->
+        <div class="tpl-fields" id="tpl-person">
+            <div class="form-group"><label class="form-label" for="ikt-person-name">Name<span class="required-star">*</span></label><input type="text" class="form-input" id="ikt-person-name" placeholder="Who is this?"></div>
+            <div class="form-group"><label class="form-label" for="ikt-person-body">What they did<span class="required-star">*</span></label><textarea class="form-textarea" id="ikt-person-body" placeholder="What did they do or contribute?"></textarea></div>
+            <div class="form-group"><label class="form-label" for="ikt-person-when">When <span class="opt-label">optional</span></label><input type="text" class="form-input" id="ikt-person-when" placeholder="Year, era, or time period"></div>
+            <div class="form-group"><label class="form-label" for="ikt-person-why">Why it matters <span class="opt-label">optional</span></label><textarea class="form-textarea" id="ikt-person-why"></textarea></div>
+        </div>
+
+        <!-- Event -->
+        <div class="tpl-fields" id="tpl-event">
+            <div class="form-group"><label class="form-label" for="ikt-event-body">What happened<span class="required-star">*</span></label><textarea class="form-textarea" id="ikt-event-body" placeholder="Describe the event."></textarea></div>
+            <div class="form-group"><label class="form-label" for="ikt-event-when">When<span class="required-star">*</span></label><input type="text" class="form-input" id="ikt-event-when" placeholder="Date, year, or time period"></div>
+            <div class="form-group"><label class="form-label" for="ikt-event-where">Where <span class="opt-label">optional</span></label><input type="text" class="form-input" id="ikt-event-where" placeholder="Location"></div>
+            <div class="form-group"><label class="form-label" for="ikt-event-why">Why it matters <span class="opt-label">optional</span></label><textarea class="form-textarea" id="ikt-event-why"></textarea></div>
+        </div>
+
+        <!-- Place -->
+        <div class="tpl-fields" id="tpl-place">
+            <div class="form-group"><label class="form-label" for="ikt-place-name">Name<span class="required-star">*</span></label><input type="text" class="form-input" id="ikt-place-name" placeholder="What is it called?"></div>
+            <div class="form-group"><label class="form-label" for="ikt-place-def">Known for<span class="required-star">*</span></label><textarea class="form-textarea" id="ikt-place-def" placeholder="What makes this place notable?"></textarea></div>
+            <div class="form-group"><label class="form-label" for="ikt-place-where">Where it is <span class="opt-label">optional</span></label><input type="text" class="form-input" id="ikt-place-where" placeholder="Country, region, or coordinates"></div>
+        </div>
+
+        <!-- Process -->
+        <div class="tpl-fields" id="tpl-process">
+            <div class="form-group"><label class="form-label" for="ikt-proc-name">Name<span class="required-star">*</span></label><input type="text" class="form-input" id="ikt-proc-name" placeholder="What is this process called?"></div>
+            <div class="form-group"><label class="form-label" for="ikt-proc-body">How it works<span class="required-star">*</span></label><textarea class="form-textarea" id="ikt-proc-body" placeholder="Steps, stages, or mechanism."></textarea></div>
+            <div class="form-group"><label class="form-label" for="ikt-proc-why">Why it matters <span class="opt-label">optional</span></label><textarea class="form-textarea" id="ikt-proc-why"></textarea></div>
+        </div>
+
+        <!-- Q&A -->
+        <div class="tpl-fields" id="tpl-qa">
+            <div class="form-group"><label class="form-label" for="ikt-qa-q">Question<span class="required-star">*</span></label><textarea class="form-textarea" id="ikt-qa-q" placeholder="Ask the question."></textarea></div>
+            <div class="form-group"><label class="form-label" for="ikt-qa-a">Answer<span class="required-star">*</span></label><textarea class="form-textarea" id="ikt-qa-a" placeholder="Answer it."></textarea></div>
+        </div>
+
+        <!-- Common fields -->
+        <div id="ikt-common">
+            <hr class="tpl-divider">
+            <div class="form-group"><label class="form-label" for="ikt-subject">Subject<span class="required-star">*</span></label><input list="ikt-subjects-list" class="form-input" id="ikt-subject" placeholder="Biology, History..." autocomplete="off"></div>
+            <div class="fields-row">
+                <div class="form-group"><label class="form-label" for="ikt-category">Category <span class="opt-label">optional</span></label><input list="ikt-categories-list" class="form-input" id="ikt-category" placeholder="Chapter 4..." autocomplete="off"></div>
+                <div class="form-group"><label class="form-label" for="ikt-grade">Grade / Level <span class="opt-label">optional</span></label><input list="ikt-grades-list" class="form-input" id="ikt-grade" placeholder="Grade 10..." autocomplete="off"></div>
+                <div class="form-group"><label class="form-label" for="ikt-tags">Tags <span class="opt-label">optional</span></label><input type="text" class="form-input" id="ikt-tags" placeholder="exam, review"></div>
+            </div>
+            <div class="save-row">
+                <button class="btn-save" onclick="saveEntryNote()">Add Note</button>
+                <span class="save-toast" id="entry-toast"></span>
+            </div>
+        </div>
+
+        <!-- Notes list -->
+        <details class="notes-summary" id="notes-summary">
+            <summary>Notes you've added (<span id="notes-count">0</span>)</summary>
+            <div class="notes-list-inner" id="notes-list-inner"></div>
+        </details>
+
+        <p class="empty-msg" id="entry-empty-msg" style="display:none">Nothing to quiz you on yet. Add some notes or load a set.</p>
+
+        <!-- Actions -->
+        <div class="entry-actions">
+            <button class="btn-primary" onclick="goToQuizSetup()">Start a Quiz</button>
+            <button class="btn-secondary" onclick="goToCardSetup()">Make Cards</button>
+            <button class="btn-ghost" onclick="exportNotes()">Export Notes</button>
+            <button class="btn-ghost" onclick="document.getElementById('load-more-input').click()">Load more notes</button>
+            <input type="file" id="load-more-input" accept=".json" onchange="importNotes(this)" hidden>
+            <span class="import-feedback" id="import-feedback"></span>
+        </div>
+    </div>
+
+    <!-- ══ SCREEN: Quiz Setup ══ -->
+    <div class="ikt-screen" id="screen-quiz-setup">
+        <div class="screen-back"><button class="btn-back" onclick="showScreen('entry')">← Back</button></div>
+        <p class="screen-title">Quiz Setup</p>
+
+        <div class="setup-section">
+            <h3>Filter notes</h3>
+            <div class="filter-row">
+                <select class="filter-select" id="qs-subject" onchange="setQuizFilter('subject',this.value)"><option value="">All subjects</option></select>
+                <select class="filter-select" id="qs-category" onchange="setQuizFilter('category',this.value)"><option value="">All categories</option></select>
+                <select class="filter-select" id="qs-grade" onchange="setQuizFilter('gradeLevel',this.value)"><option value="">All grades</option></select>
+                <input type="text" class="filter-tag-input" id="qs-tags" placeholder="Tag filter" oninput="setQuizFilter('tags',this.value)">
+            </div>
+            <div class="available-line" id="qs-available"></div>
+        </div>
+
+        <div class="setup-section">
+            <h3>Questions</h3>
+            <div class="count-row">
+                <input type="number" class="count-input" id="qs-count" value="20" min="1" oninput="handleCountChange()">
+                <span class="count-label">questions</span>
+            </div>
+            <div class="repeat-prompt" id="qs-repeat-prompt" style="display:none">
+                <p id="qs-repeat-msg"></p>
+                <div class="repeat-btns">
+                    <button class="btn-secondary" onclick="startQuiz(true)">Repeat cards</button>
+                    <button class="btn-ghost" id="qs-just-do-btn" onclick="startQuiz(false)">Just do it</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="setup-section">
+            <h3>Scoring</h3>
+            <div class="toggle-row">
+                <input type="checkbox" class="toggle-check" id="qs-scoring" checked>
+                <label class="toggle-label" for="qs-scoring">Track score</label>
+            </div>
+        </div>
+
+        <div class="start-row">
+            <button class="btn-primary" id="qs-start-btn" onclick="startQuiz(false)">Start Quiz</button>
+        </div>
+    </div>
+
+    <!-- ══ SCREEN: Active Quiz ══ -->
+    <div class="ikt-screen" id="screen-quiz">
+        <div class="quiz-wrap">
+            <div class="quiz-progress" id="quiz-progress">1 of 20</div>
+            <div class="quiz-subject" id="quiz-subject"></div>
+            <div class="quiz-question" id="quiz-question"></div>
+            <input type="text" class="quiz-answer-input" id="quiz-answer-input" placeholder="Type your answer — optional" aria-label="Your answer">
+            <button class="btn-show-answer" id="btn-show-answer" onclick="showAnswer()">Show Answer</button>
+            <div class="quiz-reveal" id="quiz-reveal" hidden>
+                <div class="quiz-divider">◆</div>
+                <div class="quiz-you-said" id="quiz-you-said"></div>
+                <div class="quiz-answer-text" id="quiz-answer-text"></div>
+                <div class="quiz-judgement">
+                    <button class="btn-knew" onclick="judgeCard(true)">Knew it.</button>
+                    <button class="btn-not-yet" onclick="judgeCard(false)">Not yet.</button>
+                </div>
+            </div>
+            <div class="quiz-quit">
+                <button class="btn-quit-link" onclick="quitQuiz()">Quit quiz</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ══ SCREEN: End ══ -->
+    <div class="ikt-screen" id="screen-end">
+        <div class="end-wrap">
+            <div class="end-score" id="end-score"></div>
+            <div class="end-message" id="end-message"></div>
+
+            <div id="end-missed-section" hidden>
+                <div class="missed-header">Here's where it got away from you.</div>
+                <div id="end-missed-list"></div>
+            </div>
+
+            <div class="end-actions">
+                <button class="btn-primary" id="btn-replay-missed" onclick="replayMissed()" hidden>Replay missed cards</button>
+                <button class="btn-ghost" onclick="clearSessionAndStart()">Start over</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ══ SCREEN: Card Setup ══ -->
+    <div class="ikt-screen" id="screen-card-setup">
+        <div class="screen-back"><button class="btn-back" onclick="showScreen('entry')">← Back</button></div>
+        <p class="screen-title">Card Generator</p>
+        <p class="screen-sub">Print-and-play flash cards from your notes. Print the fronts, flip the paper, print the backs, cut.</p>
+
+        <div class="setup-section">
+            <h3>Filter notes</h3>
+            <div class="filter-row">
+                <select class="filter-select" id="cs-subject" onchange="setCardFilter('subject',this.value)"><option value="">All subjects</option></select>
+                <select class="filter-select" id="cs-category" onchange="setCardFilter('category',this.value)"><option value="">All categories</option></select>
+                <select class="filter-select" id="cs-grade" onchange="setCardFilter('gradeLevel',this.value)"><option value="">All grades</option></select>
+                <input type="text" class="filter-tag-input" id="cs-tags" placeholder="Tag filter" oninput="setCardFilter('tags',this.value)">
+            </div>
+            <div class="available-line" id="cs-available"></div>
+        </div>
+
+        <div class="setup-section">
+            <h3>Card size</h3>
+            <div class="picker-row">
+                <button class="picker-btn active" data-size="playing" onclick="setCardSize('playing', this)">Playing Card<br><small>2.5″ × 3.5″</small></button>
+                <button class="picker-btn" data-size="index" onclick="setCardSize('index', this)">Index Card<br><small>4″ × 6″</small></button>
+                <button class="picker-btn" data-size="half" onclick="setCardSize('half', this)">Half Page<br><small>5.5″ × 8.5″</small></button>
+            </div>
+        </div>
+
+        <div class="setup-section">
+            <h3>Paper size</h3>
+            <div class="picker-row">
+                <button class="picker-btn active" data-paper="letter" onclick="setPaperSize('letter', this)">Letter</button>
+                <button class="picker-btn" data-paper="a4" onclick="setPaperSize('a4', this)">A4</button>
+            </div>
+        </div>
+
+        <div class="setup-section">
+            <h3>Print mode</h3>
+            <div class="picker-row">
+                <button class="picker-btn active" data-mode="color" onclick="setPrintMode('color', this)">Full Color</button>
+                <button class="picker-btn" data-mode="inksaver" onclick="setPrintMode('inksaver', this)">Ink Saver</button>
+            </div>
+            <div class="card-count-line" id="cs-count-line"></div>
+        </div>
+
+        <div class="start-row">
+            <button class="btn-primary" id="cs-generate-btn" onclick="generateCards()">Generate Cards</button>
+        </div>
+    </div>
+
+</div><!-- .tool-wrap -->
+</main>
+
+<!-- Shared datalists -->
+<datalist id="ikt-subjects-list"></datalist>
+<datalist id="ikt-categories-list"></datalist>
+<datalist id="ikt-grades-list"></datalist>
+
+<script>
+/* ── Constants ── */
+const IKT_INDEX    = 'nofnway-ikt-index';
+const IKT_PREFIX   = 'nofnway-ikt-note-';
+const IKT_SUBJECTS = 'nofnway-ikt-subjects';
+const IKT_CATS     = 'nofnway-ikt-categories';
+const IKT_GRADES   = 'nofnway-ikt-grades';
+const IKT_SESSION  = 'nofnway-ikt-session';
+
+const SUBJECT_COLORS = ['#0057B8','#C62828','#2E7D32','#6A1B9A','#E65100','#00838F','#546E7A','#F9A825'];
+
+/* ── State ── */
+const state = {
+    activeTemplate: null,
+    quizFilters: { subject: '', category: '', gradeLevel: '', tags: '' },
+    cardFilters: { subject: '', category: '', gradeLevel: '', tags: '' },
+    cardSize: 'playing',
+    paperSize: 'letter',
+    printMode: 'color',
+    session: null
+};
+
+/* ── Utilities ── */
+function generateId() { return Date.now().toString(36) + Math.random().toString(36).slice(2); }
+function truncate(str, n) { if (!str) return ''; return str.length > n ? str.slice(0, n).trimEnd() + '…' : str; }
+function parseTags(str) { return str.split(',').map(t => t.trim()).filter(Boolean); }
+function toggleTheme() {
+    const next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    localStorage.setItem('nofnway-theme', next);
+    document.documentElement.setAttribute('data-theme', next);
+}
+function subjectColor(subject) {
+    if (!subject) return SUBJECT_COLORS[0];
+    let h = 0;
+    for (let i = 0; i < subject.length; i++) h = subject.charCodeAt(i) + ((h << 5) - h);
+    return SUBJECT_COLORS[Math.abs(h) % SUBJECT_COLORS.length];
+}
+function escHtml(s) {
+    return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function shuffleArray(arr) {
+    const a = [...arr];
+    for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+}
+
+/* ── Screen navigation ── */
+function showScreen(name) {
+    document.querySelectorAll('.ikt-screen').forEach(s => s.classList.remove('active'));
+    const scr = document.getElementById('screen-' + name);
+    if (scr) scr.classList.add('active');
+    window.scrollTo(0, 0);
+    if (name === 'quiz-setup')  populateSetupFilters('qs');
+    if (name === 'card-setup')  { populateSetupFilters('cs'); updateCardCountLine(); }
+    if (name === 'entry')       { renderNotesList(); updateEntryEmpty(); }
+}
+
+/* ── localStorage helpers ── */
+function getIndex() { try { return JSON.parse(localStorage.getItem(IKT_INDEX) || '[]'); } catch(e) { return []; } }
+function setIndex(arr) { try { localStorage.setItem(IKT_INDEX, JSON.stringify(arr)); } catch(e) {} }
+function getNote(id) { try { return JSON.parse(localStorage.getItem(IKT_PREFIX + id)); } catch(e) { return null; } }
+function saveNoteToStorage(note) {
+    const idx = getIndex();
+    if (!idx.includes(note.id)) { idx.push(note.id); setIndex(idx); }
+    try { localStorage.setItem(IKT_PREFIX + note.id, JSON.stringify(note)); } catch(e) {}
+}
+function deleteNoteFromStorage(id) {
+    setIndex(getIndex().filter(i => i !== id));
+    try { localStorage.removeItem(IKT_PREFIX + id); } catch(e) {}
+}
+function getAllNotes() { return getIndex().map(id => getNote(id)).filter(Boolean); }
+
+/* ── Known values ── */
+function getKnown(key) { try { return JSON.parse(localStorage.getItem(key) || '[]'); } catch(e) { return []; } }
+function updateKnown(key, value) {
+    if (!value || !value.trim()) return;
+    const list = getKnown(key);
+    if (!list.includes(value.trim())) { list.push(value.trim()); try { localStorage.setItem(key, JSON.stringify(list)); } catch(e) {} }
+}
+function updateDataLists() {
+    fillDataList('ikt-subjects-list',   getKnown(IKT_SUBJECTS));
+    fillDataList('ikt-categories-list', getKnown(IKT_CATS));
+    fillDataList('ikt-grades-list',     getKnown(IKT_GRADES));
+}
+function fillDataList(id, values) {
+    const dl = document.getElementById(id);
+    if (!dl) return;
+    while (dl.firstChild) dl.removeChild(dl.firstChild);
+    values.forEach(v => { const o = document.createElement('option'); o.value = v; dl.appendChild(o); });
+}
+
+/* ── Template selection ── */
+function selectTemplate(name) {
+    state.activeTemplate = name;
+    document.querySelectorAll('.tpl-fields').forEach(el => el.classList.remove('active'));
+    document.querySelectorAll('.tpl-btn').forEach(el => el.classList.remove('active'));
+    const fields = document.getElementById('tpl-' + name);
+    if (fields) fields.classList.add('active');
+    const btn = document.querySelector('.tpl-btn[data-tpl="' + name + '"]');
+    if (btn) btn.classList.add('active');
+    document.getElementById('ikt-common').classList.add('visible');
+}
+
+/* ── Form reading ── */
+function readEntryForm() {
+    const tpl = state.activeTemplate;
+    if (!tpl) return null;
+    const g = id => { const el = document.getElementById(id); return el ? el.value.trim() : ''; };
+    const f = { title:'', body:'', name:'', definition:'', example:'', when:'', where:'', why:'', question:'', answer:'', mainNotes:'', cueColumn:'', summary:'' };
+    if (tpl === 'thing')   { f.name = g('ikt-thing-name');  f.definition = g('ikt-thing-def');  f.example = g('ikt-thing-ex'); }
+    if (tpl === 'person')  { f.name = g('ikt-person-name'); f.body = g('ikt-person-body');       f.when = g('ikt-person-when'); f.why = g('ikt-person-why'); }
+    if (tpl === 'event')   { f.body = g('ikt-event-body');  f.when = g('ikt-event-when');        f.where = g('ikt-event-where'); f.why = g('ikt-event-why'); }
+    if (tpl === 'place')   { f.name = g('ikt-place-name');  f.definition = g('ikt-place-def');   f.where = g('ikt-place-where'); }
+    if (tpl === 'process') { f.name = g('ikt-proc-name');   f.body = g('ikt-proc-body');         f.why = g('ikt-proc-why'); }
+    if (tpl === 'qa')      { f.question = g('ikt-qa-q');    f.answer = g('ikt-qa-a'); }
+    return {
+        subject:    g('ikt-subject'),
+        category:   g('ikt-category'),
+        gradeLevel: g('ikt-grade'),
+        tags:       parseTags(g('ikt-tags')),
+        fields: f
+    };
+}
+
+function clearEntryForm() {
+    const ids = ['ikt-thing-name','ikt-thing-def','ikt-thing-ex','ikt-person-name','ikt-person-body','ikt-person-when','ikt-person-why','ikt-event-body','ikt-event-when','ikt-event-where','ikt-event-why','ikt-place-name','ikt-place-def','ikt-place-where','ikt-proc-name','ikt-proc-body','ikt-proc-why','ikt-qa-q','ikt-qa-a','ikt-subject','ikt-category','ikt-grade','ikt-tags'];
+    ids.forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+    document.querySelectorAll('.tpl-fields').forEach(el => el.classList.remove('active'));
+    document.querySelectorAll('.tpl-btn').forEach(el => el.classList.remove('active'));
+    document.getElementById('ikt-common').classList.remove('visible');
+    state.activeTemplate = null;
+}
+
+/* ── Save note ── */
+function saveEntryNote() {
+    const data = readEntryForm();
+    if (!data || !data.subject) { const el = document.getElementById('ikt-subject'); if (el) el.focus(); return; }
+
+    const note = {
+        id: generateId(),
+        mode: 'structured',
+        template: state.activeTemplate,
+        subject: data.subject,
+        category: data.category,
+        gradeLevel: data.gradeLevel,
+        tags: data.tags,
+        date: Date.now(),
+        fields: data.fields
+    };
+
+    saveNoteToStorage(note);
+    updateKnown(IKT_SUBJECTS, note.subject);
+    if (note.category)   updateKnown(IKT_CATS,   note.category);
+    if (note.gradeLevel) updateKnown(IKT_GRADES,  note.gradeLevel);
+    updateDataLists();
+    clearEntryForm();
+    renderNotesList();
+    updateEntryEmpty();
+    showToast('entry-toast', 'Added!');
+}
+
+/* ── Notes list ── */
+function renderNotesList() {
+    const notes = getAllNotes();
+    const countEl = document.getElementById('notes-count');
+    if (countEl) countEl.textContent = notes.length;
+    const inner = document.getElementById('notes-list-inner');
+    if (!inner) return;
+    while (inner.firstChild) inner.removeChild(inner.firstChild);
+    if (!notes.length) {
+        const p = document.createElement('p');
+        p.style.cssText = 'padding:12px 16px; font-size:.85rem; color:var(--text-dim); margin:0;';
+        p.textContent = 'No notes yet.';
+        inner.appendChild(p);
+        return;
+    }
+    notes.sort((a, b) => b.date - a.date).forEach(note => {
+        const row = document.createElement('div');
+        row.className = 'note-row';
+        const subj = document.createElement('span');
+        subj.className = 'note-row-subject';
+        subj.textContent = note.subject || '';
+        const title = document.createElement('span');
+        title.className = 'note-row-title';
+        title.textContent = getNoteTitle(note);
+        const del = document.createElement('button');
+        del.className = 'note-row-delete';
+        del.textContent = '×';
+        del.setAttribute('aria-label', 'Delete note');
+        del.addEventListener('click', () => { deleteNoteFromStorage(note.id); renderNotesList(); updateEntryEmpty(); });
+        row.appendChild(subj);
+        row.appendChild(title);
+        row.appendChild(del);
+        inner.appendChild(row);
+    });
+}
+
+function updateEntryEmpty() {
+    const el = document.getElementById('entry-empty-msg');
+    if (!el) return;
+    el.style.display = getAllNotes().length === 0 ? 'block' : 'none';
+}
+
+function getNoteTitle(note) {
+    const f = note.fields;
+    const t = note.template;
+    if (t === 'thing' || t === 'place' || t === 'process' || t === 'person') return f.name || '(unnamed)';
+    if (t === 'event')  return truncate(f.body, 50) || '(event)';
+    if (t === 'qa')     return truncate(f.question, 50) || '(question)';
+    if (note.mode === 'quick')   return f.title || truncate(f.body, 50) || '(note)';
+    if (note.mode === 'cornell') return note.subject || '(cornell)';
+    return '(note)';
+}
+
+/* ── Import / Export ── */
+function loadNoteSet(input) {
+    const file = input.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        try {
+            const incoming = JSON.parse(e.target.result);
+            if (!Array.isArray(incoming)) { alert('Unrecognised file format.'); return; }
+            const existing = new Set(getIndex());
+            let added = 0;
+            incoming.forEach(note => {
+                if (note && note.id && !existing.has(note.id)) {
+                    if (!note.fields) note.fields = {};
+                    saveNoteToStorage(note);
+                    if (note.subject)    updateKnown(IKT_SUBJECTS, note.subject);
+                    if (note.category)   updateKnown(IKT_CATS,     note.category);
+                    if (note.gradeLevel) updateKnown(IKT_GRADES,   note.gradeLevel);
+                    added++;
+                }
+            });
+            updateDataLists();
+            showScreen('entry');
+        } catch(err) { alert('Could not read that file.'); }
+        input.value = '';
+    };
+    reader.readAsText(file);
+}
+
+function importNotes(input) {
+    const file = input.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        try {
+            const incoming = JSON.parse(e.target.result);
+            if (!Array.isArray(incoming)) { showImportFeedback('Unrecognised file format.'); return; }
+            const existing = new Set(getIndex());
+            let added = 0;
+            incoming.forEach(note => {
+                if (note && note.id && !existing.has(note.id)) {
+                    if (!note.fields) note.fields = {};
+                    saveNoteToStorage(note);
+                    if (note.subject)    updateKnown(IKT_SUBJECTS, note.subject);
+                    if (note.category)   updateKnown(IKT_CATS,     note.category);
+                    if (note.gradeLevel) updateKnown(IKT_GRADES,   note.gradeLevel);
+                    added++;
+                }
+            });
+            updateDataLists();
+            renderNotesList();
+            updateEntryEmpty();
+            showImportFeedback(added + ' note' + (added !== 1 ? 's' : '') + ' added.');
+        } catch(err) { showImportFeedback('Could not read that file.'); }
+        input.value = '';
+    };
+    reader.readAsText(file);
+}
+
+function exportNotes() {
+    const notes = getAllNotes();
+    if (!notes.length) return;
+    const subject = state.cardFilters.subject || state.quizFilters.subject;
+    const filename = subject ? 'i-knew-that-' + subject.toLowerCase().replace(/\s+/g,'-') + '.json' : 'i-knew-that-all-notes.json';
+    const blob = new Blob([JSON.stringify(notes, null, 2)], { type: 'application/json' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(a.href);
+}
+
+function showImportFeedback(msg) {
+    const el = document.getElementById('import-feedback');
+    if (!el) return;
+    el.textContent = msg;
+    setTimeout(() => { el.textContent = ''; }, 4000);
+}
+
+/* ── Setup filter population ── */
+function populateSetupFilters(prefix) {
+    const notes = getAllNotes();
+    const subjects  = [...new Set(notes.map(n => n.subject).filter(Boolean))].sort();
+    const cats      = [...new Set(notes.map(n => n.category).filter(Boolean))].sort();
+    const grades    = [...new Set(notes.map(n => n.gradeLevel).filter(Boolean))].sort();
+    fillSetupSelect(prefix + '-subject',  subjects, 'All subjects');
+    fillSetupSelect(prefix + '-category', cats,     'All categories');
+    fillSetupSelect(prefix + '-grade',    grades,   'All grades');
+    if (prefix === 'qs') updateQuizAvailable();
+    if (prefix === 'cs') updateCardAvailable();
+}
+
+function fillSetupSelect(id, values, placeholder) {
+    const sel = document.getElementById(id);
+    if (!sel) return;
+    while (sel.firstChild) sel.removeChild(sel.firstChild);
+    const empty = document.createElement('option');
+    empty.value = '';
+    empty.textContent = placeholder;
+    sel.appendChild(empty);
+    values.forEach(v => {
+        const opt = document.createElement('option');
+        opt.value = v;
+        opt.textContent = v;
+        sel.appendChild(opt);
+    });
+}
+
+/* ── Quiz filters ── */
+function setQuizFilter(key, value) {
+    state.quizFilters[key] = value;
+    updateQuizAvailable();
+}
+
+function getFilteredNotes(filters) {
+    return getAllNotes().filter(note => {
+        if (filters.subject    && note.subject    !== filters.subject)    return false;
+        if (filters.category   && note.category   !== filters.category)   return false;
+        if (filters.gradeLevel && note.gradeLevel !== filters.gradeLevel) return false;
+        if (filters.tags) { const q = filters.tags.toLowerCase(); if (!note.tags.some(t => t.toLowerCase().includes(q))) return false; }
+        return true;
+    });
+}
+
+function updateQuizAvailable() {
+    const cards = generateQuizCards(getFilteredNotes(state.quizFilters));
+    const avEl = document.getElementById('qs-available');
+    const startBtn = document.getElementById('qs-start-btn');
+    const repeatPrompt = document.getElementById('qs-repeat-prompt');
+    if (!avEl) return;
+    if (cards.length === 0) {
+        avEl.textContent = 'No notes match those filters.';
+        if (startBtn) startBtn.disabled = true;
+        if (repeatPrompt) repeatPrompt.style.display = 'none';
+        return;
+    }
+    if (startBtn) startBtn.disabled = false;
+    const count = parseInt(document.getElementById('qs-count')?.value) || 20;
+    avEl.textContent = cards.length + ' card' + (cards.length !== 1 ? 's' : '') + ' available.';
+    if (count > cards.length) {
+        if (repeatPrompt) repeatPrompt.style.display = 'block';
+        const msgEl = document.getElementById('qs-repeat-msg');
+        if (msgEl) msgEl.textContent = 'You have ' + cards.length + ' card' + (cards.length !== 1 ? 's' : '') + '. Want to repeat cards to hit your number, or just do ' + cards.length + '?';
+        const justBtn = document.getElementById('qs-just-do-btn');
+        if (justBtn) justBtn.textContent = 'Just do ' + cards.length;
+    } else {
+        if (repeatPrompt) repeatPrompt.style.display = 'none';
+    }
+}
+
+function handleCountChange() { updateQuizAvailable(); }
+
+/* ── Quiz question generation ── */
+function generateQuizCards(notes) {
+    const cards = [];
+    notes.forEach(note => {
+        const f = note.fields;
+        const t = note.template;
+        const m = note.mode;
+        const meta = { subject: note.subject, noteId: note.id, template: t || m };
+        if (t === 'thing'   && f.name && f.definition) cards.push({ ...meta, q: 'What is ' + f.name + '?', a: f.definition });
+        if (t === 'person'  && f.name && f.body)       cards.push({ ...meta, q: 'What did ' + f.name + ' do?', a: f.body });
+        if (t === 'event'   && f.body && f.when) {
+            cards.push({ ...meta, q: 'When did "' + truncate(f.body, 50) + '" happen?', a: f.when });
+            cards.push({ ...meta, q: 'What happened in ' + f.when + '?', a: f.body });
+        }
+        if (t === 'place'   && f.name && f.definition) cards.push({ ...meta, q: 'What is ' + f.name + ' known for?', a: f.definition });
+        if (t === 'process' && f.name && f.body)       cards.push({ ...meta, q: 'How does ' + f.name + ' work?', a: f.body });
+        if (t === 'qa'      && f.question && f.answer) cards.push({ ...meta, q: f.question, a: f.answer });
+        if (m === 'quick' && f.body) {
+            const q = (f.title && f.title.trim()) ? f.title : f.body.split('\n')[0];
+            if (q && q !== f.body) cards.push({ ...meta, q, a: f.body });
+        }
+        if (m === 'cornell') {
+            if (f.cueColumn && (f.mainNotes || f.summary)) cards.push({ ...meta, q: f.cueColumn, a: f.mainNotes || f.summary });
+            else if (!f.cueColumn && f.summary) cards.push({ ...meta, q: 'Key points of: ' + note.subject, a: f.summary });
+        }
+    });
+    return cards;
+}
+
+function buildSessionCards(notes, count, repeat) {
+    let cards = shuffleArray(generateQuizCards(notes));
+    if (repeat && cards.length > 0) {
+        const base = [...cards];
+        while (cards.length < count) cards = cards.concat(shuffleArray(base));
+    }
+    return cards.slice(0, count);
+}
+
+/* ── Start quiz ── */
+function goToQuizSetup() { showScreen('quiz-setup'); }
+function goToCardSetup() { showScreen('card-setup'); }
+
+function startQuiz(repeat) {
+    const filtered = getFilteredNotes(state.quizFilters);
+    const count    = parseInt(document.getElementById('qs-count')?.value) || 20;
+    const scoring  = document.getElementById('qs-scoring')?.checked !== false;
+    const cards    = buildSessionCards(filtered, count, repeat);
+    if (!cards.length) return;
+    const session  = { cards, current: 0, scoring, totalRequested: count, startedAt: Date.now(), answered: [] };
+    state.session  = session;
+    saveSession();
+    showScreen('quiz');
+    renderQuizCard();
+}
+
+/* ── Session persistence ── */
+function saveSession() {
+    try { localStorage.setItem(IKT_SESSION, JSON.stringify(state.session)); } catch(e) {}
+}
+function loadSession() {
+    try { const s = localStorage.getItem(IKT_SESSION); return s ? JSON.parse(s) : null; } catch(e) { return null; }
+}
+function clearSession() {
+    try { localStorage.removeItem(IKT_SESSION); } catch(e) {}
+    state.session = null;
+}
+function clearSessionAndStart() { clearSession(); showScreen('landing'); }
+
+function resumeSession() {
+    if (!state.session) return;
+    showScreen('quiz');
+    renderQuizCard();
+}
+
+/* ── Active quiz ── */
+function renderQuizCard() {
+    const { session } = state;
+    if (!session) return;
+    if (session.current >= session.cards.length) { showEndScreen(); return; }
+    const card = session.cards[session.current];
+    const prog = document.getElementById('quiz-progress');
+    if (prog) prog.textContent = (session.current + 1) + ' of ' + session.cards.length;
+    const subj = document.getElementById('quiz-subject');
+    if (subj) subj.textContent = card.subject || '';
+    const qEl = document.getElementById('quiz-question');
+    if (qEl) qEl.textContent = card.q;
+    const input = document.getElementById('quiz-answer-input');
+    if (input) input.value = '';
+    const reveal = document.getElementById('quiz-reveal');
+    if (reveal) reveal.hidden = true;
+    const showBtn = document.getElementById('btn-show-answer');
+    if (showBtn) showBtn.hidden = false;
+    delete session.cards[session.current]._userAnswer;
+}
+
+function showAnswer() {
+    const { session } = state;
+    if (!session) return;
+    const card  = session.cards[session.current];
+    const input = document.getElementById('quiz-answer-input');
+    const userAnswer = input ? input.value.trim() : '';
+    session.cards[session.current]._userAnswer = userAnswer;
+
+    const showBtn = document.getElementById('btn-show-answer');
+    if (showBtn) showBtn.hidden = true;
+
+    const youSaidEl = document.getElementById('quiz-you-said');
+    if (youSaidEl) {
+        youSaidEl.textContent = '';
+        if (userAnswer) {
+            const lbl = document.createElement('span');
+            lbl.className = 'qlabel';
+            lbl.textContent = 'You said: ';
+            const val = document.createTextNode(userAnswer);
+            youSaidEl.appendChild(lbl);
+            youSaidEl.appendChild(val);
+        }
+    }
+
+    const ansEl = document.getElementById('quiz-answer-text');
+    if (ansEl) ansEl.textContent = card.a;
+
+    const reveal = document.getElementById('quiz-reveal');
+    if (reveal) reveal.hidden = false;
+}
+
+function judgeCard(knew) {
+    const { session } = state;
+    if (!session) return;
+    const userAnswer = session.cards[session.current]._userAnswer || '';
+    session.answered.push({ index: session.current, userAnswer, knew });
+    session.current++;
+    saveSession();
+    if (session.current >= session.cards.length) showEndScreen();
+    else renderQuizCard();
+}
+
+function quitQuiz() {
+    clearSession();
+    showScreen('landing');
+}
+
+/* ── End screen ── */
+function showEndScreen() {
+    const { session } = state;
+    if (!session) return;
+    const knew  = session.answered.filter(a => a.knew).length;
+    const total = session.answered.length;
+    const pct   = total > 0 ? knew / total : 0;
+
+    const scoreEl = document.getElementById('end-score');
+    if (scoreEl) scoreEl.textContent = session.scoring ? 'You got ' + knew + ' out of ' + total + '.' : '';
+    const msgEl = document.getElementById('end-message');
+    if (msgEl) msgEl.textContent = getResponseMessage(pct);
+
+    const missed = session.answered.filter(a => !a.knew);
+    const missedSection = document.getElementById('end-missed-section');
+    const missedList    = document.getElementById('end-missed-list');
+    const replayBtn     = document.getElementById('btn-replay-missed');
+
+    if (missedList) while (missedList.firstChild) missedList.removeChild(missedList.firstChild);
+
+    if (missed.length > 0 && missedSection && missedList) {
+        missedSection.hidden = false;
+        missed.forEach(m => {
+            const card = session.cards[m.index];
+            const row  = document.createElement('div');
+            row.className = 'missed-card-row';
+            [{ label: 'Question', value: card.q }, { label: 'You said', value: m.userAnswer || '—' }, { label: 'Answer', value: card.a }].forEach(col => {
+                const div = document.createElement('div');
+                const lbl = document.createElement('div');
+                lbl.className = 'missed-col-label';
+                lbl.textContent = col.label;
+                const val = document.createElement('div');
+                val.className = 'missed-col-value';
+                val.textContent = col.value;
+                div.appendChild(lbl);
+                div.appendChild(val);
+                row.appendChild(div);
+            });
+            missedList.appendChild(row);
+        });
+        if (replayBtn) replayBtn.hidden = false;
+    } else {
+        if (missedSection) missedSection.hidden = true;
+        if (replayBtn) replayBtn.hidden = true;
+    }
+
+    clearSession(); // done
+    showScreen('end');
+}
+
+function getResponseMessage(pct) {
+    if (pct === 1)   return 'You knew that. All of it.';
+    if (pct >= 0.8)  return 'You knew that. Most of it.';
+    if (pct >= 0.6)  return 'Solid. The gaps are getting smaller.';
+    if (pct >= 0.4)  return 'Some of it stuck. Review the rest.';
+    if (pct > 0)     return 'The review is the point. Start there.';
+    return 'Now you know what you\'re working on.';
+}
+
+function replayMissed() {
+    const saved = state.session;
+    if (!saved) return;
+    const missedCards = saved.answered.filter(a => !a.knew).map(m => saved.cards[m.index]);
+    const session = { cards: shuffleArray(missedCards), current: 0, scoring: saved.scoring, totalRequested: missedCards.length, startedAt: Date.now(), answered: [] };
+    state.session = session;
+    saveSession();
+    showScreen('quiz');
+    renderQuizCard();
+}
+
+/* ── Card setup ── */
+function setCardFilter(key, value) { state.cardFilters[key] = value; updateCardAvailable(); updateCardCountLine(); }
+function setCardSize(size, btn) { state.cardSize = size; document.querySelectorAll('[data-size]').forEach(b => b.classList.remove('active')); btn.classList.add('active'); updateCardCountLine(); }
+function setPaperSize(paper, btn) { state.paperSize = paper; document.querySelectorAll('[data-paper]').forEach(b => b.classList.remove('active')); btn.classList.add('active'); updateCardCountLine(); }
+function setPrintMode(mode, btn) { state.printMode = mode; document.querySelectorAll('[data-mode]').forEach(b => b.classList.remove('active')); btn.classList.add('active'); }
+
+function updateCardAvailable() {
+    const cards = generateQuizCards(getFilteredNotes(state.cardFilters));
+    const el = document.getElementById('cs-available');
+    if (el) el.textContent = cards.length + ' card' + (cards.length !== 1 ? 's' : '') + ' available.';
+    const genBtn = document.getElementById('cs-generate-btn');
+    if (genBtn) genBtn.disabled = cards.length === 0;
+}
+
+const PER_PAGE = { playing: 9, index: 2, half: 2 };
+
+function updateCardCountLine() {
+    const cards    = generateQuizCards(getFilteredNotes(state.cardFilters));
+    const perPage  = PER_PAGE[state.cardSize] || 9;
+    const total    = cards.length + 1; // +1 for rules card
+    const sheets   = Math.ceil(total / perPage);
+    const el = document.getElementById('cs-count-line');
+    if (el) el.textContent = cards.length + ' card' + (cards.length !== 1 ? 's' : '') + ' + 1 rules card — ' + sheets + ' front sheet' + (sheets !== 1 ? 's' : '') + ' + 1 back sheet.';
+}
+
+/* ── Card generator / print window ── */
+function generateCards() {
+    const notes = getFilteredNotes(state.cardFilters);
+    const cards = generateQuizCards(notes);
+    if (!cards.length) return;
+    const settings = { cardSize: state.cardSize, paperSize: state.paperSize, printMode: state.printMode };
+    openPrintWindow(cards, settings);
+}
+
+function openPrintWindow(cards, settings) {
+    const win = window.open('', '_blank');
+    if (!win) { alert('Pop-up was blocked. Please allow pop-ups for this site to generate cards.'); return; }
+    win.document.write(buildPrintHTML(cards, settings));
+    win.document.close();
+    setTimeout(() => { win.focus(); win.print(); }, 900);
+}
+
+function buildPrintHTML(cards, settings) {
+    const { cardSize, paperSize, printMode } = settings;
+    const ink = printMode === 'inksaver';
+    const perPage = PER_PAGE[cardSize] || 9;
+
+    const dim = {
+        playing: { w: '2.5in', h: '3.5in', cols: 3, fs: '7.5pt', lfs: '6pt' },
+        index:   { w: '4in',   h: '6in',   cols: 2, fs: '9pt',   lfs: '7.5pt' },
+        half:    { w: '8.5in', h: '5.5in', cols: 1, fs: '11pt',  lfs: '9pt' }
+    }[cardSize] || { w: '2.5in', h: '3.5in', cols: 3, fs: '7.5pt', lfs: '6pt' };
+
+    const pageW = paperSize === 'a4' ? '8.27in' : '8.5in';
+    const pageH = paperSize === 'a4' ? '11.69in' : '11in';
+
+    const allCards = [...cards, { isRules: true }];
+    let frontSheets = '';
+    for (let i = 0; i < allCards.length; i += perPage) {
+        const batch = allCards.slice(i, i + perPage);
+        while (batch.length < perPage) batch.push(null);
+        const html = batch.map(c => {
+            if (!c)           return '<div class="card card-blank"></div>';
+            if (c.isRules)    return buildRulesCardHTML(dim, ink);
+            return buildCardFrontHTML(c, dim, ink);
+        }).join('');
+        const pageNum = Math.floor(i / perPage) + 1;
+        const total   = Math.ceil(allCards.length / perPage);
+        frontSheets  += `<div class="page-label">Fronts — Sheet ${pageNum} of ${total}</div><div class="print-page front-page">${html}</div>`;
+    }
+
+    const subjects = [...new Set(cards.map(c => c.subject).filter(Boolean))];
+    const backColor = ink ? '#efefef' : (subjects.length === 1 ? subjectColor(subjects[0]) : '#0057B8');
+    const backs = Array(perPage).fill(0).map(() => buildCardBackHTML(dim, ink, backColor)).join('');
+    const backSheet = `<div class="page-label">Backs — print this side after flipping</div><div class="print-page back-page">${backs}</div>`;
+
+    const css = buildPrintCSS(dim, pageW, pageH, ink, backColor);
+
+    return `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>I KNEW THAT — Card Deck</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@900&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+<style>${css}</style></head><body>
+<div class="print-instructions"><h2>Ready to print</h2><ol><li>Print this page (Ctrl+P / Cmd+P).</li><li>Set paper size to ${paperSize === 'a4' ? 'A4' : 'Letter'}. Turn on <strong>Background graphics</strong>.</li><li>Print the <strong>front sheets first</strong>.</li><li>Flip the printed stack and feed it back into the printer.</li><li>Print the <strong>back sheet</strong>.</li><li>Cut the cards.</li></ol></div>
+${frontSheets}${backSheet}
+</body></html>`;
+}
+
+function buildCardFrontHTML(card, dim, ink) {
+    const color = ink ? '#cccccc' : subjectColor(card.subject || '');
+    const badge = getTemplateBadge(card.template);
+    return `<div class="card">
+        <div class="card-top-bar" style="background:${color}"></div>
+        <div class="card-inner">
+            <div class="card-badge">${escHtml(badge)}</div>
+            <div class="card-question">${escHtml(card.q)}</div>
+            <div class="card-divider">◆</div>
+            <div class="card-answer">${escHtml(card.a)}</div>
+            <div class="card-footer">${escHtml(card.subject || '')}</div>
+        </div>
+    </div>`;
+}
+
+function buildCardBackHTML(dim, ink, backColor) {
+    return `<div class="card card-back" style="background:${backColor}">
+        <div class="back-pattern"></div>
+        <div class="back-content">
+            <div class="back-diamond">◆</div>
+            <div class="back-brand">NOFNWAY</div>
+        </div>
+    </div>`;
+}
+
+function buildRulesCardHTML(dim, ink) {
+    const color = ink ? '#cccccc' : '#0057B8';
+    return `<div class="card rules-card">
+        <div class="card-top-bar" style="background:${color}"></div>
+        <div class="card-inner">
+            <div class="rules-title">How to Play</div>
+            <div class="card-divider">◆</div>
+            <div class="rules-body">
+                Read the question.<br>Try to answer.<br>Flip to reveal.<br>
+                You call it: <strong>Knew it</strong> or <strong>Not yet.</strong><br><br>
+                <strong>Icons:</strong><br>
+                TH&nbsp;Thing &nbsp; PE&nbsp;Person &nbsp; EV&nbsp;Event<br>
+                PL&nbsp;Place &nbsp; PR&nbsp;Process &nbsp; QA&nbsp;Q&amp;A
+            </div>
+            <div class="card-footer">nofnway.ca</div>
+        </div>
+    </div>`;
+}
+
+function buildPrintCSS(dim, pageW, pageH, ink, backColor) {
+    return `
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:#d8d8d8;font-family:'Roboto',sans-serif;}
+.print-instructions{max-width:540px;margin:30px auto;padding:20px 24px;background:white;border-radius:8px;box-shadow:0 2px 10px rgba(0,0,0,.15);font-size:13px;line-height:1.7;color:#333;}
+.print-instructions h2{font-size:15px;margin-bottom:10px;color:#0057B8;font-family:'Montserrat',sans-serif;}
+.print-instructions ol{padding-left:18px;}
+.page-label{text-align:center;font-family:sans-serif;font-size:10px;color:#888;margin:10px 0 4px;font-weight:700;text-transform:uppercase;letter-spacing:1px;}
+.print-page{width:${pageW};min-height:${pageH};background:white;margin:0 auto 40px;padding:0.3in;display:grid;grid-template-columns:repeat(${dim.cols},${dim.w});gap:0.1in;align-content:start;box-shadow:0 2px 12px rgba(0,0,0,.2);}
+.card{width:${dim.w};height:${dim.h};border:1px solid #ccc;border-radius:3px;overflow:hidden;display:flex;flex-direction:column;background:${ink?'#fff':'#fff'};font-size:${dim.fs};}
+.card-blank{border:1px dashed #e0e0e0;background:transparent;}
+.card-top-bar{height:7px;flex-shrink:0;}
+.card-inner{flex:1;padding:6px 8px;display:flex;flex-direction:column;position:relative;}
+.card-badge{position:absolute;top:4px;right:5px;font-size:5.5pt;font-weight:700;color:#aaa;text-transform:uppercase;letter-spacing:.5px;}
+.card-question{font-weight:700;flex:1;display:flex;align-items:flex-start;line-height:1.3;padding-right:18px;color:${ink?'#000':'#111'};}
+.card-divider{text-align:center;color:${ink?'#aaa':'#ccc'};padding:3px 0;border-top:1px solid ${ink?'#ccc':'#eee'};margin:3px 0;flex-shrink:0;font-size:7pt;}
+.card-answer{flex:1;line-height:1.35;color:${ink?'#222':'#333'};display:flex;align-items:flex-start;}
+.card-footer{font-size:5pt;color:#bbb;text-align:right;padding-top:2px;flex-shrink:0;text-transform:uppercase;letter-spacing:.5px;}
+.card-back{position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center;}
+.back-pattern{position:absolute;inset:0;background:repeating-linear-gradient(-45deg,transparent 0 8px,rgba(0,0,0,0.07) 8px 9px);}
+.back-content{position:relative;z-index:1;text-align:center;color:${ink?'#444':'#fff'};}
+.back-diamond{font-size:${dim.w==='2.5in'?'1.8rem':'3rem'};margin-bottom:6px;opacity:.9;}
+.back-brand{font-family:'Montserrat',sans-serif;font-weight:900;font-size:${dim.w==='2.5in'?'5.5pt':'8pt'};letter-spacing:3px;text-transform:uppercase;opacity:.8;}
+.rules-title{font-family:'Montserrat',sans-serif;font-weight:900;font-size:${dim.lfs};text-transform:uppercase;letter-spacing:.8px;color:#0057B8;margin-bottom:3px;}
+.rules-body{font-size:${dim.lfs};color:#444;line-height:1.6;}
+@media print{
+  body{background:white;}
+  .print-instructions,.page-label{display:none;}
+  .print-page{width:${pageW};height:${pageH};margin:0;padding:0.3in;box-shadow:none;page-break-after:always;}
+}`;
+}
+
+function getTemplateBadge(t) {
+    return { thing:'TH', person:'PE', event:'EV', place:'PL', process:'PR', qa:'QA', quick:'QK', cornell:'CO' }[t] || '??';
+}
+
+/* ── Toast ── */
+function showToast(id, msg) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.textContent = msg;
+    el.classList.add('show');
+    setTimeout(() => el.classList.remove('show'), 1800);
+}
+
+/* ── Init ── */
+(function init() {
+    updateDataLists();
+    const saved = loadSession();
+    if (saved && saved.cards && saved.current < saved.cards.length) {
+        state.session = saved;
+        document.getElementById('resume-notice').style.display = 'block';
+    }
+})();
+</script>
+
+<script src="privacy.js"></script>
+
+<footer style="text-align:center; padding:8px 20px; font-size:0.65rem; color:var(--text-dim); border-top:1px solid var(--border); flex-shrink:0;">
+    &copy; 2026 NOFNWAY. All Rights Reserved.
+</footer>
+
+</body>
+</html>
