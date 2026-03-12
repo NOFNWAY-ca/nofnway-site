@@ -40,6 +40,16 @@
         .landing-btn-title { display:block; font-size:1.1rem; font-weight:700; color:var(--text-main); margin-bottom:4px; }
         .landing-btn-sub { display:block; font-size:.85rem; color:var(--text-dim); }
 
+        /* ── Built-in set chooser ── */
+        .builtin-list { list-style:none; padding:0; margin:0 0 20px; display:flex; flex-direction:column; gap:10px; }
+        .builtin-item { display:flex; align-items:center; gap:12px; padding:14px 16px; background:var(--card-bg); border:2px solid var(--border); border-radius:8px; cursor:pointer; transition:border-color .15s,box-shadow .15s; }
+        .builtin-item:hover { border-color:var(--brand); box-shadow:3px 3px 0 var(--brand); }
+        .builtin-item input[type="checkbox"] { width:18px; height:18px; accent-color:var(--brand); flex-shrink:0; cursor:pointer; }
+        .builtin-item label { cursor:pointer; font-weight:700; flex:1; font-size:.95rem; }
+        .builtin-count { color:var(--text-dim); font-size:.82rem; white-space:nowrap; }
+        .builtin-feedback { font-size:.85rem; font-weight:700; color:var(--brand); min-height:1.2em; margin:0 0 14px; }
+        .builtin-feedback.builtin-error { color:var(--accent); }
+
         /* ── Shared form styles ── */
         .form-group { margin-bottom:16px; }
         .form-label { display:block; font-size:.78rem; font-weight:700; text-transform:uppercase; letter-spacing:.5px; color:var(--text-dim); margin-bottom:5px; }
@@ -231,8 +241,61 @@
                     <span class="landing-btn-title">Build one here</span>
                     <span class="landing-btn-sub">Add notes using templates, then quiz yourself</span>
                 </button>
+
+                <button class="btn-landing" onclick="showScreen('builtin')">
+                    <span class="landing-btn-title">Start with a built-in set</span>
+                    <span class="landing-btn-sub">Load NIMH notes on ADHD, Anxiety, ASD, Bipolar, Depression, OCD, or PTSD</span>
+                </button>
             </div>
         </div>
+    </div>
+
+    <!-- ══ SCREEN: Built-in set chooser ══ -->
+    <div class="ikt-screen" id="screen-builtin">
+        <div class="screen-back"><button class="btn-back" onclick="showScreen('landing')">← Back</button></div>
+        <p class="screen-title">[FN] I KNEW THAT</p>
+        <p class="screen-sub">Pick one or more condition sets to load. All facts sourced from NIMH public domain publications.</p>
+
+        <ul class="builtin-list">
+            <li class="builtin-item">
+                <input type="checkbox" class="builtin-check" id="bi-adhd" value="ADHD">
+                <label for="bi-adhd">ADHD</label>
+                <span class="builtin-count">15 notes</span>
+            </li>
+            <li class="builtin-item">
+                <input type="checkbox" class="builtin-check" id="bi-anxiety" value="Anxiety">
+                <label for="bi-anxiety">Anxiety</label>
+                <span class="builtin-count">15 notes</span>
+            </li>
+            <li class="builtin-item">
+                <input type="checkbox" class="builtin-check" id="bi-asd" value="ASD">
+                <label for="bi-asd">ASD</label>
+                <span class="builtin-count">15 notes</span>
+            </li>
+            <li class="builtin-item">
+                <input type="checkbox" class="builtin-check" id="bi-bipolar" value="Bipolar Disorder">
+                <label for="bi-bipolar">Bipolar Disorder</label>
+                <span class="builtin-count">15 notes</span>
+            </li>
+            <li class="builtin-item">
+                <input type="checkbox" class="builtin-check" id="bi-depression" value="Depression">
+                <label for="bi-depression">Depression</label>
+                <span class="builtin-count">15 notes</span>
+            </li>
+            <li class="builtin-item">
+                <input type="checkbox" class="builtin-check" id="bi-ocd" value="OCD">
+                <label for="bi-ocd">OCD</label>
+                <span class="builtin-count">15 notes</span>
+            </li>
+            <li class="builtin-item">
+                <input type="checkbox" class="builtin-check" id="bi-ptsd" value="PTSD">
+                <label for="bi-ptsd">PTSD</label>
+                <span class="builtin-count">15 notes</span>
+            </li>
+        </ul>
+
+        <div class="builtin-feedback" id="builtin-feedback"></div>
+        <button class="btn-primary" id="builtin-load-btn" onclick="loadBuiltinSets()">Load selected →</button>
     </div>
 
     <!-- ══ SCREEN: Entry ══ -->
@@ -744,6 +807,65 @@ function importNotes(input) {
         input.value = '';
     };
     reader.readAsText(file);
+}
+
+/* ── Built-in seed sets ── */
+const SEED_FILES = {
+    'ADHD':             '/seed-data/duly-noted-adhd.json',
+    'Anxiety':          '/seed-data/duly-noted-anxiety.json',
+    'ASD':              '/seed-data/duly-noted-asd.json',
+    'Bipolar Disorder': '/seed-data/duly-noted-bipolar.json',
+    'Depression':       '/seed-data/duly-noted-depression.json',
+    'OCD':              '/seed-data/duly-noted-ocd.json',
+    'PTSD':             '/seed-data/duly-noted-ptsd.json',
+};
+
+function loadBuiltinSets() {
+    const checked = Array.from(document.querySelectorAll('.builtin-check:checked'))
+                         .map(cb => cb.value);
+    if (!checked.length) { showBuiltinFeedback('Pick at least one.', true); return; }
+    const btn = document.getElementById('builtin-load-btn');
+    btn.disabled = true;
+    btn.textContent = 'Loading\u2026';
+    let totalAdded = 0;
+    Promise.all(checked.map(cond =>
+        fetch(SEED_FILES[cond])
+            .then(r => { if (!r.ok) throw new Error(); return r.json(); })
+            .then(notes => {
+                const existing = new Set(getIndex());
+                notes.forEach(note => {
+                    if (note && note.id && !existing.has(note.id)) {
+                        if (!note.fields) note.fields = {};
+                        saveNoteToStorage(note);
+                        if (note.subject)    updateKnown(IKT_SUBJECTS, note.subject);
+                        if (note.category)   updateKnown(IKT_CATS,     note.category);
+                        if (note.gradeLevel) updateKnown(IKT_GRADES,   note.gradeLevel);
+                        totalAdded++;
+                    }
+                });
+            })
+    )).then(() => {
+        updateDataLists();
+        const y = checked.length;
+        showBuiltinFeedback(
+            totalAdded + ' notes loaded across ' + y + ' condition' + (y !== 1 ? 's' : '') + '. You\'re ready.',
+            false
+        );
+        btn.disabled = false;
+        btn.textContent = 'Load selected \u2192';
+        setTimeout(() => showScreen('quiz-setup'), 1600);
+    }).catch(() => {
+        showBuiltinFeedback('Could not load the files. Check your connection.', true);
+        btn.disabled = false;
+        btn.textContent = 'Load selected \u2192';
+    });
+}
+
+function showBuiltinFeedback(msg, isError) {
+    const el = document.getElementById('builtin-feedback');
+    if (!el) return;
+    el.textContent = msg;
+    el.className = 'builtin-feedback' + (isError ? ' builtin-error' : '');
 }
 
 function exportNotes() {

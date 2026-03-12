@@ -446,7 +446,7 @@
         <div class="notes-actions-bar">
             <button class="btn-action" onclick="exportNotes()">Export Notes</button>
             <button class="btn-action" onclick="document.getElementById('import-input').click()">Load a note set</button>
-            <input type="file" id="import-input" accept=".json" onchange="importNotes(this)" hidden>
+            <input type="file" id="import-input" accept=".json" onchange="importNotes(this)" multiple hidden>
             <span class="import-feedback" id="import-feedback"></span>
         </div>
         <div class="filters-bar">
@@ -1127,37 +1127,43 @@ function exportNotes() {
     URL.revokeObjectURL(a.href);
 }
 
-/* ── Import ── */
+/* ── Import (supports multiple files) ── */
 function importNotes(input) {
-    const file = input.files[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = function(e) {
-        try {
-            const incoming = JSON.parse(e.target.result);
-            if (!Array.isArray(incoming)) {
-                showImportFeedback('Unrecognised file format.');
-                return;
-            }
-            const existingIds = new Set(getIndex());
-            let added = 0;
-            incoming.forEach(note => {
-                if (note && note.id && !existingIds.has(note.id)) {
-                    // Ensure fields object exists
-                    if (!note.fields) note.fields = {};
-                    saveNoteToStorage(note);
-                    added++;
-                }
-            });
+    const files = Array.from(input.files);
+    if (!files.length) return;
+    let totalAdded = 0;
+    let idx = 0;
+    function readNext() {
+        if (idx >= files.length) {
+            input.value = '';
             updateDataLists();
-            showImportFeedback(added + ' note' + (added !== 1 ? 's' : '') + ' added to your collection.');
             if (state.activeTab === 'notes') renderNotesTab();
-        } catch(err) {
-            showImportFeedback('Could not read that file.');
+            const n = files.length;
+            showImportFeedback(totalAdded + ' note' + (totalAdded !== 1 ? 's' : '') +
+                ' added from ' + n + ' file' + (n !== 1 ? 's' : '') + '.');
+            return;
         }
-        input.value = '';
-    };
-    reader.readAsText(file);
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            try {
+                const incoming = JSON.parse(e.target.result);
+                if (Array.isArray(incoming)) {
+                    const existingIds = new Set(getIndex());
+                    incoming.forEach(note => {
+                        if (note && note.id && !existingIds.has(note.id)) {
+                            if (!note.fields) note.fields = {};
+                            saveNoteToStorage(note);
+                            totalAdded++;
+                        }
+                    });
+                }
+            } catch(err) { /* skip unreadable files */ }
+            idx++;
+            readNext();
+        };
+        reader.readAsText(files[idx]);
+    }
+    readNext();
 }
 
 function showImportFeedback(msg) {
