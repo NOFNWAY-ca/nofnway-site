@@ -362,5 +362,31 @@
       "cueColumn": "",
       "summary": ""
     }
+  },
+  {
+    "id": "seed-depression-015",
+    "mode": "structured",
+    "template": "qa",
+    "subject": "Depression",
+    "category": "Mental Health",
+    "gradeLevel": "Adult",
+    "tags": ["misconception", "myth", "facts"],
+    "date": "2026-03-12",
+    "source": "https://www.nimh.nih.gov/health/publications/depression",
+    "fields": {
+      "title": "",
+      "body": "",
+      "name": "",
+      "definition": "",
+      "example": "",
+      "when": "",
+      "where": "",
+      "why": "",
+      "question": "Is depression just sadness — can people choose to feel better or snap out of it?",
+      "answer": "No. NIMH states directly: \"Everyone feels sad or low sometimes, but these feelings usually pass. Depression is different.\" Clinical depression requires symptoms lasting most of the day, nearly every day, for at least two weeks, severe enough to interfere with daily functioning including work, sleep, and relationships. NIMH frames depression as a medical condition — not a mood, a character flaw, or a choice. The emphasis on diagnosable criteria, neurobiological factors, and required professional treatment makes clear that depression cannot be resolved through attitude adjustment or force of will.",
+      "mainNotes": "",
+      "cueColumn": "",
+      "summary": ""
+    }
   }
 ]

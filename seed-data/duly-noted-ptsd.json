@@ -362,5 +362,31 @@
       "cueColumn": "",
       "summary": ""
     }
+  },
+  {
+    "id": "seed-ptsd-015",
+    "mode": "structured",
+    "template": "qa",
+    "subject": "PTSD",
+    "category": "Mental Health",
+    "gradeLevel": "Adult",
+    "tags": ["misconception", "myth", "facts"],
+    "date": "2026-03-12",
+    "source": "https://www.nimh.nih.gov/health/publications/post-traumatic-stress-disorder-ptsd",
+    "fields": {
+      "title": "",
+      "body": "",
+      "name": "",
+      "definition": "",
+      "example": "",
+      "when": "",
+      "where": "",
+      "why": "",
+      "question": "Does PTSD only affect combat veterans or military personnel?",
+      "answer": "No. NIMH explicitly states: \"Anyone can develop PTSD at any age. This includes combat veterans and people who have experienced or witnessed a physical or sexual assault, abuse, an accident, a disaster, a terror attack, or other serious events.\" NIMH also notes that learning about a close friend or relative's traumatic experience can cause PTSD. Approximately 6 out of every 100 people will experience PTSD during their lifetime — the vast majority are not veterans. Framing PTSD as exclusively a military condition delays recognition and treatment for the many civilians who need help.",
+      "mainNotes": "",
+      "cueColumn": "",
+      "summary": ""
+    }
   }
 ]

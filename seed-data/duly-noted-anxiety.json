@@ -362,5 +362,31 @@
       "cueColumn": "",
       "summary": ""
     }
+  },
+  {
+    "id": "seed-anxiety-015",
+    "mode": "structured",
+    "template": "qa",
+    "subject": "Anxiety",
+    "category": "Mental Health",
+    "gradeLevel": "Adult",
+    "tags": ["misconception", "myth", "facts"],
+    "date": "2026-03-12",
+    "source": "https://www.nimh.nih.gov/health/topics/anxiety-disorders",
+    "fields": {
+      "title": "",
+      "body": "",
+      "name": "",
+      "definition": "",
+      "example": "",
+      "when": "",
+      "where": "",
+      "why": "",
+      "question": "Can people with anxiety disorders just calm down or stop worrying?",
+      "answer": "No. NIMH distinguishes anxiety disorders from everyday worry by noting that clinical anxiety \"does not go away and can get worse over time\" — it is not situational or temporary. Anxiety disorders cause persistent fear and worry that is excessive relative to the actual situation and interferes with daily activities including work, school, and relationships. Telling someone with an anxiety disorder to \"just relax\" misunderstands the condition. Effective treatments exist — including cognitive behavioral therapy and medication — but recovery requires professional intervention, not willpower or perspective adjustment.",
+      "mainNotes": "",
+      "cueColumn": "",
+      "summary": ""
+    }
   }
 ]

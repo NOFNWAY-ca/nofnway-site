@@ -362,5 +362,31 @@
       "cueColumn": "",
       "summary": ""
     }
+  },
+  {
+    "id": "seed-bipolar-015",
+    "mode": "structured",
+    "template": "qa",
+    "subject": "Bipolar Disorder",
+    "category": "Mental Health",
+    "gradeLevel": "Adult",
+    "tags": ["misconception", "myth", "facts"],
+    "date": "2026-03-12",
+    "source": "https://www.nimh.nih.gov/health/publications/bipolar-disorder",
+    "fields": {
+      "title": "",
+      "body": "",
+      "name": "",
+      "definition": "",
+      "example": "",
+      "when": "",
+      "where": "",
+      "why": "",
+      "question": "Isn't bipolar disorder just having strong mood swings — doesn't everyone experience those?",
+      "answer": "No. NIMH directly addresses this: while \"everyone experiences ups and downs, with bipolar disorder, the range of mood changes can be extreme.\" Manic episodes involve markedly elevated or irritable mood and dramatically increased activity that lasts most of the day, every day — for at least 7 days, or any duration if hospitalization is required. These episodes cause changes in behavior that are noticeable to others and significantly impair functioning or require medical intervention. This is qualitatively different from the normal emotional variation everyone experiences. Bipolar disorder is a serious, treatable medical condition — not a personality trait or dramatic disposition.",
+      "mainNotes": "",
+      "cueColumn": "",
+      "summary": ""
+    }
   }
 ]

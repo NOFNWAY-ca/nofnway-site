@@ -362,5 +362,31 @@
       "cueColumn": "",
       "summary": ""
     }
+  },
+  {
+    "id": "seed-ocd-015",
+    "mode": "structured",
+    "template": "qa",
+    "subject": "OCD",
+    "category": "Mental Health",
+    "gradeLevel": "Adult",
+    "tags": ["misconception", "myth", "facts"],
+    "date": "2026-03-12",
+    "source": "https://www.nimh.nih.gov/health/publications/obsessive-compulsive-disorder-when-unwanted-thoughts-or-repetitive-behaviors-take-over",
+    "fields": {
+      "title": "",
+      "body": "",
+      "name": "",
+      "definition": "",
+      "example": "",
+      "when": "",
+      "where": "",
+      "why": "",
+      "question": "Does OCD just mean being very neat, organized, or detail-oriented?",
+      "answer": "No. NIMH defines OCD as \"a long-lasting disorder in which a person experiences uncontrollable and recurring thoughts (obsessions), engages in repetitive behaviors (compulsions), or both.\" The defining features are involuntary distress and impairment: people with OCD spend more than an hour per day on obsessions and compulsions and feel no pleasure from them — only temporary relief from anxiety. NIMH notes that \"not all repeated thoughts are obsessions, and not all rituals or habits are compulsions\" — the distinction is that OCD symptoms are uncontrollable, time-consuming, and cause genuine suffering. Preferring an organized desk is not OCD.",
+      "mainNotes": "",
+      "cueColumn": "",
+      "summary": ""
+    }
   }
 ]
