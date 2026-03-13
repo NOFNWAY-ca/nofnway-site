@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="author" content="Gerry McMahon">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>This Works at School — NOFNWAY</title>
+    <meta name="description" content="Free browser tools for teachers, parents, and students. Note-taking, self-quizzing, printable card games, and a classroom-ready game about neurodiversity. No accounts. Nothing uploaded.">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+
+    <!-- Open Graph / social sharing -->
+    <meta property="og:type"        content="website">
+    <meta property="og:url"         content="https://nofnway.ca/this_works_at_school">
+    <meta property="og:title"       content="This Works at School — NOFNWAY">
+    <meta property="og:description" content="Free browser tools for teachers, parents, and students. Note-taking, self-quizzing, printable card games, and a classroom-ready game about neurodiversity. No accounts. Nothing uploaded.">
+    <meta property="og:site_name"   content="NOFNWAY">
+    <meta property="og:image"       content="https://nofnway.ca/og-image.png">
+    <meta name="twitter:card"       content="summary_large_image">
+    <meta name="twitter:title"      content="This Works at School — NOFNWAY">
+    <meta name="twitter:description" content="Free browser tools for teachers, parents, and students. Note-taking, self-quizzing, printable card games, and a classroom-ready game about neurodiversity. No accounts. Nothing uploaded.">
+    <meta name="twitter:image"      content="https://nofnway.ca/og-image.png">
+    <link rel="canonical" href="https://nofnway.ca/this_works_at_school">
+
+    <script>document.documentElement.setAttribute('data-theme', localStorage.getItem('nofnway-theme') || 'light');</script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bangers&family=Montserrat:wght@900&family=Roboto:wght@400;700&display=swap" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bangers&family=Montserrat:wght@900&family=Roboto:wght@400;700&display=swap"></noscript>
+    <link rel="stylesheet" href="theme.css">
+    <script>if ('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js').catch(() => {});</script>
+
+    <style>
+        .page-intro {
+            max-width: 780px;
+            margin: 48px 0 8px;
+        }
+        .page-heading {
+            font-family: 'Bangers', cursive;
+            font-size: 3.2rem;
+            letter-spacing: 3px;
+            line-height: 1.1;
+            color: var(--text-main);
+            text-shadow: 3px 3px 0 var(--brand);
+            margin: 0 0 20px;
+        }
+        .page-intro > p {
+            font-size: 1.05rem;
+            line-height: 1.75;
+            color: var(--text-dim);
+            margin: 0;
+        }
+        .prose-section {
+            max-width: 780px;
+            margin-bottom: 44px;
+        }
+        .prose-section p {
+            font-size: 1rem;
+            line-height: 1.75;
+            color: var(--text-dim);
+            margin: 0 0 14px;
+        }
+        .prose-section p:last-of-type {
+            margin-bottom: 0;
+        }
+        .tool-link {
+            display: inline-block;
+            margin-top: 18px;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 900;
+            font-size: 0.8rem;
+            text-decoration: none;
+            color: var(--brand);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 2px solid var(--brand);
+            padding-bottom: 2px;
+        }
+        .tool-link:hover { opacity: 0.7; }
+        @media (max-width: 600px) {
+            .page-heading { font-size: 2.4rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <a href="index" class="brand">NO<span>FN</span>WAY</a>
+        <div class="nav-controls">
+            <button class="theme-toggle" onclick="toggleTheme()">Light/Dark Mode</button>
+        </div>
+    </nav>
+
+    <div class="container">
+
+        <div class="page-intro">
+            <h1 class="page-heading">This Works at School</h1>
+            <p>These tools were built for people whose brains don't always cooperate with the way things are usually done. That includes a lot of classrooms. If you're a teacher, a parent, or anyone trying to help a kid learn without making it harder than it needs to be, there's something here for you.</p>
+        </div>
+
+        <h2 class="category-title">[FN] Duly Noted</h2>
+        <div class="prose-section">
+            <p>Note-taking is hard when your brain won't slow down enough to organize what it's capturing. Duly Noted gives students a structure to drop into instead of a blank page to fill. Quick capture for random thoughts, structured templates for deliberate study, Cornell format for active note-taking during class.</p>
+            <p>Teachers can build a complete note set, export it as a single file, and share it with an entire class by email. Students import it in a few steps. No accounts, no shared logins, no platform to manage. The notes live in the student's browser and nowhere else.</p>
+            <a href="duly_noted" class="tool-link">→ Open [FN] Duly Noted</a>
+        </div>
+
+        <h2 class="category-title">[FN] I Knew That</h2>
+        <div class="prose-section">
+            <p>Turns any note set into a quiz or a printable card game. Students can load the built-in mental health note sets, quiz themselves on screen, or print a deck to cut out and play at home or in class.</p>
+            <p>For teachers, the pipeline is straightforward: build notes in Duly Noted, export them as a file, and share it with your class however you normally share things. Students import it in a few steps. The card game works without screens, without internet, without anything except a printed sheet and scissors. A study tool that works away from a computer is a study tool that actually gets used.</p>
+            <a href="i_knew_that" class="tool-link">→ Open [FN] I Knew That</a>
+        </div>
+
+        <h2 class="category-title">No Fs to Give</h2>
+        <div class="prose-section">
+            <p>A card game about what it actually costs to get through an ordinary day. Players draw energy cards, match them to tasks, and try not to burn out — with eight conditions that change the rules. ADHD, anxiety, autism, depression, OCD, PTSD, bipolar, and neurotypical are all playable.</p>
+            <p>It's a practical, low-pressure way to open a conversation about neurodiversity in a classroom. Nobody has to disclose anything. The game makes the point without anyone having to make it.</p>
+            <p>Free to play in any browser. Print and play version coming.</p>
+            <a href="nofs-game/" class="tool-link">→ Play No Fs to Give</a>
+        </div>
+
+        <h2 class="category-title">The questions worth asking</h2>
+        <div class="faq-grid">
+            <div class="faq-item">
+                <h3>Do students need accounts?</h3>
+                <p>No. Nothing requires a login, an email address, or any personal information at any point.</p>
+            </div>
+            <div class="faq-item">
+                <h3>Does it work on school computers?</h3>
+                <p>Yes. Everything runs in any modern browser. Nothing needs to be installed. No administrator permissions required.</p>
+            </div>
+            <div class="faq-item">
+                <h3>What happens to student data?</h3>
+                <p>Nothing, because there isn't any. Notes and quiz results stay in the student's own browser. Nothing is uploaded, transmitted, or stored anywhere else.</p>
+            </div>
+            <div class="faq-item">
+                <h3>Can I build something and share it with my whole class?</h3>
+                <p>Yes. Build a note set in Duly Noted, use the export function to save it as a file, and share that file however you normally share things with your class — email, Google Classroom, a shared drive. Students import it in a few steps.</p>
+            </div>
+            <div class="faq-item">
+                <h3>Is the content appropriate for students?</h3>
+                <p>The built-in mental health note sets are sourced from reputable public health organizations. The content is factual, plain-language, and written for general audiences. Teachers can review any note set before sharing it.</p>
+            </div>
+        </div>
+
+        <h2 class="category-title">About the mental health content</h2>
+        <div class="prose-section">
+            <p>The built-in note sets cover ADHD, anxiety, autism spectrum disorder, bipolar disorder, depression, OCD, and PTSD. They exist because accurate information about these conditions is genuinely hard to find in a format that's useful for learning rather than just clinical reference.</p>
+            <p>A student who understands what ADHD actually is — not the stereotype, not the dismissal, but the real thing — is better equipped whether they have it themselves, know someone who does, or is just trying to understand why some days are harder than others.</p>
+            <p>The facts are sourced from reputable public health organizations. Source URLs are recorded on every note.</p>
+        </div>
+
+        <h2 class="category-title">Something specific in mind?</h2>
+        <div class="about-strip">
+            <p class="about-text">If you're thinking about something particular for your school or organization, get in touch. <a href="mailto:hello@nofnway.ca" style="color:var(--brand); font-weight:700;">hello@nofnway.ca</a></p>
+        </div>
+
+    </div>
+
+    <footer style="text-align:center; padding:8px 20px; font-size:0.65rem; color:var(--text-dim); border-top:1px solid var(--border); flex-shrink:0;">
+        <div class="footer-share">
+            <button class="footer-share-btn" onclick="shareThisPage()">You know who might like this?</button>
+        </div>
+        &copy; 2026 NOFNWAY. All Rights Reserved.
+    </footer>
+
+    <script>
+        function toggleTheme() {
+            const next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+            localStorage.setItem('nofnway-theme', next);
+            document.documentElement.setAttribute('data-theme', next);
+        }
+        function shareThisPage() {
+            if (navigator.share) {
+                navigator.share({
+                    title: document.title,
+                    url: window.location.href
+                }).catch(() => {});
+            } else {
+                navigator.clipboard.writeText(window.location.href).then(() => {
+                    const btn = document.querySelector('.footer-share-btn');
+                    const orig = btn.textContent;
+                    btn.textContent = 'Link copied!';
+                    setTimeout(() => { btn.textContent = orig; }, 2000);
+                }).catch(() => {});
+            }
+        }
+    </script>
+
+</body>
+</html>
