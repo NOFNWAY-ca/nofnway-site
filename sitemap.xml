@@ -3,98 +3,112 @@
 
   <url>
     <loc>https://nofnway.ca/</loc>
-    <lastmod>2026-03-08</lastmod>
+    <lastmod>2026-03-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
 
   <url>
-    <loc>https://nofnway.ca/jpeger.html</loc>
-    <lastmod>2026-03-08</lastmod>
+    <loc>https://nofnway.ca/jpeger</loc>
+    <lastmod>2026-03-12</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
 
   <url>
-    <loc>https://nofnway.ca/pdfer.html</loc>
-    <lastmod>2026-03-08</lastmod>
+    <loc>https://nofnway.ca/pdfer</loc>
+    <lastmod>2026-03-12</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
 
   <url>
-    <loc>https://nofnway.ca/how_long.html</loc>
-    <lastmod>2026-03-08</lastmod>
+    <loc>https://nofnway.ca/how_long</loc>
+    <lastmod>2026-03-12</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
 
   <url>
-    <loc>https://nofnway.ca/how_much.html</loc>
-    <lastmod>2026-03-08</lastmod>
+    <loc>https://nofnway.ca/how_much</loc>
+    <lastmod>2026-03-12</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
 
   <url>
-    <loc>https://nofnway.ca/get_lost.html</loc>
-    <lastmod>2026-03-08</lastmod>
+    <loc>https://nofnway.ca/get_lost</loc>
+    <lastmod>2026-03-12</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
 
   <url>
-    <loc>https://nofnway.ca/magnet.html</loc>
-    <lastmod>2026-03-08</lastmod>
+    <loc>https://nofnway.ca/magnet</loc>
+    <lastmod>2026-03-12</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
 
   <url>
-    <loc>https://nofnway.ca/copy_that.html</loc>
-    <lastmod>2026-03-08</lastmod>
+    <loc>https://nofnway.ca/copy_that</loc>
+    <lastmod>2026-03-12</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
 
   <url>
-    <loc>https://nofnway.ca/fidget.html</loc>
-    <lastmod>2026-03-08</lastmod>
+    <loc>https://nofnway.ca/fidget</loc>
+    <lastmod>2026-03-12</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
 
   <url>
-    <loc>https://nofnway.ca/dial_in.html</loc>
-    <lastmod>2026-03-08</lastmod>
+    <loc>https://nofnway.ca/dial_in</loc>
+    <lastmod>2026-03-12</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
 
   <url>
-    <loc>https://nofnway.ca/one_thing.html</loc>
-    <lastmod>2026-03-08</lastmod>
+    <loc>https://nofnway.ca/one_thing</loc>
+    <lastmod>2026-03-12</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
 
   <url>
-    <loc>https://nofnway.ca/sleep_math.html</loc>
-    <lastmod>2026-03-08</lastmod>
+    <loc>https://nofnway.ca/sleep_math</loc>
+    <lastmod>2026-03-12</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
 
   <url>
-    <loc>https://nofnway.ca/just_pick.html</loc>
-    <lastmod>2026-03-08</lastmod>
+    <loc>https://nofnway.ca/just_pick</loc>
+    <lastmod>2026-03-12</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://nofnway.ca/duly_noted</loc>
+    <lastmod>2026-03-12</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://nofnway.ca/i_knew_that</loc>
+    <lastmod>2026-03-12</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
 
   <url>
     <loc>https://nofnway.ca/nofs-game/</loc>
-    <lastmod>2026-03-08</lastmod>
+    <lastmod>2026-03-12</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
