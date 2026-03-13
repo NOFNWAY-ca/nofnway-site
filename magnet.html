@@ -925,8 +925,28 @@
     updateMagnetSize();
     toggleHideEmpty();
 </script>
+<script>
+function shareThisPage() {
+    if (navigator.share) {
+        navigator.share({
+            title: document.title,
+            url: window.location.href
+        }).catch(() => {});
+    } else {
+        navigator.clipboard.writeText(window.location.href).then(() => {
+            const btn = document.querySelector('.footer-share-btn');
+            const orig = btn.textContent;
+            btn.textContent = 'Link copied!';
+            setTimeout(() => { btn.textContent = orig; }, 2000);
+        }).catch(() => {});
+    }
+}
+</script>
 <script src="privacy.js"></script>
 <footer style="text-align:center; padding:8px 20px; font-size:0.65rem; color:var(--text-dim); border-top:1px solid var(--border); flex-shrink:0;">
+    <div class="footer-share">
+        <button class="footer-share-btn" onclick="shareThisPage()">You know who might like this?</button>
+    </div>
     &copy; 2026 NOFNWAY. All Rights Reserved.
 </footer>
 </body>

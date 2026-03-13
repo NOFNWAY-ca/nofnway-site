@@ -774,3 +774,25 @@ footer {
         scroll-behavior: auto !important;
     }
 }
+
+/* ═══════════════════════════════════════
+   FOOTER SHARE
+═══════════════════════════════════════ */
+.footer-share {
+    margin-bottom: 12px;
+}
+.footer-share-btn {
+    background: none;
+    border: none;
+    color: var(--text-dim);
+    font-family: 'Roboto', sans-serif;
+    font-size: 0.8rem;
+    cursor: pointer;
+    padding: 0;
+    opacity: 0.7;
+    transition: opacity .15s;
+}
+.footer-share-btn:hover {
+    opacity: 1;
+    color: var(--brand);
+}
