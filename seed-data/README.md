@@ -4,7 +4,11 @@ Pre-built note sets for [FN] DULY NOTED (and the related [FN] I KNEW THAT quiz m
 
 ## Source Attribution
 
-All facts in these note sets are sourced from the **National Institute of Mental Health (NIMH)** at [nimh.nih.gov](https://www.nimh.nih.gov). As a U.S. government agency, NIMH content is in the public domain. Source URLs are recorded in each note object's `source` field.
+Facts in these note sets are sourced from the **Centre for Addiction and Mental Health (CAMH)** at [camh.ca](https://www.camh.ca) and the **National Institute of Mental Health (NIMH)** at [nimh.nih.gov](https://www.nimh.nih.gov). Most notes draw from both sources. All content is paraphrased, not quoted.
+
+Source URLs for each note are recorded in its `source` field. When a note draws from both CAMH and NIMH, URLs are separated by ` | `.
+
+CAMH is Canada's largest mental health and addiction teaching hospital. NIMH is a U.S. federal research agency. Neither organization has endorsed or reviewed these note sets.
 
 ## Included Files
 
@@ -13,12 +17,12 @@ All facts in these note sets are sourced from the **National Institute of Mental
 | `duly-noted-adhd.json` | Attention-Deficit/Hyperactivity Disorder (ADHD) |
 | `duly-noted-anxiety.json` | Anxiety Disorders (GAD, Panic Disorder, Social Anxiety, Specific Phobia) |
 | `duly-noted-asd.json` | Autism Spectrum Disorder (ASD) |
-| `duly-noted-bipolar.json` | Bipolar Disorder (Bipolar I, II, Cyclothymia) |
+| `duly-noted-bipolar.json` | Bipolar Disorder (Mania, Hypomania, Bipolar Depression, Mixed Episodes) |
 | `duly-noted-depression.json` | Depression (MDD, PDD, Postpartum, SAD) |
 | `duly-noted-ocd.json` | Obsessive-Compulsive Disorder (OCD) |
 | `duly-noted-ptsd.json` | Post-Traumatic Stress Disorder (PTSD) |
 
-Each file contains 14 notes covering: overview/definition, key subtypes, diagnostic criteria, treatments, prevalence statistics, and common misconceptions.
+Each file contains 14 notes covering: overview/definition, key subtypes or symptom clusters, diagnostic criteria, treatments, prevalence statistics, and common misconceptions.
 
 ## Note Format
 
@@ -33,8 +37,8 @@ Each file is a JSON array of note objects. Every note object has the following t
   "category": "Mental Health",
   "gradeLevel": "Adult",
   "tags": ["overview", "definition"],
-  "date": "2026-03-12",
-  "source": "https://www.nimh.nih.gov/...",
+  "date": "2026-03-13",
+  "source": "https://www.camh.ca/... | https://www.nimh.nih.gov/...",
   "fields": {
     "title": "",
     "body": "",

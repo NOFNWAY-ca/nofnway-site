@@ -49,7 +49,7 @@ Built by someone who spent 40 years being told to try harder before getting a di
 
 ## Site Structure
 
-**URL:** https://nofnway.ca  
+**URL:** https://nofnway.ca
 **Stack:** Plain HTML/CSS/JS. No frameworks. No build tools. Runs in the browser.
 
 ### Current Tools
@@ -67,17 +67,36 @@ Built by someone who spent 40 years being told to try harder before getting a di
 | [FN] ONE THING | one_thing.html | Full-screen single task focus |
 | [FN] SLEEP MATH | sleep_math.html | Bedtime/wake time calculator |
 | [FN] JUST PICK | just_pick.html | Weighted spin wheel |
+| [FN] DULY NOTED | duly_noted.html | Structured note-taking with export |
+| [FN] I KNEW THAT | i_knew_that.html | Quiz and printable card generator from notes |
 
 ### Current Games
 | Game | File | Description |
 |------|------|-------------|
 | NO Fs TO GIVE | nofs-game/index.html | Card game about energy management across 8 conditions |
 
+### Informational Pages
+| Page | File | Description |
+|------|------|-------------|
+| This Works at School | this_works_at_school.html | For teachers and parents — covers Duly Noted, I Knew That, and No Fs to Give |
+
+---
+
+## Seed Data
+
+Seven JSON note files live in `/seed-data/`. Each covers one mental health condition.
+
+**Primary source:** CAMH (camh.ca) — Canadian, politically insulated, aligns with NOFNWAY's Canadian identity. Rebuild in progress.
+**Secondary source:** NIMH may remain where CAMH doesn't cover something.
+**Previous primary source:** NIMH (US federal agency, subject to political restructuring — replaced 2026-03-13).
+
+**Status:** All seven files exist but are pending rebuild. Data structure is unchanged.
+
 ---
 
 ## Naming Convention
 
-Tools are named `[FN] ALLCAPS`. Short, punchy, says what it does. Slight attitude.  
+Tools are named `[FN] ALLCAPS`. Short, punchy, says what it does. Slight attitude.
 Examples: `[FN] JUST PICK`, `[FN] ONE THING`, `[FN] GET LOST`
 
 ---
@@ -105,10 +124,61 @@ Examples: `[FN] JUST PICK`, `[FN] ONE THING`, `[FN] GET LOST`
 > When something gets decided, log it here so it doesn't get re-litigated.
 
 - [2026-03-09] Using CONTEXT.md as the handoff layer between Claude chat (content) and Claude Code (implementation).
+- [2026-03-13] Seed data primary source changed from NIMH to CAMH. NIMH is a US federal agency under political restructuring; CAMH is Canadian and more stable.
 
 ---
 
 ## Current Status / Known Issues
 > Update this before switching between Claude chat and Claude Code.
 
-_Nothing logged yet._
+- Card generator backing sheet fix still outstanding (off-centre, pattern not filling page correctly)
+- Service worker precache still uses .html file paths -- functional but inconsistent with the extension-free navigation URLs now in use sitewide
+- Seed data rebuild (NIMH to CAMH) is next priority -- handle in a separate chat session
+- Google indexing in progress: 3 pages currently indexed (homepage, just_pick, just_pick.html duplicate); just_pick.html duplicate flagged for removal in Search Console
+
+---
+
+## Running Log
+
+### 2026-03-13
+
+**SEO and indexing:**
+- Discovered all tool pages were returning 308 redirects because GitHub Pages strips .html extensions by default
+- Removed .html extensions from all internal href links across all 18 files
+- Updated all canonical tags, og:url, and JSON-LD url fields to use extension-free URLs
+- Updated sitemap.xml to use extension-free URLs and added duly_noted and i_knew_that entries
+- Submitted updated sitemap to Google Search Console
+- Requested manual indexing for priority pages
+- Currently 3 pages indexed (homepage, just_pick, just_pick.html duplicate)
+- just_pick.html duplicate flagged for removal in Search Console
+- Service worker precache list still uses .html paths -- flagged for future fix
+
+**Seed data:**
+- All seven NIMH-sourced seed data JSON files reviewed
+- Decision made to rebuild seed data using CAMH (camh.ca) as primary source
+- Reason: NIMH is a US federal agency currently subject to political restructuring; CAMH is Canadian, politically insulated, and better aligned with NOFNWAY's Canadian identity
+- Myth-busting Q&A notes (seed-xxx-015) added to all seven files via previous prompt -- need to verify these are accurate against CAMH sources during rebuild
+- Rebuild is next priority, to be handled in a separate chat session
+
+**New pages:**
+- this_works_at_school.html created and live at /this_works_at_school
+- Covers Duly Noted, I Knew That, and No Fs to Give for teachers and parents
+- Added to sitemap.xml and sw.js precache
+- Card link added to index.html tools grid
+
+**Share functionality:**
+- shareThisPage() function and footer share button added to all tool pages and game pages
+- Uses navigator.share() on mobile, clipboard fallback on desktop
+- CSS added to theme.css
+
+**Card generator (i_knew_that.html):**
+- All six card types now rendering correctly
+- QK badge error fixed
+- Card layout grid fixed for efficient printing
+- Backing sheet still has issues -- off-centre, pattern not filling page correctly -- fix in progress
+
+**Reddit:**
+- Active on r/ExecutiveDysfunction, r/ADHD, r/ADHD_Programmers
+- Profile bio updated to: "Building free browser tools for brains that work differently. No accounts, no subscriptions, no strings. nofnway.ca"
+- Username: u/Objective_Value1537
+- Approach: genuine participation, site mentioned only when directly relevant
