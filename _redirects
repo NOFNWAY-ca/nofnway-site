@@ -1,0 +1,7 @@
+# Canonical URL redirects — processed by Cloudflare Pages in order, first match wins
+
+/index.html             /               301
+/index                  /               301
+/nofs-game/index.html   /nofs-game/     301
+/nofs-game/index        /nofs-game/     301
+/*.html                 /:splat         301

@@ -4,36 +4,34 @@
    updates to users: e.g. nofnway-v1 → nofnway-v2
    ============================================================ */
 
-const CACHE_NAME = 'nofnway-v21';
+const CACHE_NAME = 'nofnway-v22';
 
 /* Pre-cached on install — all HTML, CSS, JS, SVG.
    Images are cached on first access (see fetch handler). */
 const PRECACHE = [
     '/',
-    '/index.html',
-    '/404.html',
     '/theme.css',
     '/privacy.js',
     '/favicon.svg',
     '/og-image.svg',
     '/og-image.png',
 
-    /* Tool pages */
-    '/jpeger.html',
-    '/pdfer.html',
-    '/how_long.html',
-    '/how_much.html',
-    '/get_lost.html',
-    '/magnet.html',
-    '/copy_that.html',
-    '/fidget.html',
-    '/dial_in.html',
-    '/one_thing.html',
-    '/sleep_math.html',
-    '/just_pick.html',
-    '/duly_noted.html',
-    '/i_knew_that.html',
-    '/this_works_at_school.html',
+    /* Tool pages — extension-free (Cloudflare Pages serves these directly) */
+    '/jpeger',
+    '/pdfer',
+    '/how_long',
+    '/how_much',
+    '/get_lost',
+    '/magnet',
+    '/copy_that',
+    '/fidget',
+    '/dial_in',
+    '/one_thing',
+    '/sleep_math',
+    '/just_pick',
+    '/duly_noted',
+    '/i_knew_that',
+    '/this_works_at_school',
 
     /* Vendor libs */
     '/vendor/pdf.min.js',
@@ -41,10 +39,10 @@ const PRECACHE = [
     '/vendor/jspdf.umd.min.js',
 
     /* Game */
-    '/nofs-game/index.html',
-    '/nofs-game/card-sandbox.html',
-    '/nofs-game/print-layout.html',
-    '/nofs-game/rulebook.html',
+    '/nofs-game/',
+    '/nofs-game/card-sandbox',
+    '/nofs-game/print-layout',
+    '/nofs-game/rulebook',
     '/nofs-game/css/styles.css',
     '/nofs-game/css/print-styles.css',
     '/nofs-game/css/rulebook-styles.css',
@@ -115,7 +113,7 @@ self.addEventListener('fetch', event => {
                 }
                 return response;
             }).catch(() =>
-                caches.match(request).then(cached => cached || caches.match('/404.html'))
+                caches.match(request).then(cached => cached || caches.match('/'))
             )
         );
         return;
