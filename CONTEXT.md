@@ -90,7 +90,7 @@ Seven JSON note files live in `/seed-data/`. Each covers one mental health condi
 **Secondary source:** NIMH may remain where CAMH doesn't cover something.
 **Previous primary source:** NIMH (US federal agency, subject to political restructuring — replaced 2026-03-13).
 
-**Status:** All seven files exist but are pending rebuild. Data structure is unchanged.
+**Status:** Rebuild complete as of 2026-03-14. All seven files replaced with CAMH-sourced content. Data structure is unchanged.
 
 ---
 
@@ -133,7 +133,6 @@ Examples: `[FN] JUST PICK`, `[FN] ONE THING`, `[FN] GET LOST`
 
 - Card generator backing sheet fix still outstanding (off-centre, pattern not filling page correctly)
 - Service worker precache still uses .html file paths -- functional but inconsistent with the extension-free navigation URLs now in use sitewide
-- Seed data rebuild (NIMH to CAMH) is next priority -- handle in a separate chat session
 - Google indexing in progress: 3 pages currently indexed (homepage, just_pick, just_pick.html duplicate); just_pick.html duplicate flagged for removal in Search Console
 
 ---

@@ -85,7 +85,7 @@ function setupScreen() {
             </div>
 
             <div class="section-label">Choose your condition(s)</div>
-            <p class="conditions-note">These aren't clinical definitions. They're simplified game mechanics — a way to briefly experience the different rules a brain might be running, and to understand why some days cost more than others for some people. A window, not a diagnosis. Play as Neurotypical if you just want to learn the game.</p>
+            <p class="conditions-note">These aren't clinical definitions. They're simplified game mechanics. A way to briefly experience the different rules a brain might be running, and to understand why some days cost more than others for some people. A window, not a diagnosis. Neurotypical is the standard mode because that's how I was measured. Fewer people fall under this category than you'd think.</p>
             <div class="condition-select">
                 ${conditionCards}
             </div>
