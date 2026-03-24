@@ -68,7 +68,28 @@
 
     <div class="container">
         <div id="main-content">
-            <h2 class="category-title">Tools</h2>
+
+            <h2 class="category-title">Get Things Done</h2>
+            <div class="grid">
+                <a href="one_thing" class="card">
+                    <h3>[FN] ONE THING</h3>
+                    <p>Write the one thing you need to do today. It fills the screen. You do it. That's the whole plan.</p>
+                </a>
+                <a href="dial_in" class="card">
+                    <h3>[FN] DIAL IN</h3>
+                    <p>Generates a live call checklist from your details. Cover what matters, not a script.</p>
+                </a>
+                <a href="just_pick" class="card">
+                    <h3>[FN] JUST PICK</h3>
+                    <p>Spins a wheel to choose from your options. Add the same option twice to weight it.</p>
+                </a>
+                <a href="copy_that" class="card">
+                    <h3>[FN] COPY THAT</h3>
+                    <p>Stores name, address, phone, and custom fields. One tap to copy any of them.</p>
+                </a>
+            </div>
+
+            <h2 class="category-title">Documents &amp; Files</h2>
             <div class="grid">
                 <a href="jpeger" class="card">
                     <h3>[FN] JPEGer</h3>
@@ -78,47 +99,26 @@
                     <h3>[FN] PDFer</h3>
                     <p>Turns photos into a redacted, ready-to-send PDF. Nothing uploaded, nothing stored.</p>
                 </a>
-                <a href="how_long" class="card">
-                    <h3>[FN] HOW LONG?</h3>
-                    <p>Records your project measurements once so you stop going back to re-measure.</p>
-                </a>
+            </div>
+
+            <h2 class="category-title">Measure &amp; Calculate</h2>
+            <div class="grid">
                 <a href="how_much" class="card">
                     <h3>[FN] HOW MUCH?</h3>
                     <p>Type a number and a unit, get instant conversions for the whole category. Works offline.</p>
                 </a>
-                <a href="get_lost" class="card">
-                    <h3>[FN] GET LOST</h3>
-                    <p>A jogging route generator for when you need to run away, but just for a bit.</p>
-                    <div class="net-badge">Requires internet</div>
-                </a>
-                <a href="magnet" class="card">
-                    <h3>[FN] MAGNET STUDIO</h3>
-                    <p>Designs and prints picture tiles for visual schedules, PECS boards, and custom labels.</p>
-                </a>
-                <a href="copy_that" class="card">
-                    <h3>[FN] COPY THAT</h3>
-                    <p>Stores name, address, phone, and custom fields. One tap to copy any of them.</p>
-                </a>
-                <a href="fidget" class="card">
-                    <h3>[FN] FIDGET</h3>
-                    <p>Pop bubbles, tap a counter, paint a grid, make ripples. Zero stakes. Close it the moment your name gets called.</p>
-                </a>
-                <a href="dial_in" class="card">
-                    <h3>[FN] DIAL IN</h3>
-                    <p>Generates a live call checklist from your details. Cover what matters, not a script.</p>
-                </a>
-                <a href="one_thing" class="card">
-                    <h3>[FN] ONE THING</h3>
-                    <p>Write the one thing you need to do today. It fills the screen. You do it. That's the whole plan.</p>
+                <a href="how_long" class="card">
+                    <h3>[FN] HOW LONG?</h3>
+                    <p>Records your project measurements once so you stop going back to re-measure.</p>
                 </a>
                 <a href="sleep_math" class="card">
                     <h3>[FN] SLEEP MATH</h3>
                     <p>Calculates bedtimes and wake times based on 90-minute sleep cycles.</p>
                 </a>
-                <a href="just_pick" class="card">
-                    <h3>[FN] JUST PICK</h3>
-                    <p>Spins a wheel to choose from your options. Add the same option twice to weight it.</p>
-                </a>
+            </div>
+
+            <h2 class="category-title">Learn &amp; Teach</h2>
+            <div class="grid">
                 <a href="duly_noted" class="card">
                     <h3>[FN] DULY NOTED</h3>
                     <p>Had a thought worth keeping? Get it down before it's gone. Structured forms, quick capture, or Cornell notes — sorted by subject, saved locally, yours to export and share.</p>
@@ -131,7 +131,25 @@
                     <h3>[FN] THIS WORKS AT SCHOOL</h3>
                     <p>For teachers, parents, and anyone trying to help a kid learn without making it harder than it needs to be.</p>
                 </a>
+                <a href="magnet" class="card">
+                    <h3>[FN] MAGNET STUDIO</h3>
+                    <p>Designs and prints picture tiles for visual schedules, PECS boards, and custom labels.</p>
+                </a>
             </div>
+
+            <h2 class="category-title">Brain Breaks</h2>
+            <div class="grid">
+                <a href="fidget" class="card">
+                    <h3>[FN] FIDGET</h3>
+                    <p>Pop bubbles, tap a counter, paint a grid, make ripples. Zero stakes. Close it the moment your name gets called.</p>
+                </a>
+                <a href="get_lost" class="card">
+                    <h3>[FN] GET LOST</h3>
+                    <p>A jogging route generator for when you need to run away, but just for a bit.</p>
+                    <div class="net-badge">Requires internet</div>
+                </a>
+            </div>
+
         </div>
 
         <div class="study-strip">
@@ -223,8 +241,16 @@
             <span>💙</span>&nbsp;Say hi / Support the work
         </a>
 
+        <div style="margin-top: 28px; display: flex; flex-direction: column; align-items: center; gap: 6px; opacity: 0.55;">
+            <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAASIAAAEiAQAAAAB1xeIbAAAB70lEQVR4nO2ZPW7kMAxGH1cCprSBOcAcRb7a3sw+Sm5glQFkfFtQnsmkyTaOf10YkvCKDxRFUaSJn7/hz39AcFEXtSMqW/064PvILK6l6xRUkCQJcsSnfY6QJEnjerrOQVX3BkgjWNcU/EB0q+o6NhXfZpNpaAOQ72VdXWeg3mzfCEtjayKvresMlNv+S6I5PEq01BegEfgubFX9/qnJExq/a9PHrd66g5mZtevpOjoVq3sDkEHD49OD/tdH11bV75tCGuccM414ZklSwX80kvqtqt83hdtdI6j3lSA8yQcu2y9IUZ9VjVRdfqxmn/cjXLZfiHraviB5pKkxZ96Ay/YLUtlMPa/H7WRAkHWN9KJ+X9cpqCDIN6lv9EwvYw3/w6OspuvolL+tLI13DGKBpkSq8xsix7Jd9fumPKLjxcwx1MKlX7hNmUdbVb9vaq4p5NagKQCh2NBiwE3ma1tVv29qzu89yQ9vo+f08vulqFffqilYN1ftrQNqP2XD6ndMRSB4rd5gihoewryek4Er5ixNzal98IRePZOXMK27/P73qPRh9dZNKuhvuxFdB6Tit7mlvkRLIwKmSBrvq+g6A/Xet5qiyC0aDDR0QVffamHq1be6yRtVtZL/aavqOjr11reizCfA14KuPOeiDkn9AyGgF+fsrUFtAAAAAElFTkSuQmCC"
+                 alt="QR code for nofnway.ca"
+                 width="100" height="100"
+                 style="display: block; image-rendering: pixelated;" />
+            <span style="font-family: 'Roboto', sans-serif; font-size: 0.7rem; letter-spacing: 0.5px;">nofnway.ca</span>
+        </div>
+
         <div style="margin-top: 20px; font-weight: bold; letter-spacing: 1px;">NOFNWAY&trade; &copy; 2026. All Rights Reserved.</div>
-        <div style="margin-top: 12px; font-size: 0.8rem; opacity: 0.7;">Something broken? Question? Just want to say hi? <a href="mailto:hello@nofnway.ca" style="color: inherit;">hello@nofnway.ca</a></div>
+        <div style="margin-top: 12px; font-size: 0.8rem; opacity: 0.7;">Something broken? Have an idea? Want something built? Email <a href="mailto:hello@nofnway.ca" style="color: inherit;">hello@nofnway.ca</a></div>
     </footer>
 
     <script>
