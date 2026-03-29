@@ -62,3 +62,5 @@ Always check `MEMORY.md` for full voice and visual guidelines. Short version:
 - **Shadows:** Offset (e.g. `4px 4px 0 var(--brand)`), never blur-based
 - **Voice:** Personal and dry, never corporate or preachy. Lead with vulnerability. Match the About strip tone.
 - **[FN]** notation is the implicit swear — preserve it, don't replace it with actual profanity or sanitize it away
+
+## See also: lessons.md
