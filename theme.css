@@ -796,3 +796,38 @@ footer {
     opacity: 1;
     color: var(--brand);
 }
+
+
+/* ═══════════════════════════════════════
+   MOBILE — RESPONSIVE NAVBAR
+═══════════════════════════════════════ */
+
+/* Brand subtitle (e.g. "// Just Pick") — shown on desktop, hidden on mobile */
+.brand-sub { display: inline; }
+
+/* Nav button text variants — swap short/full text at mobile breakpoint */
+.nav-text-short { display: none; }
+
+@media (max-width: 520px) {
+    .navbar {
+        padding: 0.6rem 1rem;
+        gap: 6px;
+    }
+    .brand {
+        font-size: 1.5rem;
+        letter-spacing: 1px;
+        min-width: 0;
+        flex-shrink: 1;
+    }
+    .brand-sub { display: none; }
+    .nav-controls { gap: 8px; flex-wrap: wrap; }
+    .share-btn,
+    .theme-toggle,
+    .bookmark-btn {
+        padding: 7px 10px;
+        font-size: 0.65rem;
+        letter-spacing: 0;
+    }
+    .nav-text-full  { display: none; }
+    .nav-text-short { display: inline; }
+}
