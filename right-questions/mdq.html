@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="author" content="Gerry McMahon">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MDQ Bipolar Screener – The Right [FN] Questions – NOFNWAY</title>
+    <meta name="description" content="The Mood Disorder Questionnaire bipolar screener. The actual validated version. Answer honestly, get your result, bring it to your appointment. Free, private, nothing leaves your browser.">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <script>document.documentElement.setAttribute('data-theme', localStorage.getItem('nofnway-theme') || 'light');</script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bangers&family=Montserrat:wght@900&family=Roboto:wght@400;700&display=swap" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bangers&family=Montserrat:wght@900&family=Roboto:wght@400;700&display=swap"></noscript>
+    <link rel="stylesheet" href="../theme.css">
+    <link rel="stylesheet" href="styles.css">
+    <script>if ('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js').catch(() => {});</script>
+    <style>
+        .mdq-section-label {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 900;
+            font-size: 0.68rem;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            color: var(--brand);
+            border-bottom: 2px solid var(--border);
+            padding-bottom: 8px;
+            margin: 32px 0 6px;
+        }
+        .mdq-section-note {
+            font-size: 0.88rem;
+            color: var(--text-dim);
+            line-height: 1.65;
+            margin: 0 0 20px;
+        }
+        .mdq-stem {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--text-main);
+            line-height: 1.55;
+            padding: 16px 20px;
+            background: var(--card-bg);
+            border: 2px solid var(--border);
+            border-left: 5px solid var(--brand);
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        /* Two-option (Yes/No) layout */
+        .options-binary {
+            display: flex;
+            gap: 8px;
+        }
+        .options-binary label {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            padding: 7px 20px;
+            min-height: 44px;
+            border: 2px solid var(--border);
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.88rem;
+            color: var(--text-dim);
+            transition: border-color 0.15s, background 0.15s, color 0.15s;
+            user-select: none;
+        }
+        .options-binary label:hover { border-color: var(--brand); color: var(--text-main); }
+        .options-binary input[type="radio"] { position: absolute; opacity: 0; width: 1px; height: 1px; pointer-events: none; }
+        .options-binary input[type="radio"]:focus-visible + span { outline: 2px solid var(--brand); outline-offset: 2px; border-radius: 2px; }
+        .options-binary label.selected { background: var(--brand); border-color: var(--brand); color: #fff; font-weight: 700; }
+
+        /* Criteria summary */
+        .mdq-criteria-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 14px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            margin-bottom: 8px;
+            background: var(--bg);
+        }
+        .mdq-criteria-icon {
+            font-size: 1rem;
+            flex-shrink: 0;
+            width: 22px;
+            text-align: center;
+        }
+        .mdq-criteria-text {
+            font-size: 0.88rem;
+            color: var(--text-dim);
+            line-height: 1.45;
+        }
+        .mdq-criteria-text strong { color: var(--text-main); }
+    </style>
+</head>
+<body>
+
+<nav class="navbar">
+    <a href="https://nofnway.ca/" class="brand">NO<span>FN</span>WAY</a>
+    <div class="nav-controls">
+        <button class="theme-toggle" onclick="toggleTheme()">Light / Dark</button>
+        <button class="privacy-btn" onclick="togglePrivacy()" aria-label="Privacy information">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        </button>
+    </div>
+</nav>
+
+<div id="privacy-panel" class="privacy-panel" hidden>
+    <div class="privacy-panel-hd">
+        <span class="privacy-panel-title">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            Privacy
+        </span>
+        <button class="privacy-close" onclick="togglePrivacy()" aria-label="Close privacy panel">&#x2715;</button>
+    </div>
+    <p>Nothing you enter here is stored, sent, or tracked. Your answers exist only in your browser and disappear when you close the tab. No accounts. No cookies. No analytics. We never see them.</p>
+</div>
+
+<div class="rq-wrap">
+
+    <a href="index.html" class="page-back">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="15 18 9 12 15 6"/></svg>
+        The Right [FN] Questions
+    </a>
+
+    <div class="screener-title-block">
+        <h1>MDQ</h1>
+        <p class="screener-subtitle">Mood Disorder Questionnaire -- Bipolar Screener</p>
+    </div>
+
+    <div class="screener-intro">
+        <p>The MDQ is a three-part questionnaire designed to screen for a history of manic or hypomanic episodes -- the experiences associated with bipolar disorder. Part 1 asks about lifetime experiences. Parts 2 and 3 ask follow-up questions about those experiences. A positive result requires specific criteria across all three parts.</p>
+    </div>
+
+    <form id="mdq-form" novalidate>
+
+        <div class="mdq-section-label">Part 1 -- Lifetime experiences</div>
+        <p class="mdq-section-note">Answer yes or no to each. These questions ask about your whole life, not just recent weeks.</p>
+
+        <div class="mdq-stem">Has there ever been a period of time when you were not your usual self and...</div>
+
+        <div class="q-block" id="qblock-p1-1">
+            <fieldset>
+                <legend><span class="q-num">Question 1 of 13</span>...you felt so good or so hyper that other people thought you were not your normal self, or you were so hyped up that you got into trouble?</legend>
+                <div class="options-binary" role="group">
+                    <label><input type="radio" name="p1q1" value="1"><span>Yes</span></label>
+                    <label><input type="radio" name="p1q1" value="0"><span>No</span></label>
+                </div>
+            </fieldset>
+        </div>
+
+        <div class="q-block" id="qblock-p1-2">
+            <fieldset>
+                <legend><span class="q-num">Question 2 of 13</span>...you were so irritable that you shouted at people or started fights or arguments?</legend>
+                <div class="options-binary" role="group">
+                    <label><input type="radio" name="p1q2" value="1"><span>Yes</span></label>
+                    <label><input type="radio" name="p1q2" value="0"><span>No</span></label>
+                </div>
+            </fieldset>
+        </div>
+
+        <div class="q-block" id="qblock-p1-3">
+            <fieldset>
+                <legend><span class="q-num">Question 3 of 13</span>...you felt much more self-confident than usual?</legend>
+                <div class="options-binary" role="group">
+                    <label><input type="radio" name="p1q3" value="1"><span>Yes</span></label>
+                    <label><input type="radio" name="p1q3" value="0"><span>No</span></label>
+                </div>
+            </fieldset>
+        </div>
+
+        <div class="q-block" id="qblock-p1-4">
+            <fieldset>
+                <legend><span class="q-num">Question 4 of 13</span>...you got much less sleep than usual and found you didn't really miss it?</legend>
+                <div class="options-binary" role="group">
+                    <label><input type="radio" name="p1q4" value="1"><span>Yes</span></label>
+                    <label><input type="radio" name="p1q4" value="0"><span>No</span></label>
+                </div>
+            </fieldset>
+        </div>
+
+        <div class="q-block" id="qblock-p1-5">
+            <fieldset>
+                <legend><span class="q-num">Question 5 of 13</span>...you were much more talkative or spoke much faster than usual?</legend>
+                <div class="options-binary" role="group">
+                    <label><input type="radio" name="p1q5" value="1"><span>Yes</span></label>
+                    <label><input type="radio" name="p1q5" value="0"><span>No</span></label>
+                </div>
+            </fieldset>
+        </div>
+
+        <div class="q-block" id="qblock-p1-6">
+            <fieldset>
+                <legend><span class="q-num">Question 6 of 13</span>...thoughts raced through your head or you couldn't slow your mind down?</legend>
+                <div class="options-binary" role="group">
+                    <label><input type="radio" name="p1q6" value="1"><span>Yes</span></label>
+                    <label><input type="radio" name="p1q6" value="0"><span>No</span></label>
+                </div>
+            </fieldset>
+        </div>
+
+        <div class="q-block" id="qblock-p1-7">
+            <fieldset>
+                <legend><span class="q-num">Question 7 of 13</span>...you were so easily distracted by things around you that you had trouble concentrating or staying on task?</legend>
+                <div class="options-binary" role="group">
+                    <label><input type="radio" name="p1q7" value="1"><span>Yes</span></label>
+                    <label><input type="radio" name="p1q7" value="0"><span>No</span></label>
+                </div>
+            </fieldset>
+        </div>
+
+        <div class="q-block" id="qblock-p1-8">
+            <fieldset>
+                <legend><span class="q-num">Question 8 of 13</span>...you had much more energy than usual?</legend>
+                <div class="options-binary" role="group">
+                    <label><input type="radio" name="p1q8" value="1"><span>Yes</span></label>
+                    <label><input type="radio" name="p1q8" value="0"><span>No</span></label>
+                </div>
+            </fieldset>
+        </div>
+
+        <div class="q-block" id="qblock-p1-9">
+            <fieldset>
+                <legend><span class="q-num">Question 9 of 13</span>...you were much more active or did many more things than usual?</legend>
+                <div class="options-binary" role="group">
+                    <label><input type="radio" name="p1q9" value="1"><span>Yes</span></label>
+                    <label><input type="radio" name="p1q9" value="0"><span>No</span></label>
+                </div>
+            </fieldset>
+        </div>
+
+        <div class="q-block" id="qblock-p1-10">
+            <fieldset>
+                <legend><span class="q-num">Question 10 of 13</span>...you were much more social or outgoing than usual; for example, you telephoned friends in the middle of the night?</legend>
+                <div class="options-binary" role="group">
+                    <label><input type="radio" name="p1q10" value="1"><span>Yes</span></label>
+                    <label><input type="radio" name="p1q10" value="0"><span>No</span></label>
+                </div>
+            </fieldset>
+        </div>
+
+        <div class="q-block" id="qblock-p1-11">
+            <fieldset>
+                <legend><span class="q-num">Question 11 of 13</span>...you were much more interested in sex than usual?</legend>
+                <div class="options-binary" role="group">
+                    <label><input type="radio" name="p1q11" value="1"><span>Yes</span></label>
+                    <label><input type="radio" name="p1q11" value="0"><span>No</span></label>
+                </div>
+            </fieldset>
+        </div>
+
+        <div class="q-block" id="qblock-p1-12">
+            <fieldset>
+                <legend><span class="q-num">Question 12 of 13</span>...you did things that were unusual for you or that other people might have thought were foolish or risky?</legend>
+                <div class="options-binary" role="group">
+                    <label><input type="radio" name="p1q12" value="1"><span>Yes</span></label>
+                    <label><input type="radio" name="p1q12" value="0"><span>No</span></label>
+                </div>
+            </fieldset>
+        </div>
+
+        <div class="q-block" id="qblock-p1-13">
+            <fieldset>
+                <legend><span class="q-num">Question 13 of 13</span>...spending money got you or your family into trouble?</legend>
+                <div class="options-binary" role="group">
+                    <label><input type="radio" name="p1q13" value="1"><span>Yes</span></label>
+                    <label><input type="radio" name="p1q13" value="0"><span>No</span></label>
+                </div>
+            </fieldset>
+        </div>
+
+        <div class="mdq-section-label">Part 2 -- Co-occurrence</div>
+        <p class="mdq-section-note">If you answered yes to more than one question above, this follow-up applies.</p>
+
+        <div class="q-block" id="qblock-p2">
+            <fieldset>
+                <legend><span class="q-num">Part 2</span>If you checked YES to more than one of the above, have several of these ever happened during the same period of time?</legend>
+                <div class="options-binary" role="group">
+                    <label><input type="radio" name="p2" value="1"><span>Yes</span></label>
+                    <label><input type="radio" name="p2" value="0"><span>No</span></label>
+                </div>
+            </fieldset>
+        </div>
+
+        <div class="mdq-section-label">Part 3 -- Impact</div>
+        <p class="mdq-section-note">How much of a problem did these experiences cause you?</p>
+
+        <div class="q-block" id="qblock-p3">
+            <fieldset>
+                <legend><span class="q-num">Part 3</span>How much of a problem did any of these experiences cause you -- like being unable to work; having family, money, or legal troubles; getting into arguments or fights?</legend>
+                <div class="options" role="group">
+                    <label><input type="radio" name="p3" value="0"><span>No problem</span></label>
+                    <label><input type="radio" name="p3" value="1"><span>Minor problem</span></label>
+                    <label><input type="radio" name="p3" value="2"><span>Moderate problem</span></label>
+                    <label><input type="radio" name="p3" value="3"><span>Serious problem</span></label>
+                </div>
+            </fieldset>
+        </div>
+
+        <div class="screener-submit-wrap">
+            <button type="submit" class="screener-submit" id="submit-btn" disabled>See my result</button>
+            <p class="screener-progress" id="progress-text">Complete all three parts to continue</p>
+        </div>
+
+    </form>
+
+    <div id="score-summary" aria-live="polite">
+
+        <div class="score-card">
+            <div class="score-range" id="score-range-label" style="font-size: 1.4rem; margin-bottom: 14px;"></div>
+            <p class="score-meaning" id="score-meaning"></p>
+
+            <div style="border-top: 2px solid var(--border); padding-top: 16px; margin-top: 8px;">
+                <div style="font-family: 'Montserrat', sans-serif; font-weight: 900; font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-dim); margin-bottom: 12px;">Screening criteria</div>
+                <div class="mdq-criteria-row" id="crit-p1">
+                    <div class="mdq-criteria-icon" id="crit-p1-icon"></div>
+                    <div class="mdq-criteria-text" id="crit-p1-text"></div>
+                </div>
+                <div class="mdq-criteria-row" id="crit-p2">
+                    <div class="mdq-criteria-icon" id="crit-p2-icon"></div>
+                    <div class="mdq-criteria-text" id="crit-p2-text"></div>
+                </div>
+                <div class="mdq-criteria-row" id="crit-p3">
+                    <div class="mdq-criteria-icon" id="crit-p3-icon"></div>
+                    <div class="mdq-criteria-text" id="crit-p3-text"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="crisis-note">
+            <strong>If you are in crisis or need to talk to someone right now:</strong> call or text <strong>988</strong> (Suicide Crisis Helpline, available across Canada, 24 hours a day). You do not need to be in immediate danger to call.
+        </div>
+
+        <div class="what-next">
+            <div class="what-next-head">What you can do with this</div>
+            <div class="next-options">
+                <div class="next-opt">
+                    <strong>Bring it in</strong>
+                    Tell your doctor your Part 1 count and how Parts 2 and 3 came out. It gives them a clear picture to work from.
+                </div>
+                <div class="next-opt">
+                    <strong>Share it</strong>
+                    Show it to someone you trust. Sometimes having words for it is the first step.
+                </div>
+                <div class="next-opt">
+                    <strong>Keep it</strong>
+                    You do not have to do anything with it right now. Sometimes just having language for your own history is enough.
+                </div>
+            </div>
+        </div>
+
+        <div class="screener-actions">
+            <button class="btn-reset" id="reset-btn">Start over</button>
+            <a href="index.html" class="back-link">Back to The Right [FN] Questions</a>
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+function toggleTheme() {
+    var current = document.documentElement.getAttribute('data-theme');
+    var next = current === 'dark' ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', next);
+    localStorage.setItem('nofnway-theme', next);
+}
+
+(function () {
+    var form = document.getElementById('mdq-form');
+    var submitBtn = document.getElementById('submit-btn');
+    var progressText = document.getElementById('progress-text');
+    var summary = document.getElementById('score-summary');
+    var answered = {};
+    var SESSION_KEY = 'rq-mdq';
+
+    // All field names that must be answered
+    var p1Names = ['p1q1','p1q2','p1q3','p1q4','p1q5','p1q6','p1q7','p1q8','p1q9','p1q10','p1q11','p1q12','p1q13'];
+    var allNames = p1Names.concat(['p2','p3']);
+
+    // Restore from sessionStorage if user navigated back mid-screener
+    (function () {
+        var saved = sessionStorage.getItem(SESSION_KEY);
+        if (!saved) return;
+        try {
+            answered = JSON.parse(saved);
+            Object.keys(answered).forEach(function (name) {
+                var input = form.querySelector('input[name="' + name + '"][value="' + answered[name] + '"]');
+                if (input) {
+                    input.closest('label').classList.add('selected');
+                    var block = input.closest('.q-block');
+                    if (block) block.classList.add('answered');
+                }
+            });
+            var count = 0;
+            allNames.forEach(function (n) { if (n in answered) count++; });
+            var remaining = allNames.length - count;
+            if (remaining === 0) {
+                submitBtn.disabled = false;
+                progressText.textContent = 'All parts answered. Ready when you are.';
+            } else {
+                progressText.textContent = remaining === 1 ? '1 question remaining' : remaining + ' questions remaining';
+            }
+        } catch (ex) { sessionStorage.removeItem(SESSION_KEY); }
+    }());
+
+    form.addEventListener('change', function (e) {
+        if (e.target.type !== 'radio') return;
+        answered[e.target.name] = parseInt(e.target.value, 10);
+        sessionStorage.setItem(SESSION_KEY, JSON.stringify(answered));
+
+        var group = e.target.closest('.options, .options-binary');
+        group.querySelectorAll('label').forEach(function (l) { l.classList.remove('selected'); });
+        e.target.closest('label').classList.add('selected');
+
+        // Mark block answered
+        var block = e.target.closest('.q-block');
+        if (block) block.classList.add('answered');
+
+        var count = 0;
+        allNames.forEach(function (n) { if (n in answered) count++; });
+        var remaining = allNames.length - count;
+        if (remaining === 0) {
+            submitBtn.disabled = false;
+            progressText.textContent = 'All parts answered. Ready when you are.';
+        } else {
+            submitBtn.disabled = true;
+            progressText.textContent = remaining === 1 ? '1 question remaining' : remaining + ' questions remaining';
+        }
+    });
+
+    form.addEventListener('submit', function (e) {
+        e.preventDefault();
+
+        // Part 1: count yes answers
+        var p1Count = 0;
+        p1Names.forEach(function (n) { p1Count += answered[n] || 0; });
+
+        var p1Met = p1Count >= 7;
+        var p2Met = answered['p2'] === 1;
+        var p3Met = (answered['p3'] || 0) >= 2;
+        var positive = p1Met && p2Met && p3Met;
+
+        document.getElementById('score-range-label').textContent = positive
+            ? 'Positive screen for bipolar spectrum'
+            : 'Does not meet all three screening criteria';
+
+        var meaning = positive
+            ? 'All three criteria were met. This is a positive screen, meaning your responses are consistent with a possible bipolar spectrum disorder. A positive MDQ does not confirm a diagnosis -- it is a signal that a thorough clinical evaluation would be worthwhile. Bipolar disorder is often underdiagnosed, and many people live with it for years before getting an accurate picture.'
+            : 'Not all three criteria were met, which means this is a negative screen. This does not rule out a mood disorder -- the MDQ is designed to catch a specific pattern of symptoms, and other presentations exist. If any of these questions resonated strongly with your experience, that is still worth discussing with a clinician.';
+
+        document.getElementById('score-meaning').textContent = meaning;
+
+        var p3Labels = ['No problem', 'Minor problem', 'Moderate problem', 'Serious problem'];
+        var p3Val = answered['p3'] || 0;
+
+        function setRow(id, met, text) {
+            document.getElementById(id + '-icon').textContent = met ? '◆' : '◇';
+            document.getElementById(id + '-icon').style.color = met ? 'var(--brand)' : 'var(--text-dim)';
+            document.getElementById(id + '-text').innerHTML = text;
+        }
+
+        setRow('crit-p1', p1Met,
+            '<strong>Part 1:</strong> ' + p1Count + ' of 13 questions answered yes' + (p1Met ? ' (7+ required -- met)' : ' (7+ required -- not met)'));
+        setRow('crit-p2', p2Met,
+            '<strong>Part 2:</strong> ' + (answered['p2'] === 1 ? 'Yes, several occurred at the same time' : 'No, they did not all happen together') + (p2Met ? ' -- met' : ' -- not met'));
+        setRow('crit-p3', p3Met,
+            '<strong>Part 3:</strong> ' + p3Labels[p3Val] + (p3Met ? ' -- met' : ' (Moderate or Serious required -- not met)'));
+
+        form.style.display = 'none';
+        summary.classList.add('visible');
+        summary.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+
+    document.getElementById('reset-btn').addEventListener('click', function () {
+        if (summary.classList.contains('visible') && !confirm('This will clear your results. Start over?')) return;
+        answered = {};
+        sessionStorage.removeItem(SESSION_KEY);
+        form.reset();
+        form.querySelectorAll('label').forEach(function (l) { l.classList.remove('selected'); });
+        form.querySelectorAll('.q-block').forEach(function (b) { b.classList.remove('answered'); });
+        submitBtn.disabled = true;
+        progressText.textContent = 'Complete all three parts to continue';
+        form.style.display = '';
+        summary.classList.remove('visible');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+
+})();
+</script>
+<script src="../privacy.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="author" content="Gerry McMahon">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PHQ-9 Depression Screener – The Right [FN] Questions – NOFNWAY</title>
+    <meta name="description" content="The PHQ-9 depression questionnaire. The actual validated version. Answer honestly, get your score, bring it to your appointment. Free, private, nothing leaves your browser.">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <script>document.documentElement.setAttribute('data-theme', localStorage.getItem('nofnway-theme') || 'light');</script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bangers&family=Montserrat:wght@900&family=Roboto:wght@400;700&display=swap" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bangers&family=Montserrat:wght@900&family=Roboto:wght@400;700&display=swap"></noscript>
+    <link rel="stylesheet" href="../theme.css">
+    <link rel="stylesheet" href="styles.css">
+    <script>if ('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js').catch(() => {});</script>
+</head>
+<body>
+
+<nav class="navbar">
+    <a href="https://nofnway.ca/" class="brand">NO<span>FN</span>WAY</a>
+    <div class="nav-controls">
+        <button class="theme-toggle" onclick="toggleTheme()">Light / Dark</button>
+        <button class="privacy-btn" onclick="togglePrivacy()" aria-label="Privacy information">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        </button>
+    </div>
+</nav>
+
+<div id="privacy-panel" class="privacy-panel" hidden>
+    <div class="privacy-panel-hd">
+        <span class="privacy-panel-title">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            Privacy
+        </span>
+        <button class="privacy-close" onclick="togglePrivacy()" aria-label="Close privacy panel">&#x2715;</button>
+    </div>
+    <p>Nothing you enter here is stored, sent, or tracked. Your answers exist only in your browser and disappear when you close the tab. No accounts. No cookies. No analytics. We never see them.</p>
+</div>
+
+<div class="rq-wrap">
+
+    <a href="index.html" class="page-back">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="15 18 9 12 15 6"/></svg>
+        The Right [FN] Questions
+    </a>
+
+    <div class="screener-title-block">
+        <h1>PHQ-9</h1>
+        <p class="screener-subtitle">Patient Health Questionnaire -- Depression Screener</p>
+    </div>
+
+    <div class="screener-intro">
+        <p>These are the nine questions that make up the PHQ-9 -- one of the most widely used depression screeners in clinical practice. Answer for the past two weeks. Your gut is usually right.</p>
+    </div>
+
+    <!-- The form -->
+    <form id="phq9-form" novalidate>
+
+        <p class="screener-prompt">Over the last two weeks, how often have you been bothered by any of the following problems?</p>
+
+        <div class="q-block" id="qblock-1">
+            <fieldset>
+                <legend><span class="q-num">Question 1 of 9</span>Little interest or pleasure in doing things</legend>
+                <div class="options" role="group">
+                    <label><input type="radio" name="q1" value="0"><span>Not at all</span></label>
+                    <label><input type="radio" name="q1" value="1"><span>Several days</span></label>
+                    <label><input type="radio" name="q1" value="2"><span>More than half the days</span></label>
+                    <label><input type="radio" name="q1" value="3"><span>Nearly every day</span></label>
+                </div>
+            </fieldset>
+        </div>
+
+        <div class="q-block" id="qblock-2">
+            <fieldset>
+                <legend><span class="q-num">Question 2 of 9</span>Feeling down, depressed, or hopeless</legend>
+                <div class="options" role="group">
+                    <label><input type="radio" name="q2" value="0"><span>Not at all</span></label>
+                    <label><input type="radio" name="q2" value="1"><span>Several days</span></label>
+                    <label><input type="radio" name="q2" value="2"><span>More than half the days</span></label>
+                    <label><input type="radio" name="q2" value="3"><span>Nearly every day</span></label>
+                </div>
+            </fieldset>
+        </div>
+
+        <div class="q-block" id="qblock-3">
+            <fieldset>
+                <legend><span class="q-num">Question 3 of 9</span>Trouble falling or staying asleep, or sleeping too much</legend>
+                <div class="options" role="group">
+                    <label><input type="radio" name="q3" value="0"><span>Not at all</span></label>
+                    <label><input type="radio" name="q3" value="1"><span>Several days</span></label>
+                    <label><input type="radio" name="q3" value="2"><span>More than half the days</span></label>
+                    <label><input type="radio" name="q3" value="3"><span>Nearly every day</span></label>
+                </div>
+            </fieldset>
+        </div>
+
+        <div class="q-block" id="qblock-4">
+            <fieldset>
+                <legend><span class="q-num">Question 4 of 9</span>Feeling tired or having little energy</legend>
+                <div class="options" role="group">
+                    <label><input type="radio" name="q4" value="0"><span>Not at all</span></label>
+                    <label><input type="radio" name="q4" value="1"><span>Several days</span></label>
+                    <label><input type="radio" name="q4" value="2"><span>More than half the days</span></label>
+                    <label><input type="radio" name="q4" value="3"><span>Nearly every day</span></label>
+                </div>
+            </fieldset>
+        </div>
+
+        <div class="q-block" id="qblock-5">
+            <fieldset>
+                <legend><span class="q-num">Question 5 of 9</span>Poor appetite or overeating</legend>
+                <div class="options" role="group">
+                    <label><input type="radio" name="q5" value="0"><span>Not at all</span></label>
+                    <label><input type="radio" name="q5" value="1"><span>Several days</span></label>
+                    <label><input type="radio" name="q5" value="2"><span>More than half the days</span></label>
+                    <label><input type="radio" name="q5" value="3"><span>Nearly every day</span></label>
+                </div>
+            </fieldset>
+        </div>
+
+        <div class="q-block" id="qblock-6">
+            <fieldset>
+                <legend><span class="q-num">Question 6 of 9</span>Feeling bad about yourself -- or that you are a failure or have let yourself or your family down</legend>
+                <div class="options" role="group">
+                    <label><input type="radio" name="q6" value="0"><span>Not at all</span></label>
+                    <label><input type="radio" name="q6" value="1"><span>Several days</span></label>
+                    <label><input type="radio" name="q6" value="2"><span>More than half the days</span></label>
+                    <label><input type="radio" name="q6" value="3"><span>Nearly every day</span></label>
+                </div>
+            </fieldset>
+        </div>
+
+        <div class="q-block" id="qblock-7">
+            <fieldset>
+                <legend><span class="q-num">Question 7 of 9</span>Trouble concentrating on things, such as reading the newspaper or watching television</legend>
+                <div class="options" role="group">
+                    <label><input type="radio" name="q7" value="0"><span>Not at all</span></label>
+                    <label><input type="radio" name="q7" value="1"><span>Several days</span></label>
+                    <label><input type="radio" name="q7" value="2"><span>More than half the days</span></label>
+                    <label><input type="radio" name="q7" value="3"><span>Nearly every day</span></label>
+                </div>
+            </fieldset>
+        </div>
+
+        <div class="q-block" id="qblock-8">
+            <fieldset>
+                <legend><span class="q-num">Question 8 of 9</span>Moving or speaking so slowly that other people could have noticed -- or the opposite, being so fidgety or restless that you have moved around a lot more than usual</legend>
+                <div class="options" role="group">
+                    <label><input type="radio" name="q8" value="0"><span>Not at all</span></label>
+                    <label><input type="radio" name="q8" value="1"><span>Several days</span></label>
+                    <label><input type="radio" name="q8" value="2"><span>More than half the days</span></label>
+                    <label><input type="radio" name="q8" value="3"><span>Nearly every day</span></label>
+                </div>
+            </fieldset>
+        </div>
+
+        <div class="q-block" id="qblock-9">
+            <fieldset>
+                <legend><span class="q-num">Question 9 of 9</span>Thoughts that you would be better off dead, or of hurting yourself in some way</legend>
+                <div class="options" role="group">
+                    <label><input type="radio" name="q9" value="0"><span>Not at all</span></label>
+                    <label><input type="radio" name="q9" value="1"><span>Several days</span></label>
+                    <label><input type="radio" name="q9" value="2"><span>More than half the days</span></label>
+                    <label><input type="radio" name="q9" value="3"><span>Nearly every day</span></label>
+                </div>
+            </fieldset>
+        </div>
+
+        <div class="screener-submit-wrap">
+            <button type="submit" class="screener-submit" id="submit-btn" disabled>See my score</button>
+            <p class="screener-progress" id="progress-text">Answer all 9 questions to continue</p>
+        </div>
+
+    </form>
+
+    <!-- Score summary (hidden until form submitted) -->
+    <div id="score-summary" aria-live="polite">
+
+        <!-- Q9 note (conditionally shown) -->
+        <div class="q9-note" id="q9-note" hidden>
+            <p>You indicated you have had some thoughts of hurting yourself or that you would be better off dead. Please mention this to your doctor, even if everything else feels manageable. It matters, and it belongs in the conversation.</p>
+        </div>
+
+        <!-- Score card -->
+        <div class="score-card">
+            <div class="score-number-wrap">
+                <span class="score-number" id="score-display">0</span>
+                <span class="score-outof">out of 27</span>
+            </div>
+            <div class="score-range" id="score-range-label"></div>
+
+            <div class="score-range-bar" aria-hidden="true">
+                <div class="range-seg" id="seg-minimal"></div>
+                <div class="range-seg" id="seg-mild"></div>
+                <div class="range-seg" id="seg-moderate"></div>
+                <div class="range-seg" id="seg-modsev"></div>
+                <div class="range-seg" id="seg-severe"></div>
+            </div>
+            <div class="range-labels" aria-hidden="true">
+                <span>Minimal</span>
+                <span>Mild</span>
+                <span>Moderate</span>
+                <span>Mod. severe</span>
+                <span>Severe</span>
+            </div>
+
+            <p class="score-meaning" id="score-meaning"></p>
+        </div>
+
+        <!-- Crisis note (always shown) -->
+        <div class="crisis-note">
+            <strong>If you are in crisis or need to talk to someone right now:</strong> call or text <strong>988</strong> (Suicide Crisis Helpline, available across Canada, 24 hours a day). You do not need to be in immediate danger to call.
+        </div>
+
+        <!-- What to do next -->
+        <div class="what-next">
+            <div class="what-next-head">What you can do with this</div>
+            <div class="next-options">
+                <div class="next-opt">
+                    <strong>Bring it in</strong>
+                    Tell your doctor or therapist the number. "I did the PHQ-9 and scored [X]" gets the conversation started faster.
+                </div>
+                <div class="next-opt">
+                    <strong>Share it</strong>
+                    Show it to someone you trust. Sometimes having words for it is the first step.
+                </div>
+                <div class="next-opt">
+                    <strong>Keep it</strong>
+                    You do not have to do anything with it right now. Sometimes just having a number for what you have been carrying is enough.
+                </div>
+            </div>
+        </div>
+
+        <!-- Reset + back -->
+        <div class="screener-actions">
+            <button class="btn-reset" id="reset-btn">Start over</button>
+            <a href="index.html" class="back-link">Back to The Right [FN] Questions</a>
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+function toggleTheme() {
+    var current = document.documentElement.getAttribute('data-theme');
+    var next = current === 'dark' ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', next);
+    localStorage.setItem('nofnway-theme', next);
+}
+
+(function () {
+    var form = document.getElementById('phq9-form');
+    var submitBtn = document.getElementById('submit-btn');
+    var progressText = document.getElementById('progress-text');
+    var summary = document.getElementById('score-summary');
+    var q9Note = document.getElementById('q9-note');
+
+    var questions = ['q1','q2','q3','q4','q5','q6','q7','q8','q9'];
+    var answered = {};
+    var SESSION_KEY = 'rq-phq9';
+
+    // Restore from sessionStorage if user navigated back mid-screener
+    (function () {
+        var saved = sessionStorage.getItem(SESSION_KEY);
+        if (!saved) return;
+        try {
+            answered = JSON.parse(saved);
+            Object.keys(answered).forEach(function (name) {
+                var input = form.querySelector('input[name="' + name + '"][value="' + answered[name] + '"]');
+                if (input) {
+                    input.closest('label').classList.add('selected');
+                    var block = input.closest('.q-block');
+                    if (block) block.classList.add('answered');
+                }
+            });
+            var count = Object.keys(answered).length;
+            var remaining = questions.length - count;
+            if (remaining === 0) {
+                submitBtn.disabled = false;
+                progressText.textContent = 'All questions answered. Ready when you are.';
+            } else {
+                progressText.textContent = remaining === 1 ? '1 question remaining' : remaining + ' questions remaining';
+            }
+        } catch (ex) { sessionStorage.removeItem(SESSION_KEY); }
+    }());
+
+    // Handle radio selection -- style pill buttons, track answered state
+    form.addEventListener('change', function (e) {
+        if (e.target.type !== 'radio') return;
+
+        var name = e.target.name;
+        answered[name] = parseInt(e.target.value, 10);
+        sessionStorage.setItem(SESSION_KEY, JSON.stringify(answered));
+
+        // Update pill button visual state for this question
+        var group = e.target.closest('.options');
+        var labels = group.querySelectorAll('label');
+        labels.forEach(function (lbl) {
+            lbl.classList.remove('selected');
+        });
+        e.target.closest('label').classList.add('selected');
+
+        // Mark q-block as answered
+        var qNum = name.replace('q', '');
+        var block = document.getElementById('qblock-' + qNum);
+        if (block) block.classList.add('answered');
+
+        // Update progress
+        var count = Object.keys(answered).length;
+        var remaining = 9 - count;
+
+        if (remaining === 0) {
+            submitBtn.disabled = false;
+            progressText.textContent = 'All questions answered. Ready when you are.';
+        } else {
+            submitBtn.disabled = true;
+            progressText.textContent = remaining === 1
+                ? '1 question remaining'
+                : remaining + ' questions remaining';
+        }
+    });
+
+    // Submit
+    form.addEventListener('submit', function (e) {
+        e.preventDefault();
+
+        // Calculate total
+        var total = 0;
+        questions.forEach(function (q) {
+            total += answered[q] || 0;
+        });
+
+        // Show score number
+        document.getElementById('score-display').textContent = total;
+
+        // Range + meaning
+        var rangeLabel, meaning, rangeClass;
+        if (total <= 4) {
+            rangeLabel = 'Minimal or no symptoms';
+            meaning = 'Scores in this range are generally below the clinical threshold for depression. A clinician would likely note this as within a normal range but may still discuss how you have been feeling.';
+            rangeClass = 'minimal';
+        } else if (total <= 9) {
+            rangeLabel = 'Mild symptoms';
+            meaning = 'This range suggests mild depressive symptoms. A clinician would typically monitor and may recommend watchful waiting, lifestyle support, or a follow-up appointment.';
+            rangeClass = 'mild';
+        } else if (total <= 14) {
+            rangeLabel = 'Moderate symptoms';
+            meaning = 'Moderate scores like this often prompt a clinician to discuss a treatment plan -- which might include counselling, medication, or both -- and a follow-up to track change over time.';
+            rangeClass = 'moderate';
+        } else if (total <= 19) {
+            rangeLabel = 'Moderately severe symptoms';
+            meaning = 'Scores in this range typically indicate active treatment is warranted. A clinician would likely discuss both psychotherapy and medication options, and will want to follow up closely.';
+            rangeClass = 'modsev';
+        } else {
+            rangeLabel = 'Severe symptoms';
+            meaning = 'This range indicates severe symptoms. A clinician would treat this as a priority and may recommend immediate initiation of treatment, including more intensive support options.';
+            rangeClass = 'severe';
+        }
+
+        document.getElementById('score-range-label').textContent = rangeLabel;
+        document.getElementById('score-meaning').textContent = meaning;
+
+        // Highlight range bar segment
+        var segs = ['minimal','mild','moderate','modsev','severe'];
+        segs.forEach(function (seg) {
+            var el = document.getElementById('seg-' + seg);
+            el.className = 'range-seg';
+            if (seg === rangeClass) el.classList.add('active-' + seg);
+        });
+
+        // Q9 note
+        if ((answered['q9'] || 0) > 0) {
+            q9Note.hidden = false;
+        } else {
+            q9Note.hidden = true;
+        }
+
+        // Hide form, show summary
+        form.style.display = 'none';
+        summary.classList.add('visible');
+        summary.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+
+    // Reset
+    document.getElementById('reset-btn').addEventListener('click', function () {
+        if (summary.classList.contains('visible') && !confirm('This will clear your results. Start over?')) return;
+        answered = {};
+        sessionStorage.removeItem(SESSION_KEY);
+        form.reset();
+
+        // Clear pill selections
+        form.querySelectorAll('label').forEach(function (lbl) {
+            lbl.classList.remove('selected');
+        });
+
+        // Clear answered state on blocks
+        form.querySelectorAll('.q-block').forEach(function (block) {
+            block.classList.remove('answered');
+        });
+
+        submitBtn.disabled = true;
+        progressText.textContent = 'Answer all 9 questions to continue';
+        form.style.display = '';
+        summary.classList.remove('visible');
+
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+
+})();
+</script>
+<script src="../privacy.js"></script>
+
+</body>
+</html>

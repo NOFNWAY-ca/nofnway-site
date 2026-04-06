@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="author" content="Gerry McMahon">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ASRS-v1.1 ADHD Screener – The Right [FN] Questions – NOFNWAY</title>
+    <meta name="description" content="The ASRS v1.1 adult ADHD self-report scale, Part A. The actual validated screener. Answer honestly, get your result, bring it to your appointment. Free, private, nothing leaves your browser.">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <script>document.documentElement.setAttribute('data-theme', localStorage.getItem('nofnway-theme') || 'light');</script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bangers&family=Montserrat:wght@900&family=Roboto:wght@400;700&display=swap" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bangers&family=Montserrat:wght@900&family=Roboto:wght@400;700&display=swap"></noscript>
+    <link rel="stylesheet" href="../theme.css">
+    <link rel="stylesheet" href="styles.css">
+    <script>if ('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js').catch(() => {});</script>
+    <style>
+        .asrs-section-label {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 900;
+            font-size: 0.68rem;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            color: var(--brand);
+            border-bottom: 2px solid var(--border);
+            padding-bottom: 8px;
+            margin: 32px 0 20px;
+        }
+        .asrs-section-note {
+            font-size: 0.88rem;
+            color: var(--text-dim);
+            line-height: 1.65;
+            margin: -12px 0 20px;
+            font-style: italic;
+        }
+        .criteria-met {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.85rem;
+            color: var(--text-dim);
+        }
+        .criteria-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+        .criteria-dot.met { background: var(--brand); }
+        .criteria-dot.unmet { background: var(--border); }
+    </style>
+</head>
+<body>
+
+<nav class="navbar">
+    <a href="https://nofnway.ca/" class="brand">NO<span>FN</span>WAY</a>
+    <div class="nav-controls">
+        <button class="theme-toggle" onclick="toggleTheme()">Light / Dark</button>
+        <button class="privacy-btn" onclick="togglePrivacy()" aria-label="Privacy information">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        </button>
+    </div>
+</nav>
+
+<div id="privacy-panel" class="privacy-panel" hidden>
+    <div class="privacy-panel-hd">
+        <span class="privacy-panel-title">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            Privacy
+        </span>
+        <button class="privacy-close" onclick="togglePrivacy()" aria-label="Close privacy panel">&#x2715;</button>
+    </div>
+    <p>Nothing you enter here is stored, sent, or tracked. Your answers exist only in your browser and disappear when you close the tab. No accounts. No cookies. No analytics. We never see them.</p>
+</div>
+
+<div class="rq-wrap">
+
+    <a href="index.html" class="page-back">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="15 18 9 12 15 6"/></svg>
+        The Right [FN] Questions
+    </a>
+
+    <div class="screener-title-block">
+        <h1>ASRS-v1.1</h1>
+        <p class="screener-subtitle">Adult ADHD Self-Report Scale -- Part A Screener</p>
+    </div>
+
+    <div class="screener-intro">
+        <p>The ASRS was developed with the World Health Organisation to screen for adult ADHD. This is Part A -- six questions that form the validated screening portion. The scoring works differently than a simple total: each question has its own threshold, and your result is based on how many of those thresholds you meet. Answer for how things generally are for you.</p>
+    </div>
+
+    <form id="asrs-form" novalidate>
+
+        <div class="asrs-section-label">Part A -- Screening Questions</div>
+
+        <div class="q-block" id="qblock-1">
+            <fieldset>
+                <legend><span class="q-num">Question 1 of 6</span>How often do you have trouble wrapping up the final details of a project, once the challenging parts have been done?</legend>
+                <div class="options" role="group">
+                    <label><input type="radio" name="q1" value="0"><span>Never</span></label>
+                    <label><input type="radio" name="q1" value="1"><span>Rarely</span></label>
+                    <label><input type="radio" name="q1" value="2"><span>Sometimes</span></label>
+                    <label><input type="radio" name="q1" value="3"><span>Often</span></label>
+                    <label><input type="radio" name="q1" value="4"><span>Very often</span></label>
+                </div>
+            </fieldset>
+        </div>
+
+        <div class="q-block" id="qblock-2">
+            <fieldset>
+                <legend><span class="q-num">Question 2 of 6</span>How often do you have difficulty getting things in order when you have to do a task that requires organisation?</legend>
+                <div class="options" role="group">
+                    <label><input type="radio" name="q2" value="0"><span>Never</span></label>
+                    <label><input type="radio" name="q2" value="1"><span>Rarely</span></label>
+                    <label><input type="radio" name="q2" value="2"><span>Sometimes</span></label>
+                    <label><input type="radio" name="q2" value="3"><span>Often</span></label>
+                    <label><input type="radio" name="q2" value="4"><span>Very often</span></label>
+                </div>
+            </fieldset>
+        </div>
+
+        <div class="q-block" id="qblock-3">
+            <fieldset>
+                <legend><span class="q-num">Question 3 of 6</span>How often do you have problems remembering appointments or obligations?</legend>
+                <div class="options" role="group">
+                    <label><input type="radio" name="q3" value="0"><span>Never</span></label>
+                    <label><input type="radio" name="q3" value="1"><span>Rarely</span></label>
+                    <label><input type="radio" name="q3" value="2"><span>Sometimes</span></label>
+                    <label><input type="radio" name="q3" value="3"><span>Often</span></label>
+                    <label><input type="radio" name="q3" value="4"><span>Very often</span></label>
+                </div>
+            </fieldset>
+        </div>
+
+        <div class="q-block" id="qblock-4">
+            <fieldset>
+                <legend><span class="q-num">Question 4 of 6</span>When you have a task that requires a lot of thought, how often do you avoid or delay getting started?</legend>
+                <div class="options" role="group">
+                    <label><input type="radio" name="q4" value="0"><span>Never</span></label>
+                    <label><input type="radio" name="q4" value="1"><span>Rarely</span></label>
+                    <label><input type="radio" name="q4" value="2"><span>Sometimes</span></label>
+                    <label><input type="radio" name="q4" value="3"><span>Often</span></label>
+                    <label><input type="radio" name="q4" value="4"><span>Very often</span></label>
+                </div>
+            </fieldset>
+        </div>
+
+        <div class="q-block" id="qblock-5">
+            <fieldset>
+                <legend><span class="q-num">Question 5 of 6</span>How often do you fidget or squirm with your hands or feet when you have to sit down for a long time?</legend>
+                <div class="options" role="group">
+                    <label><input type="radio" name="q5" value="0"><span>Never</span></label>
+                    <label><input type="radio" name="q5" value="1"><span>Rarely</span></label>
+                    <label><input type="radio" name="q5" value="2"><span>Sometimes</span></label>
+                    <label><input type="radio" name="q5" value="3"><span>Often</span></label>
+                    <label><input type="radio" name="q5" value="4"><span>Very often</span></label>
+                </div>
+            </fieldset>
+        </div>
+
+        <div class="q-block" id="qblock-6">
+            <fieldset>
+                <legend><span class="q-num">Question 6 of 6</span>How often do you feel overly active and compelled to do things, like you were driven by a motor?</legend>
+                <div class="options" role="group">
+                    <label><input type="radio" name="q6" value="0"><span>Never</span></label>
+                    <label><input type="radio" name="q6" value="1"><span>Rarely</span></label>
+                    <label><input type="radio" name="q6" value="2"><span>Sometimes</span></label>
+                    <label><input type="radio" name="q6" value="3"><span>Often</span></label>
+                    <label><input type="radio" name="q6" value="4"><span>Very often</span></label>
+                </div>
+            </fieldset>
+        </div>
+
+        <div class="screener-submit-wrap">
+            <button type="submit" class="screener-submit" id="submit-btn" disabled>See my result</button>
+            <p class="screener-progress" id="progress-text">Answer all 6 questions to continue</p>
+        </div>
+
+    </form>
+
+    <div id="score-summary" aria-live="polite">
+
+        <div class="score-card">
+            <div class="score-number-wrap">
+                <span class="score-number" id="score-display">0</span>
+                <span class="score-outof">of 6 criteria met</span>
+            </div>
+            <div class="score-range" id="score-range-label"></div>
+
+            <p class="score-meaning" id="score-meaning" style="margin-top: 14px;"></p>
+
+            <div style="margin-top: 16px; border-top: 2px solid var(--border); padding-top: 14px;">
+                <div style="font-family: 'Montserrat', sans-serif; font-weight: 900; font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-dim); margin-bottom: 10px;">Threshold met per question</div>
+                <div id="criteria-list" style="display: flex; flex-direction: column; gap: 6px;"></div>
+            </div>
+        </div>
+
+        <div class="screener-intro" style="margin-top: 16px;">
+            <p><strong style="color: var(--text-main);">A note on this screener:</strong> The ASRS uses thresholds rather than a simple total. Questions 1-3 count if you answered "Sometimes" or higher. Questions 4-6 count if you answered "Often" or higher. Four or more criteria met is considered consistent with ADHD symptoms in adults. A full diagnostic assessment would still be needed to confirm.</p>
+        </div>
+
+        <div class="crisis-note">
+            <strong>If you are in crisis or need to talk to someone right now:</strong> call or text <strong>988</strong> (Suicide Crisis Helpline, available across Canada, 24 hours a day). You do not need to be in immediate danger to call.
+        </div>
+
+        <div class="what-next">
+            <div class="what-next-head">What you can do with this</div>
+            <div class="next-options">
+                <div class="next-opt">
+                    <strong>Bring it in</strong>
+                    Tell your doctor how many criteria you met and which questions. "I did the ASRS Part A and met 5 of 6 criteria" gives them a useful starting point.
+                </div>
+                <div class="next-opt">
+                    <strong>Share it</strong>
+                    Show it to someone you trust. Sometimes having words for it is the first step.
+                </div>
+                <div class="next-opt">
+                    <strong>Keep it</strong>
+                    You do not have to do anything with it right now. Sometimes just recognising the pattern matters.
+                </div>
+            </div>
+        </div>
+
+        <div class="screener-actions">
+            <button class="btn-reset" id="reset-btn">Start over</button>
+            <a href="index.html" class="back-link">Back to The Right [FN] Questions</a>
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+function toggleTheme() {
+    var current = document.documentElement.getAttribute('data-theme');
+    var next = current === 'dark' ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', next);
+    localStorage.setItem('nofnway-theme', next);
+}
+
+(function () {
+    var TOTAL_Q = 6;
+    var form = document.getElementById('asrs-form');
+    var submitBtn = document.getElementById('submit-btn');
+    var progressText = document.getElementById('progress-text');
+    var summary = document.getElementById('score-summary');
+    var answered = {};
+    var SESSION_KEY = 'rq-asrs';
+
+    // Q1-3: threshold at Sometimes (2+), Q4-6: threshold at Often (3+)
+    var thresholds = { q1: 2, q2: 2, q3: 2, q4: 3, q5: 3, q6: 3 };
+
+    var questionLabels = [
+        'Trouble finishing final details of a project',
+        'Difficulty getting things in order',
+        'Problems remembering appointments',
+        'Avoiding or delaying tasks that require thought',
+        'Fidgeting or squirming when sitting long',
+        'Feeling overly active, driven by a motor'
+    ];
+
+    // Restore from sessionStorage if user navigated back mid-screener
+    (function () {
+        var saved = sessionStorage.getItem(SESSION_KEY);
+        if (!saved) return;
+        try {
+            answered = JSON.parse(saved);
+            Object.keys(answered).forEach(function (name) {
+                var input = form.querySelector('input[name="' + name + '"][value="' + answered[name] + '"]');
+                if (input) {
+                    input.closest('label').classList.add('selected');
+                    var block = input.closest('.q-block');
+                    if (block) block.classList.add('answered');
+                }
+            });
+            var count = Object.keys(answered).length;
+            var remaining = TOTAL_Q - count;
+            if (remaining === 0) {
+                submitBtn.disabled = false;
+                progressText.textContent = 'All questions answered. Ready when you are.';
+            } else {
+                progressText.textContent = remaining === 1 ? '1 question remaining' : remaining + ' questions remaining';
+            }
+        } catch (ex) { sessionStorage.removeItem(SESSION_KEY); }
+    }());
+
+    form.addEventListener('change', function (e) {
+        if (e.target.type !== 'radio') return;
+        answered[e.target.name] = parseInt(e.target.value, 10);
+        sessionStorage.setItem(SESSION_KEY, JSON.stringify(answered));
+
+        var group = e.target.closest('.options');
+        group.querySelectorAll('label').forEach(function (l) { l.classList.remove('selected'); });
+        e.target.closest('label').classList.add('selected');
+
+        var qNum = e.target.name.replace('q', '');
+        var block = document.getElementById('qblock-' + qNum);
+        if (block) block.classList.add('answered');
+
+        var count = Object.keys(answered).length;
+        var remaining = TOTAL_Q - count;
+        if (remaining === 0) {
+            submitBtn.disabled = false;
+            progressText.textContent = 'All questions answered. Ready when you are.';
+        } else {
+            submitBtn.disabled = true;
+            progressText.textContent = remaining === 1 ? '1 question remaining' : remaining + ' questions remaining';
+        }
+    });
+
+    form.addEventListener('submit', function (e) {
+        e.preventDefault();
+
+        var criteriaMet = 0;
+        var criteriaResults = [];
+
+        ['q1','q2','q3','q4','q5','q6'].forEach(function (q, i) {
+            var val = answered[q] || 0;
+            var met = val >= thresholds[q];
+            if (met) criteriaMet++;
+            criteriaResults.push({ label: questionLabels[i], met: met, threshold: thresholds[q], value: val });
+        });
+
+        document.getElementById('score-display').textContent = criteriaMet;
+
+        var positive = criteriaMet >= 4;
+        var rangeLabel = positive
+            ? 'Consistent with ADHD symptoms in adults'
+            : 'Below the screening threshold';
+        var meaning = positive
+            ? 'Meeting 4 or more of the 6 criteria is considered highly consistent with adult ADHD symptoms. This is not a diagnosis -- but it is the result that would typically prompt a clinician to refer you for a full assessment.'
+            : 'Fewer than 4 criteria met is below the screening threshold for adult ADHD. This does not rule out ADHD -- late-diagnosed ADHD is common, and many adults have learned to compensate. If these questions resonated with your experience, that is worth mentioning to a clinician regardless of the count.';
+
+        document.getElementById('score-range-label').textContent = rangeLabel;
+        document.getElementById('score-range-label').style.color = positive ? '#e67e22' : 'var(--text-main)';
+        document.getElementById('score-meaning').textContent = meaning;
+
+        var list = document.getElementById('criteria-list');
+        list.innerHTML = '';
+        criteriaResults.forEach(function (r) {
+            var row = document.createElement('div');
+            row.className = 'criteria-met';
+            var dot = document.createElement('div');
+            dot.className = 'criteria-dot ' + (r.met ? 'met' : 'unmet');
+            var text = document.createElement('span');
+            text.textContent = r.label + (r.met ? ' -- threshold met' : ' -- threshold not met');
+            row.appendChild(dot);
+            row.appendChild(text);
+            list.appendChild(row);
+        });
+
+        form.style.display = 'none';
+        summary.classList.add('visible');
+        summary.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+
+    document.getElementById('reset-btn').addEventListener('click', function () {
+        if (summary.classList.contains('visible') && !confirm('This will clear your results. Start over?')) return;
+        answered = {};
+        sessionStorage.removeItem(SESSION_KEY);
+        form.reset();
+        form.querySelectorAll('label').forEach(function (l) { l.classList.remove('selected'); });
+        form.querySelectorAll('.q-block').forEach(function (b) { b.classList.remove('answered'); });
+        submitBtn.disabled = true;
+        progressText.textContent = 'Answer all ' + TOTAL_Q + ' questions to continue';
+        form.style.display = '';
+        summary.classList.remove('visible');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+
+})();
+</script>
+<script src="../privacy.js"></script>
+
+</body>
+</html>

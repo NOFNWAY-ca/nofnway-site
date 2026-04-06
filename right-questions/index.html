@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="author" content="Gerry McMahon">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Right [FN] Questions – Mental Health Screeners – NOFNWAY</title>
+    <meta name="description" content="The actual validated questionnaires clinicians use. PHQ-9, GAD-7, ASRS and more. Fill them out on your own terms before your appointment. Free, private, nothing leaves your browser.">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <script>document.documentElement.setAttribute('data-theme', localStorage.getItem('nofnway-theme') || 'light');</script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bangers&family=Montserrat:wght@900&family=Roboto:wght@400;700&display=swap" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bangers&family=Montserrat:wght@900&family=Roboto:wght@400;700&display=swap"></noscript>
+    <link rel="stylesheet" href="../theme.css">
+    <link rel="stylesheet" href="styles.css">
+    <script>if ('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js').catch(() => {});</script>
+</head>
+<body>
+
+<nav class="navbar">
+    <a href="https://nofnway.ca/" class="brand">NO<span>FN</span>WAY</a>
+    <div class="nav-controls">
+        <button class="theme-toggle" onclick="toggleTheme()">Light / Dark</button>
+        <button class="privacy-btn" onclick="togglePrivacy()" aria-label="Privacy information">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        </button>
+    </div>
+</nav>
+
+<div id="privacy-panel" class="privacy-panel" hidden>
+    <div class="privacy-panel-hd">
+        <span class="privacy-panel-title">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            Privacy
+        </span>
+        <button class="privacy-close" onclick="togglePrivacy()" aria-label="Close privacy panel">&#x2715;</button>
+    </div>
+    <p>Nothing you enter here is stored, sent, or tracked. There are no accounts. No cookies. No analytics. Your answers exist only in your browser for the duration of your session and disappear when you close the tab. We never see them.</p>
+</div>
+
+<div class="rq-hero">
+    <div class="rq-hero-inner">
+        <div class="rq-section-label">THE RIGHT [<span>FN</span>] QUESTIONS</div>
+        <p class="rq-hero-sub">The actual screeners. On your terms, before the appointment.</p>
+    </div>
+</div>
+
+<div class="rq-wrap">
+
+    <div class="rq-prose">
+
+        <p>These are the actual questionnaires. Not an approximation. Not "inspired by" the clinical versions. The same forms sitting in a folder on your doctor's desk.</p>
+
+        <p>PHQ-9 for depression. GAD-7 for anxiety. ASRS for ADHD. The ones you usually answer in the waiting room, cold, on three hours of sleep, trying to reconstruct the last two weeks from scratch in a plastic chair, while someone at the desk asks if you've changed your address.</p>
+
+        <h2>Why knowing them in advance is fine</h2>
+
+        <p>You are not gaming anything. A screener measures how you have actually been feeling. Knowing the questions in advance does not change how you have been feeling. What it does is give you time to think honestly, instead of trying to reconstruct two weeks of your life on the spot under fluorescent lights.</p>
+
+        <p>Clinicians use these tools because they are standardised and they work. You can use them for the same reason. The score you get here will be the same score you would get in the office -- because you are the same person, with the same two weeks behind you.</p>
+
+        <h2>How to answer</h2>
+
+        <p>Answer for the last two weeks. Not your worst day ever. Not the good stretch you had last month. The last two weeks, as honestly as you can manage. If you are not sure, go with your gut -- your gut is usually right about this.</p>
+
+        <h2>What the score means</h2>
+
+        <p>It is a number on a scale clinicians use to understand severity and track change over time. It is not a diagnosis. A high score does not confirm anything. A low score does not rule anything out. It is a data point, and data points are useful.</p>
+
+        <h2>What to do with it</h2>
+
+        <p>Bring it in. Print it or screenshot it or just remember the number. Tell your doctor "I did the PHQ-9 and scored a 14" and watch the conversation get more useful immediately. Or share it with someone you trust. Or keep it for yourself -- sometimes just having language for what you have been feeling is enough.</p>
+
+    </div>
+
+    <hr class="rq-divider">
+
+    <div class="rq-grid-head">Screeners available</div>
+
+    <div class="rq-grid">
+
+        <a href="phq9.html" class="rq-card">
+            <div class="rq-card-condition">Depression</div>
+            <div class="rq-card-name">PHQ-9</div>
+            <p class="rq-card-desc">9 questions. Scores from 0 to 27. One of the most commonly used depression screeners in primary care.</p>
+        </a>
+
+        <a href="gad7.html" class="rq-card">
+            <div class="rq-card-condition">Anxiety</div>
+            <div class="rq-card-name">GAD-7</div>
+            <p class="rq-card-desc">7 questions. Generalised anxiety disorder screener. Used alongside PHQ-9 in most primary care settings.</p>
+        </a>
+
+        <a href="asrs.html" class="rq-card">
+            <div class="rq-card-condition">ADHD</div>
+            <div class="rq-card-name">ASRS-v1.1</div>
+            <p class="rq-card-desc">6 questions. Adult ADHD self-report scale, Part A screening section. Developed with the World Health Organisation.</p>
+        </a>
+
+        <a href="aq10.html" class="rq-card">
+            <div class="rq-card-condition">Autism</div>
+            <div class="rq-card-name">AQ-10</div>
+            <p class="rq-card-desc">10 questions. Autism spectrum quotient short form. Used as a starting point for referral discussions.</p>
+        </a>
+
+        <a href="ocir.html" class="rq-card">
+            <div class="rq-card-condition">OCD</div>
+            <div class="rq-card-name">OCI-R</div>
+            <p class="rq-card-desc">18 questions. Obsessive-compulsive inventory, revised version. Covers six symptom dimensions.</p>
+        </a>
+
+        <a href="mdq.html" class="rq-card">
+            <div class="rq-card-condition">Bipolar</div>
+            <div class="rq-card-name">MDQ</div>
+            <p class="rq-card-desc">Three-part questionnaire. Screens for a history of manic or hypomanic episodes and the impact they caused.</p>
+        </a>
+
+        <a href="pcl5.html" class="rq-card">
+            <div class="rq-card-condition">PTSD</div>
+            <div class="rq-card-name">PCL-5</div>
+            <p class="rq-card-desc">20 questions. PTSD checklist for DSM-5. Used to monitor symptom change during and after treatment.</p>
+        </a>
+
+    </div>
+
+</div>
+
+<script>
+function toggleTheme() {
+    var current = document.documentElement.getAttribute('data-theme');
+    var next = current === 'dark' ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', next);
+    localStorage.setItem('nofnway-theme', next);
+}
+
+// Session progress badges
+(function () {
+    var screeners = [
+        { key: 'rq-phq9',  total: 9,  href: 'phq9.html' },
+        { key: 'rq-gad7',  total: 7,  href: 'gad7.html' },
+        { key: 'rq-asrs',  total: 6,  href: 'asrs.html' },
+        { key: 'rq-aq10',  total: 10, href: 'aq10.html' },
+        { key: 'rq-ocir',  total: 18, href: 'ocir.html' },
+        { key: 'rq-mdq',   total: 15, href: 'mdq.html'  },
+        { key: 'rq-pcl5',  total: 20, href: 'pcl5.html' }
+    ];
+
+    screeners.forEach(function (s) {
+        var saved = sessionStorage.getItem(s.key);
+        if (!saved) return;
+        try {
+            var data = JSON.parse(saved);
+            var count = Object.keys(data).length;
+            var card = document.querySelector('a.rq-card[href="' + s.href + '"]');
+            if (!card) return;
+            var badge = document.createElement('div');
+            badge.className = 'rq-session-badge ' + (count >= s.total ? 'rq-done' : 'rq-progress');
+            badge.textContent = count >= s.total ? 'Done this session' : 'In progress';
+            card.appendChild(badge);
+        } catch (e) {}
+    });
+}());
+</script>
+<script src="../privacy.js"></script>
+
+</body>
+</html>

@@ -4,7 +4,7 @@
    updates to users: e.g. nofnway-v1 → nofnway-v2
    ============================================================ */
 
-const CACHE_NAME = 'nofnway-v23';
+const CACHE_NAME = 'nofnway-v24';
 
 /* Pre-cached on install — all HTML, CSS, JS, SVG.
    Images are cached on first access (see fetch handler). */
@@ -32,6 +32,17 @@ const PRECACHE = [
     '/duly_noted',
     '/i_knew_that',
     '/this_works_at_school',
+
+    /* Right Questions screeners */
+    '/right-questions/',
+    '/right-questions/styles.css',
+    '/right-questions/phq9',
+    '/right-questions/gad7',
+    '/right-questions/asrs',
+    '/right-questions/aq10',
+    '/right-questions/mdq',
+    '/right-questions/ocir',
+    '/right-questions/pcl5',
 
     /* Vendor libs */
     '/vendor/pdf.min.js',

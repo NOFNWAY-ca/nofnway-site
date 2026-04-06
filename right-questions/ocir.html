@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="author" content="Gerry McMahon">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OCI-R OCD Screener – The Right [FN] Questions – NOFNWAY</title>
+    <meta name="description" content="The OCI-R obsessive-compulsive inventory, revised. The actual validated version. Answer honestly, get your score, bring it to your appointment. Free, private, nothing leaves your browser.">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <script>document.documentElement.setAttribute('data-theme', localStorage.getItem('nofnway-theme') || 'light');</script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bangers&family=Montserrat:wght@900&family=Roboto:wght@400;700&display=swap" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bangers&family=Montserrat:wght@900&family=Roboto:wght@400;700&display=swap"></noscript>
+    <link rel="stylesheet" href="../theme.css">
+    <link rel="stylesheet" href="styles.css">
+    <script>if ('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js').catch(() => {});</script>
+</head>
+<body>
+
+<nav class="navbar">
+    <a href="https://nofnway.ca/" class="brand">NO<span>FN</span>WAY</a>
+    <div class="nav-controls">
+        <button class="theme-toggle" onclick="toggleTheme()">Light / Dark</button>
+        <button class="privacy-btn" onclick="togglePrivacy()" aria-label="Privacy information">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        </button>
+    </div>
+</nav>
+
+<div id="privacy-panel" class="privacy-panel" hidden>
+    <div class="privacy-panel-hd">
+        <span class="privacy-panel-title">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            Privacy
+        </span>
+        <button class="privacy-close" onclick="togglePrivacy()" aria-label="Close privacy panel">&#x2715;</button>
+    </div>
+    <p>Nothing you enter here is stored, sent, or tracked. Your answers exist only in your browser and disappear when you close the tab. No accounts. No cookies. No analytics. We never see them.</p>
+</div>
+
+<div class="rq-wrap">
+
+    <a href="index.html" class="page-back">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="15 18 9 12 15 6"/></svg>
+        The Right [FN] Questions
+    </a>
+
+    <div class="screener-title-block">
+        <h1>OCI-R</h1>
+        <p class="screener-subtitle">Obsessive-Compulsive Inventory -- Revised</p>
+    </div>
+
+    <div class="screener-intro">
+        <p>18 questions across six symptom areas. For each one, rate how much that experience has distressed or bothered you during the past month. Some of these may not apply to you at all -- "Not at all" is a valid answer.</p>
+    </div>
+
+    <form id="ocir-form" novalidate>
+
+        <p class="screener-prompt">During the past month, how much were you distressed by the following experiences?</p>
+
+        <div class="q-block" id="qblock-1">
+            <fieldset>
+                <legend><span class="q-num">Question 1 of 18</span>I have saved up so many things that they get in the way.</legend>
+                <div class="options" role="group">
+                    <label><input type="radio" name="q1" value="0"><span>Not at all</span></label>
+                    <label><input type="radio" name="q1" value="1"><span>A little</span></label>
+                    <label><input type="radio" name="q1" value="2"><span>Moderately</span></label>
+                    <label><input type="radio" name="q1" value="3"><span>A lot</span></label>
+                    <label><input type="radio" name="q1" value="4"><span>Extremely</span></label>
+                </div>
+            </fieldset>
+        </div>
+
+        <div class="q-block" id="qblock-2">
+            <fieldset>
+                <legend><span class="q-num">Question 2 of 18</span>I check things more often than necessary.</legend>
+                <div class="options" role="group">
+                    <label><input type="radio" name="q2" value="0"><span>Not at all</span></label>
+                    <label><input type="radio" name="q2" value="1"><span>A little</span></label>
+                    <label><input type="radio" name="q2" value="2"><span>Moderately</span></label>
+                    <label><input type="radio" name="q2" value="3"><span>A lot</span></label>
+                    <label><input type="radio" name="q2" value="4"><span>Extremely</span></label>
+                </div>
+            </fieldset>
+        </div>
+
+        <div class="q-block" id="qblock-3">
+            <fieldset>
+                <legend><span class="q-num">Question 3 of 18</span>I get upset if objects are not arranged properly.</legend>
+                <div class="options" role="group">
+                    <label><input type="radio" name="q3" value="0"><span>Not at all</span></label>
+                    <label><input type="radio" name="q3" value="1"><span>A little</span></label>
+                    <label><input type="radio" name="q3" value="2"><span>Moderately</span></label>
+                    <label><input type="radio" name="q3" value="3"><span>A lot</span></label>
+                    <label><input type="radio" name="q3" value="4"><span>Extremely</span></label>
+                </div>
+            </fieldset>
+        </div>
+
+        <div class="q-block" id="qblock-4">
+            <fieldset>
+                <legend><span class="q-num">Question 4 of 18</span>I feel compelled to count while I am doing things.</legend>
+                <div class="options" role="group">
+                    <label><input type="radio" name="q4" value="0"><span>Not at all</span></label>
+                    <label><input type="radio" name="q4" value="1"><span>A little</span></label>
+                    <label><input type="radio" name="q4" value="2"><span>Moderately</span></label>
+                    <label><input type="radio" name="q4" value="3"><span>A lot</span></label>
+                    <label><input type="radio" name="q4" value="4"><span>Extremely</span></label>
+                </div>
+            </fieldset>
+        </div>
+
+        <div class="q-block" id="qblock-5">
+            <fieldset>
+                <legend><span class="q-num">Question 5 of 18</span>I find it difficult to touch an object when I know it has been touched by strangers or certain people.</legend>
+                <div class="options" role="group">
+                    <label><input type="radio" name="q5" value="0"><span>Not at all</span></label>
+                    <label><input type="radio" name="q5" value="1"><span>A little</span></label>
+                    <label><input type="radio" name="q5" value="2"><span>Moderately</span></label>
+                    <label><input type="radio" name="q5" value="3"><span>A lot</span></label>
+                    <label><input type="radio" name="q5" value="4"><span>Extremely</span></label>
+                </div>
+            </fieldset>
+        </div>
+
+        <div class="q-block" id="qblock-6">
+            <fieldset>
+                <legend><span class="q-num">Question 6 of 18</span>I find it difficult to control my own thoughts.</legend>
+                <div class="options" role="group">
+                    <label><input type="radio" name="q6" value="0"><span>Not at all</span></label>
+                    <label><input type="radio" name="q6" value="1"><span>A little</span></label>
+                    <label><input type="radio" name="q6" value="2"><span>Moderately</span></label>
+                    <label><input type="radio" name="q6" value="3"><span>A lot</span></label>
+                    <label><input type="radio" name="q6" value="4"><span>Extremely</span></label>
+                </div>
+            </fieldset>
+        </div>
+
+        <div class="q-block" id="qblock-7">
+            <fieldset>
+                <legend><span class="q-num">Question 7 of 18</span>I collect things I don't need.</legend>
+                <div class="options" role="group">
+                    <label><input type="radio" name="q7" value="0"><span>Not at all</span></label>
+                    <label><input type="radio" name="q7" value="1"><span>A little</span></label>
+                    <label><input type="radio" name="q7" value="2"><span>Moderately</span></label>
+                    <label><input type="radio" name="q7" value="3"><span>A lot</span></label>
+                    <label><input type="radio" name="q7" value="4"><span>Extremely</span></label>
+                </div>
+            </fieldset>
+        </div>
+
+        <div class="q-block" id="qblock-8">
+            <fieldset>
+                <legend><span class="q-num">Question 8 of 18</span>I repeatedly check doors, windows, drawers, etc.</legend>
+                <div class="options" role="group">
+                    <label><input type="radio" name="q8" value="0"><span>Not at all</span></label>
+                    <label><input type="radio" name="q8" value="1"><span>A little</span></label>
+                    <label><input type="radio" name="q8" value="2"><span>Moderately</span></label>
+                    <label><input type="radio" name="q8" value="3"><span>A lot</span></label>
+                    <label><input type="radio" name="q8" value="4"><span>Extremely</span></label>
+                </div>
+            </fieldset>
+        </div>
+
+        <div class="q-block" id="qblock-9">
+            <fieldset>
+                <legend><span class="q-num">Question 9 of 18</span>I get upset if others change the way I have arranged things.</legend>
+                <div class="options" role="group">
+                    <label><input type="radio" name="q9" value="0"><span>Not at all</span></label>
+                    <label><input type="radio" name="q9" value="1"><span>A little</span></label>
+                    <label><input type="radio" name="q9" value="2"><span>Moderately</span></label>
+                    <label><input type="radio" name="q9" value="3"><span>A lot</span></label>
+                    <label><input type="radio" name="q9" value="4"><span>Extremely</span></label>
+                </div>
+            </fieldset>
+        </div>
+
+        <div class="q-block" id="qblock-10">
+            <fieldset>
+                <legend><span class="q-num">Question 10 of 18</span>I feel I have to repeat certain numbers.</legend>
+                <div class="options" role="group">
+                    <label><input type="radio" name="q10" value="0"><span>Not at all</span></label>
+                    <label><input type="radio" name="q10" value="1"><span>A little</span></label>
+                    <label><input type="radio" name="q10" value="2"><span>Moderately</span></label>
+                    <label><input type="radio" name="q10" value="3"><span>A lot</span></label>
+                    <label><input type="radio" name="q10" value="4"><span>Extremely</span></label>
+                </div>
+            </fieldset>
+        </div>
+
+        <div class="q-block" id="qblock-11">
+            <fieldset>
+                <legend><span class="q-num">Question 11 of 18</span>I sometimes have to wash or clean myself simply because I feel contaminated.</legend>
+                <div class="options" role="group">
+                    <label><input type="radio" name="q11" value="0"><span>Not at all</span></label>
+                    <label><input type="radio" name="q11" value="1"><span>A little</span></label>
+                    <label><input type="radio" name="q11" value="2"><span>Moderately</span></label>
+                    <label><input type="radio" name="q11" value="3"><span>A lot</span></label>
+                    <label><input type="radio" name="q11" value="4"><span>Extremely</span></label>
+                </div>
+            </fieldset>
+        </div>
+
+        <div class="q-block" id="qblock-12">
+            <fieldset>
+                <legend><span class="q-num">Question 12 of 18</span>I am upset by unpleasant thoughts that come into my mind against my will.</legend>
+                <div class="options" role="group">
+                    <label><input type="radio" name="q12" value="0"><span>Not at all</span></label>
+                    <label><input type="radio" name="q12" value="1"><span>A little</span></label>
+                    <label><input type="radio" name="q12" value="2"><span>Moderately</span></label>
+                    <label><input type="radio" name="q12" value="3"><span>A lot</span></label>
+                    <label><input type="radio" name="q12" value="4"><span>Extremely</span></label>
+                </div>
+            </fieldset>
+        </div>
+
+        <div class="q-block" id="qblock-13">
+            <fieldset>
+                <legend><span class="q-num">Question 13 of 18</span>I avoid throwing things away because I am afraid I might need them later.</legend>
+                <div class="options" role="group">
+                    <label><input type="radio" name="q13" value="0"><span>Not at all</span></label>
+                    <label><input type="radio" name="q13" value="1"><span>A little</span></label>
+                    <label><input type="radio" name="q13" value="2"><span>Moderately</span></label>
+                    <label><input type="radio" name="q13" value="3"><span>A lot</span></label>
+                    <label><input type="radio" name="q13" value="4"><span>Extremely</span></label>
+                </div>
+            </fieldset>
+        </div>
+
+        <div class="q-block" id="qblock-14">
+            <fieldset>
+                <legend><span class="q-num">Question 14 of 18</span>I repeatedly check gas and water taps and light switches after turning them off.</legend>
+                <div class="options" role="group">
+                    <label><input type="radio" name="q14" value="0"><span>Not at all</span></label>
+                    <label><input type="radio" name="q14" value="1"><span>A little</span></label>
+                    <label><input type="radio" name="q14" value="2"><span>Moderately</span></label>
+                    <label><input type="radio" name="q14" value="3"><span>A lot</span></label>
+                    <label><input type="radio" name="q14" value="4"><span>Extremely</span></label>
+                </div>
+            </fieldset>
+        </div>
+
+        <div class="q-block" id="qblock-15">
+            <fieldset>
+                <legend><span class="q-num">Question 15 of 18</span>I need things to be arranged in a particular way.</legend>
+                <div class="options" role="group">
+                    <label><input type="radio" name="q15" value="0"><span>Not at all</span></label>
+                    <label><input type="radio" name="q15" value="1"><span>A little</span></label>
+                    <label><input type="radio" name="q15" value="2"><span>Moderately</span></label>
+                    <label><input type="radio" name="q15" value="3"><span>A lot</span></label>
+                    <label><input type="radio" name="q15" value="4"><span>Extremely</span></label>
+                </div>
+            </fieldset>
+        </div>
+
+        <div class="q-block" id="qblock-16">
+            <fieldset>
+                <legend><span class="q-num">Question 16 of 18</span>I feel that there are good and bad numbers.</legend>
+                <div class="options" role="group">
+                    <label><input type="radio" name="q16" value="0"><span>Not at all</span></label>
+                    <label><input type="radio" name="q16" value="1"><span>A little</span></label>
+                    <label><input type="radio" name="q16" value="2"><span>Moderately</span></label>
+                    <label><input type="radio" name="q16" value="3"><span>A lot</span></label>
+                    <label><input type="radio" name="q16" value="4"><span>Extremely</span></label>
+                </div>
+            </fieldset>
+        </div>
+
+        <div class="q-block" id="qblock-17">
+            <fieldset>
+                <legend><span class="q-num">Question 17 of 18</span>I wash my hands more often and longer than necessary.</legend>
+                <div class="options" role="group">
+                    <label><input type="radio" name="q17" value="0"><span>Not at all</span></label>
+                    <label><input type="radio" name="q17" value="1"><span>A little</span></label>
+                    <label><input type="radio" name="q17" value="2"><span>Moderately</span></label>
+                    <label><input type="radio" name="q17" value="3"><span>A lot</span></label>
+                    <label><input type="radio" name="q17" value="4"><span>Extremely</span></label>
+                </div>
+            </fieldset>
+        </div>
+
+        <div class="q-block" id="qblock-18">
+            <fieldset>
+                <legend><span class="q-num">Question 18 of 18</span>I frequently get nasty thoughts and have difficulty in getting rid of them.</legend>
+                <div class="options" role="group">
+                    <label><input type="radio" name="q18" value="0"><span>Not at all</span></label>
+                    <label><input type="radio" name="q18" value="1"><span>A little</span></label>
+                    <label><input type="radio" name="q18" value="2"><span>Moderately</span></label>
+                    <label><input type="radio" name="q18" value="3"><span>A lot</span></label>
+                    <label><input type="radio" name="q18" value="4"><span>Extremely</span></label>
+                </div>
+            </fieldset>
+        </div>
+
+        <div class="screener-submit-wrap">
+            <button type="submit" class="screener-submit" id="submit-btn" disabled>See my score</button>
+            <p class="screener-progress" id="progress-text">Answer all 18 questions to continue</p>
+        </div>
+
+    </form>
+
+    <div id="score-summary" aria-live="polite">
+
+        <div class="score-card">
+            <div class="score-number-wrap">
+                <span class="score-number" id="score-display">0</span>
+                <span class="score-outof">out of 72</span>
+            </div>
+            <div class="score-range" id="score-range-label"></div>
+
+            <div class="score-range-bar" aria-hidden="true" id="range-bar"></div>
+            <div class="range-labels" aria-hidden="true">
+                <span>Below threshold</span>
+                <span>Above threshold</span>
+            </div>
+
+            <p class="score-meaning" id="score-meaning"></p>
+        </div>
+
+        <div class="score-card" style="margin-top: 16px;">
+            <div style="font-family: 'Montserrat', sans-serif; font-weight: 900; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-dim); margin-bottom: 14px;">Subscale breakdown</div>
+            <div id="subscale-breakdown" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 10px;"></div>
+        </div>
+
+        <div class="crisis-note">
+            <strong>If you are in crisis or need to talk to someone right now:</strong> call or text <strong>988</strong> (Suicide Crisis Helpline, available across Canada, 24 hours a day). You do not need to be in immediate danger to call.
+        </div>
+
+        <div class="what-next">
+            <div class="what-next-head">What you can do with this</div>
+            <div class="next-options">
+                <div class="next-opt">
+                    <strong>Bring it in</strong>
+                    Tell your doctor or therapist the total and which subscales were highest. It helps them understand where to start.
+                </div>
+                <div class="next-opt">
+                    <strong>Share it</strong>
+                    Show it to someone you trust. Sometimes having words for it is the first step.
+                </div>
+                <div class="next-opt">
+                    <strong>Keep it</strong>
+                    You do not have to do anything with it right now. Sometimes just recognising the pattern is enough.
+                </div>
+            </div>
+        </div>
+
+        <div class="screener-actions">
+            <button class="btn-reset" id="reset-btn">Start over</button>
+            <a href="index.html" class="back-link">Back to The Right [FN] Questions</a>
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+function toggleTheme() {
+    var current = document.documentElement.getAttribute('data-theme');
+    var next = current === 'dark' ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', next);
+    localStorage.setItem('nofnway-theme', next);
+}
+
+(function () {
+    var TOTAL_Q = 18;
+    var form = document.getElementById('ocir-form');
+    var submitBtn = document.getElementById('submit-btn');
+    var progressText = document.getElementById('progress-text');
+    var summary = document.getElementById('score-summary');
+    var answered = {};
+    var SESSION_KEY = 'rq-ocir';
+
+    var THRESHOLD = 21;
+
+    // Subscale groupings (1-indexed question numbers)
+    var subscales = [
+        { name: 'Washing',      questions: [5, 11, 17] },
+        { name: 'Obsessing',    questions: [6, 12, 18] },
+        { name: 'Hoarding',     questions: [1,  7, 13] },
+        { name: 'Ordering',     questions: [3,  9, 15] },
+        { name: 'Checking',     questions: [2,  8, 14] },
+        { name: 'Neutralising', questions: [4, 10, 16] }
+    ];
+
+    // Restore from sessionStorage if user navigated back mid-screener
+    (function () {
+        var saved = sessionStorage.getItem(SESSION_KEY);
+        if (!saved) return;
+        try {
+            answered = JSON.parse(saved);
+            Object.keys(answered).forEach(function (name) {
+                var input = form.querySelector('input[name="' + name + '"][value="' + answered[name] + '"]');
+                if (input) {
+                    input.closest('label').classList.add('selected');
+                    var block = input.closest('.q-block');
+                    if (block) block.classList.add('answered');
+                }
+            });
+            var count = Object.keys(answered).length;
+            var remaining = TOTAL_Q - count;
+            if (remaining === 0) {
+                submitBtn.disabled = false;
+                progressText.textContent = 'All questions answered. Ready when you are.';
+            } else {
+                progressText.textContent = remaining === 1 ? '1 question remaining' : remaining + ' questions remaining';
+            }
+        } catch (ex) { sessionStorage.removeItem(SESSION_KEY); }
+    }());
+
+    form.addEventListener('change', function (e) {
+        if (e.target.type !== 'radio') return;
+        answered[e.target.name] = parseInt(e.target.value, 10);
+        sessionStorage.setItem(SESSION_KEY, JSON.stringify(answered));
+
+        var group = e.target.closest('.options');
+        group.querySelectorAll('label').forEach(function (l) { l.classList.remove('selected'); });
+        e.target.closest('label').classList.add('selected');
+
+        var qNum = e.target.name.replace('q', '');
+        var block = document.getElementById('qblock-' + qNum);
+        if (block) block.classList.add('answered');
+
+        var count = Object.keys(answered).length;
+        var remaining = TOTAL_Q - count;
+        if (remaining === 0) {
+            submitBtn.disabled = false;
+            progressText.textContent = 'All questions answered. Ready when you are.';
+        } else {
+            submitBtn.disabled = true;
+            progressText.textContent = remaining === 1 ? '1 question remaining' : remaining + ' questions remaining';
+        }
+    });
+
+    form.addEventListener('submit', function (e) {
+        e.preventDefault();
+        var total = 0;
+        for (var q in answered) total += answered[q];
+
+        document.getElementById('score-display').textContent = total;
+
+        var aboveThreshold = total >= THRESHOLD;
+        var rangeLabel = aboveThreshold
+            ? 'Above the clinical threshold (' + THRESHOLD + '+)'
+            : 'Below the clinical threshold (under ' + THRESHOLD + ')';
+        var meaning = aboveThreshold
+            ? 'Scores of ' + THRESHOLD + ' or above are clinically significant. A clinician would want to discuss these results and may recommend further assessment or an OCD-specific treatment approach such as ERP (exposure and response prevention) therapy.'
+            : 'Scores below ' + THRESHOLD + ' are generally below the clinical threshold for OCD. A clinician would note any subscales with elevated scores and may ask about specific symptoms that stood out.';
+
+        document.getElementById('score-range-label').textContent = rangeLabel;
+        document.getElementById('score-meaning').textContent = meaning;
+
+        var bar = document.getElementById('range-bar');
+        bar.innerHTML = '';
+        [false, true].forEach(function (isAbove) {
+            var seg = document.createElement('div');
+            seg.className = 'range-seg';
+            if (isAbove === aboveThreshold) {
+                seg.style.background = aboveThreshold ? '#e74c3c' : '#2ecc71';
+            }
+            bar.appendChild(seg);
+        });
+
+        // Subscale breakdown
+        var breakdown = document.getElementById('subscale-breakdown');
+        breakdown.innerHTML = '';
+        subscales.forEach(function (sub) {
+            var subTotal = sub.questions.reduce(function (sum, qNum) {
+                return sum + (answered['q' + qNum] || 0);
+            }, 0);
+            var item = document.createElement('div');
+            item.style.cssText = 'padding: 10px 12px; background: var(--bg); border: 1px solid var(--border); border-radius: 6px;';
+            var label = document.createElement('div');
+            label.style.cssText = 'font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--text-dim); margin-bottom: 4px;';
+            label.textContent = sub.name;
+            var score = document.createElement('div');
+            score.style.cssText = 'font-family: Montserrat, sans-serif; font-weight: 900; font-size: 1.4rem; color: var(--text-main);';
+            score.textContent = subTotal + ' / 12';
+            item.appendChild(label);
+            item.appendChild(score);
+            breakdown.appendChild(item);
+        });
+
+        form.style.display = 'none';
+        summary.classList.add('visible');
+        summary.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+
+    document.getElementById('reset-btn').addEventListener('click', function () {
+        if (summary.classList.contains('visible') && !confirm('This will clear your results. Start over?')) return;
+        answered = {};
+        sessionStorage.removeItem(SESSION_KEY);
+        form.reset();
+        form.querySelectorAll('label').forEach(function (l) { l.classList.remove('selected'); });
+        form.querySelectorAll('.q-block').forEach(function (b) { b.classList.remove('answered'); });
+        submitBtn.disabled = true;
+        progressText.textContent = 'Answer all ' + TOTAL_Q + ' questions to continue';
+        form.style.display = '';
+        summary.classList.remove('visible');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+
+})();
+</script>
+<script src="../privacy.js"></script>
+
+</body>
+</html>
