@@ -261,7 +261,8 @@
 
         /* Pause all animations by toggling class on scene */
         .bug-scene.paused .bug-body-group,
-        .bug-scene.paused .bug-body-group * {
+        .bug-scene.paused .bug-body-group *,
+        .bug-scene.paused .in-panic .bug-body-group {
             animation-play-state: paused !important;
         }
 
@@ -470,6 +471,92 @@
         .btn-again:hover { filter: brightness(1.1); }
 
         .hidden { display: none !important; }
+
+        /* ── Time-of-day backgrounds ──────────────────────────────── */
+        .bug-scene.time-morning {
+            background: linear-gradient(180deg, #e8f5e9 0%, #c8e6c9 65%, #a5d6a7 100%);
+            border-color: #81c784;
+        }
+        .bug-scene.time-afternoon {
+            background: linear-gradient(180deg, #fffde7 0%, #f5f0b0 65%, #c8e6c9 100%);
+            border-color: #f9a825;
+        }
+        .bug-scene.time-evening {
+            background: linear-gradient(180deg, #fce4ec 0%, #ffccbc 65%, #c8e6c9 100%);
+            border-color: #ef9a9a;
+        }
+        .bug-scene.time-night {
+            background: linear-gradient(180deg, #0d1b2a 0%, #1a2744 65%, #1b3022 100%);
+            border-color: #1a3a44;
+        }
+        [data-theme="dark"] .bug-scene.time-morning,
+        [data-theme="dark"] .bug-scene.time-afternoon,
+        [data-theme="dark"] .bug-scene.time-evening {
+            background: linear-gradient(180deg, #1a2f1b 0%, #1a3320 65%, #1b3d22 100%);
+            border-color: #2e7d32;
+        }
+
+        /* ── Adrenaline / panic ───────────────────────────────────── */
+        @keyframes bug-panic {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            20%  { transform: translateY(-9px) rotate(-5deg); }
+            60%  { transform: translateY(-7px) rotate(4deg); }
+        }
+        .bug-wrap.in-panic .bug-body-group {
+            animation: bug-panic 0.45s ease-in-out infinite !important;
+        }
+
+        .timer-urgent {
+            color: var(--accent) !important;
+            animation: pulse-red 0.5s ease-in-out infinite;
+        }
+        @keyframes pulse-red {
+            0%, 100% { opacity: 1; }
+            50%  { opacity: 0.65; }
+        }
+
+        /* ── Done screen entrance ─────────────────────────────────── */
+        @keyframes done-bounce-in {
+            0%   { transform: scale(0.75); opacity: 0; }
+            65%  { transform: scale(1.06); opacity: 1; }
+            100% { transform: scale(1);    opacity: 1; }
+        }
+        .done-screen.show-juice {
+            animation: done-bounce-in 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+        }
+
+        /* ── Finish juice overlay ─────────────────────────────────── */
+        .finish-juice {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            overflow: hidden;
+            z-index: 99;
+        }
+        @keyframes bug-fly-across {
+            from { transform: translateX(0) translateY(0) rotate(-10deg); opacity: 1; }
+            to   { transform: translateX(calc(100vw + 80px)) translateY(-30px) rotate(15deg); opacity: 0.7; }
+        }
+        .finish-bug {
+            position: absolute;
+            animation: bug-fly-across linear forwards;
+        }
+
+        /* ── Audio toggle ─────────────────────────────────────────── */
+        .btn-audio-toggle {
+            font-size: 0.68rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--text-dim);
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 6px 8px;
+            transition: color 0.15s;
+        }
+        .btn-audio-toggle:hover { color: var(--text-main); }
+        .btn-audio-toggle.audio-on { color: var(--brand); }
     </style>
     <meta property="og:type"        content="website">
     <meta property="og:url"         content="https://nofnway.ca/accountabilibugs">
@@ -583,6 +670,7 @@
         <div class="session-controls">
             <button class="btn-ctrl" id="pause-btn" onclick="togglePause()">Pause</button>
             <button class="btn-timer-toggle" id="timer-toggle-btn" onclick="toggleTimerDisplay()">Hide timer</button>
+            <button class="btn-audio-toggle" id="audio-toggle-btn" onclick="toggleAudio()">Sound off</button>
             <button class="btn-ctrl btn-stop" onclick="stopSession()">Stop</button>
         </div>
     </div>
@@ -603,6 +691,27 @@
 
 <script src="privacy.js"></script>
 <script>
+
+// ── Bug names + inner thoughts ─────────────────────────────────────────────────
+
+const BUG_NAMES = ['Steve', 'Mildred', 'Gord', 'Janet', 'Carl', 'Dot', 'Reg', 'Barb', 'Ernie', 'Phyllis', 'Dave', 'Norma'];
+const BUG_THOUGHTS = [
+    'Just here for the snacks.',
+    'This is fine.',
+    'Deadline? Never heard of her.',
+    'Keeping it together.',
+    'One step at a time.',
+    'No thoughts. Only vibes.',
+    'Pretending to be productive.',
+    'Doing my best.',
+    'Already thinking about lunch.',
+    'Eyes on the prize.',
+    'Whatever it takes.',
+    'Somebody has to do it.',
+];
+
+let audioCtx = null;
+let wakeLock = null;
 
 // ── Activities ─────────────────────────────────────────────────────────────────
 
@@ -760,6 +869,8 @@ const S = {
     pauseStart: 0,
     tickId: null,
     showTimer: true,
+    adrenaline: false,
+    audioOn: false,
 };
 
 // ── Theme ──────────────────────────────────────────────────────────────────────
@@ -812,17 +923,27 @@ function startSession() {
     const count = bugCount(S.selectedMin);
     S.departInterval = S.durationMs / count;
 
-    // Pick random activities, no repeats until cycled
-    const pool = [...ACTIVITIES].sort(() => Math.random() - 0.5);
+    // Reset adrenaline state
+    S.adrenaline = false;
+    document.getElementById('timer-display').classList.remove('timer-urgent');
+
+    // Pick random activities, names, thoughts — no repeats until cycled
+    const pool    = [...ACTIVITIES].sort(() => Math.random() - 0.5);
+    const names   = [...BUG_NAMES].sort(() => Math.random() - 0.5);
+    const thoughts = [...BUG_THOUGHTS].sort(() => Math.random() - 0.5);
     S.bugs = Array.from({ length: count }, (_, i) => ({
         id: i,
         activity: pool[i % pool.length],
+        name: names[i % names.length],
+        thought: thoughts[i % thoughts.length],
         departed: false,
         wrapper: null,
     }));
     S.remainingBugs = count;
 
     renderScene();
+    setTimeOfDayBg();
+    acquireWakeLock();
 
     // Task display
     const taskEl = document.getElementById('session-task');
@@ -857,6 +978,7 @@ function renderScene() {
         const wrap = document.createElement('div');
         wrap.className = 'bug-wrap';
         wrap.id = 'bug-' + bug.id;
+        wrap.title = bug.name + ': ' + bug.thought;
         wrap.style.setProperty('--bob-dur', (1.5 + Math.random() * 1.2).toFixed(2) + 's');
         wrap.style.marginBottom = Math.floor(Math.random() * 14) + 'px';
 
@@ -865,7 +987,7 @@ function renderScene() {
 
         const lbl = document.createElement('span');
         lbl.className = 'bug-activity-label';
-        lbl.textContent = bug.activity.label;
+        lbl.textContent = bug.name + ' \u2014 ' + bug.activity.label;
         wrap.appendChild(lbl);
 
         scene.appendChild(wrap);
@@ -889,6 +1011,13 @@ function tick() {
         S.nextDepart += S.departInterval;
     }
 
+    // Adrenaline: last 60s, remaining bugs panic
+    if (!S.adrenaline && remaining <= 60000 && S.remainingBugs > 0) {
+        S.adrenaline = true;
+        S.bugs.filter(b => !b.departed).forEach(b => b.wrapper.classList.add('in-panic'));
+        document.getElementById('timer-display').classList.add('timer-urgent');
+    }
+
     if (remaining <= 0) {
         finishSession();
     }
@@ -910,7 +1039,9 @@ function departNext() {
     bug.departed = true;
     S.remainingBugs--;
 
+    bug.wrapper.classList.remove('in-panic');
     bug.wrapper.classList.add('departing');
+    playDepartSound();
     setTimeout(() => {
         bug.wrapper.classList.remove('departing');
         bug.wrapper.classList.add('gone');
@@ -961,6 +1092,7 @@ function stopSession() {
     if (S.phase === 'setup') return;
     if (!confirm('Stop this session?')) return;
     clearInterval(S.tickId);
+    releaseWakeLock();
     S.phase = 'setup';
     goSetup();
 }
@@ -971,12 +1103,15 @@ function finishSession() {
     clearInterval(S.tickId);
     S.phase = 'done';
     updateTimerDisplay(0);
+    releaseWakeLock();
 
     // Depart any remaining bugs together
     S.bugs.filter(b => !b.departed).forEach((b, i) => {
         b.departed = true;
         setTimeout(() => {
+            b.wrapper.classList.remove('in-panic');
             b.wrapper.classList.add('departing');
+            playDepartSound();
             setTimeout(() => {
                 b.wrapper.classList.remove('departing');
                 b.wrapper.classList.add('gone');
@@ -986,6 +1121,9 @@ function finishSession() {
 
     setTimeout(() => {
         show('screen-done');
+        const doneScreen = document.getElementById('screen-done');
+        doneScreen.classList.add('show-juice');
+        showFinishJuice();
         const dt = document.getElementById('done-task');
         if (S.task) {
             dt.textContent = S.task;
@@ -1003,6 +1141,7 @@ function goSetup() {
     S.showTimer = true;
     document.getElementById('timer-display').classList.remove('hidden');
     document.getElementById('timer-toggle-btn').textContent = 'Hide timer';
+    document.getElementById('screen-done').classList.remove('show-juice');
     show('screen-setup');
 }
 
@@ -1011,6 +1150,90 @@ function show(id) {
         document.getElementById(s).classList.toggle('hidden', s !== id);
     });
 }
+
+// ── Wake Lock ──────────────────────────────────────────────────────────────────
+
+async function acquireWakeLock() {
+    if (!('wakeLock' in navigator)) return;
+    try { wakeLock = await navigator.wakeLock.request('screen'); } catch(e) {}
+}
+function releaseWakeLock() {
+    if (wakeLock) { wakeLock.release(); wakeLock = null; }
+}
+document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible' && S.phase === 'running') acquireWakeLock();
+});
+
+// ── Time of day ────────────────────────────────────────────────────────────────
+
+function getTimeOfDay() {
+    const h = new Date().getHours();
+    if (h >= 5 && h < 12) return 'morning';
+    if (h >= 12 && h < 18) return 'afternoon';
+    if (h >= 18 && h < 21) return 'evening';
+    return 'night';
+}
+function setTimeOfDayBg() {
+    const scene = document.getElementById('bug-scene');
+    scene.classList.remove('time-morning', 'time-afternoon', 'time-evening', 'time-night');
+    scene.classList.add('time-' + getTimeOfDay());
+}
+
+// ── Audio ──────────────────────────────────────────────────────────────────────
+
+function playDepartSound() {
+    if (!S.audioOn) return;
+    try {
+        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc  = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'sine';
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.frequency.setValueAtTime(2800, audioCtx.currentTime);
+        osc.frequency.setValueAtTime(2200, audioCtx.currentTime + 0.06);
+        osc.frequency.setValueAtTime(2800, audioCtx.currentTime + 0.12);
+        gain.gain.setValueAtTime(0, audioCtx.currentTime);
+        gain.gain.linearRampToValueAtTime(0.12, audioCtx.currentTime + 0.01);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.22);
+        osc.start(audioCtx.currentTime);
+        osc.stop(audioCtx.currentTime + 0.25);
+    } catch(e) {}
+}
+function toggleAudio() {
+    S.audioOn = !S.audioOn;
+    const btn = document.getElementById('audio-toggle-btn');
+    btn.textContent = S.audioOn ? 'Sound on' : 'Sound off';
+    btn.classList.toggle('audio-on', S.audioOn);
+    if (S.audioOn && !audioCtx) {
+        try { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); } catch(e) {}
+    }
+}
+
+// ── Finish juice ───────────────────────────────────────────────────────────────
+
+function showFinishJuice() {
+    const overlay = document.createElement('div');
+    overlay.className = 'finish-juice';
+    document.body.appendChild(overlay);
+    for (let i = 0; i < 8; i++) {
+        const bug = document.createElement('span');
+        bug.className = 'finish-bug';
+        bug.textContent = '\uD83D\uDC1E';
+        bug.style.top = (20 + Math.random() * 55) + '%';
+        bug.style.left = '-40px';
+        bug.style.animationDelay = (i * 0.15) + 's';
+        bug.style.animationDuration = (1.2 + Math.random() * 0.8) + 's';
+        bug.style.fontSize = (0.9 + Math.random() * 0.8) + 'rem';
+        overlay.appendChild(bug);
+    }
+    setTimeout(() => overlay.remove(), 4000);
+}
+
+// ── Init ───────────────────────────────────────────────────────────────────────
+
+// Pre-fill task so users don't get stuck on naming
+document.getElementById('task-input').value = 'Doing the thing';
 
 </script>
 </body>
