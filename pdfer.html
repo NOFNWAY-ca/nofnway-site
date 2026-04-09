@@ -5,7 +5,7 @@
     <meta name="author" content="Gerry McMahon">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Free Image to PDF Converter – NOFNWAY</title>
-    <meta name="description" content="Convert photos to a single PDF and redact anything you don't want to share. Runs entirely in your browser. Nothing is uploaded or stored.'t want to share. Runs entirely in your browser. Nothing is uploaded or stored.">
+    <meta name="description" content="Convert photos to a single PDF and redact anything you don't want to share. Runs entirely in your browser. Nothing is uploaded or stored.">
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -162,7 +162,6 @@
         <ul>
             <li><strong>Add Page</strong> to add a photo from your camera or files. Add as many as you need.</li>
             <li>Tap a page to edit it: draw black redaction boxes over anything you don't want to share, or add a page title using the quick-tags (Receipt, Invoice, etc.).</li>
-            <li>Drag pages to reorder them.</li>
             <li>Tap <strong>Make PDF</strong> when ready. Your document saves automatically as you work. Come back anytime and pick up where you left off.</li>
             <li>Nothing is uploaded. Nothing leaves your browser.</li>
         </ul>
@@ -207,7 +206,7 @@
                 <button class="tool-btn" onclick="undoRedaction()">Undo</button>
                 <button class="tool-btn" onclick="clearRedactions()">Clear All</button>
             </div>
-            <div class="redact-hint" id="redactHint">Drag to black out sensitive info. Burns in permanently.</div>
+            <div class="redact-hint" id="redactHint">Drag to black out sensitive info.</div>
         </div>
         <div class="editor-footer">
             <button class="btn btn-secondary" onclick="closeModal()">Cancel</button>
@@ -241,19 +240,72 @@
     applyTheme();
     window.addEventListener('storage', e => { if (e.key === 'nofnway-theme') applyTheme(); });
 
+    /* --- INDEXEDDB --- */
+    let _db = null;
+    function openDB() {
+        if (_db) return Promise.resolve(_db);
+        return new Promise((resolve, reject) => {
+            const req = indexedDB.open('pdferDB', 1);
+            req.onupgradeneeded = e => e.target.result.createObjectStore('images', { keyPath: 'id' });
+            req.onsuccess = e => { _db = e.target.result; resolve(_db); };
+            req.onerror = e => reject(e.target.error);
+        });
+    }
+    function saveImage(blob) {
+        return openDB().then(db => new Promise((resolve, reject) => {
+            const id = 'img_' + Date.now() + '_' + Math.random().toString(36).slice(2);
+            const tx = db.transaction('images', 'readwrite');
+            tx.objectStore('images').put({ id, blob });
+            tx.oncomplete = () => resolve(id);
+            tx.onerror = e => reject(e.target.error);
+        }));
+    }
+    function getImage(imageId) {
+        return openDB().then(db => new Promise((resolve, reject) => {
+            const tx = db.transaction('images', 'readonly');
+            const req = tx.objectStore('images').get(imageId);
+            req.onsuccess = e => resolve(e.target.result ? e.target.result.blob : null);
+            req.onerror = e => reject(e.target.error);
+        }));
+    }
+    function deleteImage(imageId) {
+        return openDB().then(db => new Promise((resolve, reject) => {
+            const tx = db.transaction('images', 'readwrite');
+            tx.objectStore('images').delete(imageId);
+            tx.oncomplete = () => resolve();
+            tx.onerror = e => reject(e.target.error);
+        }));
+    }
+
+    /* --- UTILITY --- */
+    function dataURLtoBlob(dataURL) {
+        const [header, data] = dataURL.split(',');
+        const mime = header.match(/:(.*?);/)[1];
+        const binary = atob(data);
+        const arr = new Uint8Array(binary.length);
+        for (let i = 0; i < binary.length; i++) arr[i] = binary.charCodeAt(i);
+        return new Blob([arr], { type: mime });
+    }
+
     /* --- STATE --- */
     let appData = { pages: [], filename: 'Expense_Report' };
-    let editingId        = null;
-    let originalImage    = null;  // raw source, never modified
+
+    // Edit session state (reset on each openEditModal)
+    let editingId              = null;
+    let editOriginalUrl        = null;  // object URL (or legacy data URL) for the original in editor
+    let editCropRect           = null;  // { x, y, w, h } in natural image coords; null = full image
+    let editRedactions         = [];    // [{ x, y, w, h }] in original image coords
+    let editDragStart          = null;  // canvas-space start of current redact drag
+    let editDragCurrent        = null;  // canvas-space current pos during drag
+    let _rafPending            = null;  // rAF handle for throttled redact preview
+    let pendingOriginalDataUrl = null;  // compressed data URL for new page before IDB save
+
+    // Other runtime state
     let currentMode      = 'crop';
     let generatedPdfBlob = null;
-    let redactReady      = false; // true once redact canvas has been initialized for this edit session
-    let baseCroppedUrl   = null;  // data URL of crop result, used as redact base
-    let redactHistory    = [];    // snapshots for undo
     let cropAction       = null;  // 'move' | 'resize'
     let cropStart        = {};
-    let redactStart      = null;
-    let redactSnapshot   = null;
+    let _thumbUrls       = [];    // object URLs for thumbnails — revoked on re-render
 
     window.onload = () => {
         const saved = localStorage.getItem('nofn_pdfer');
@@ -283,7 +335,7 @@
                 const c = document.getElementById('compressor');
                 c.width = w; c.height = h;
                 c.getContext('2d').drawImage(img, 0, 0, w, h);
-                originalImage = c.toDataURL('image/jpeg', 0.85);
+                pendingOriginalDataUrl = c.toDataURL('image/jpeg', 0.85);
                 showLoader(false);
                 openEditModal(null);
             };
@@ -295,42 +347,58 @@
     /* ------------------------------------------------------------------ */
     /* EDIT MODAL                                                           */
     /* ------------------------------------------------------------------ */
-    function openEditModal(id) {
-        editingId      = id;
-        redactReady    = false;
-        baseCroppedUrl = null;
-        redactHistory  = [];
-        currentMode    = 'crop';
+    async function openEditModal(id) {
+        editingId       = id;
+        currentMode     = 'crop';
+        editCropRect    = null;
+        editRedactions  = [];
+        editDragStart   = null;
+        editDragCurrent = null;
+        if (_rafPending) { cancelAnimationFrame(_rafPending); _rafPending = null; }
+
+        if (editOriginalUrl && editOriginalUrl.startsWith('blob:')) {
+            URL.revokeObjectURL(editOriginalUrl);
+            editOriginalUrl = null;
+        }
 
         if (id) {
             const p = appData.pages.find(pg => pg.id === id);
-            originalImage = p.img;
+            const sourceId = p.originalImageId || p.imageId;
+            if (sourceId) {
+                const blob = await getImage(sourceId);
+                if (blob) editOriginalUrl = URL.createObjectURL(blob);
+            } else {
+                editOriginalUrl = p.img; // legacy data URL
+            }
+            if (p.edits) {
+                editCropRect   = p.edits.crop       ? { ...p.edits.crop }     : null;
+                editRedactions = p.edits.redactions ? [...p.edits.redactions] : [];
+            }
             document.getElementById('pageTitleInput').value = p.title || '';
         } else {
+            editOriginalUrl = pendingOriginalDataUrl;
             document.getElementById('pageTitleInput').value = '';
         }
 
         const img = document.getElementById('editorImg');
-        img.src = originalImage;
+        img.src = editOriginalUrl;
         document.getElementById('editModal').style.display = 'flex';
 
-        // Init crop after image renders
-        const ready = () => {
-            switchTab('crop');
-            initCropBox();
-        };
-        if (img.complete && img.naturalWidth) {
-            requestAnimationFrame(ready);
-        } else {
-            img.onload = ready;
-        }
+        const ready = () => { switchTab('crop'); initCropBox(); };
+        if (img.complete && img.naturalWidth) requestAnimationFrame(ready);
+        else img.onload = ready;
     }
 
     function closeModal() {
         document.getElementById('editModal').style.display = 'none';
-        redactReady    = false;
-        baseCroppedUrl = null;
-        redactHistory  = [];
+        if (editOriginalUrl && editOriginalUrl.startsWith('blob:')) {
+            URL.revokeObjectURL(editOriginalUrl);
+            editOriginalUrl = null;
+        }
+        if (_rafPending) { cancelAnimationFrame(_rafPending); _rafPending = null; }
+        editCropRect   = null;
+        editRedactions = [];
+        editDragStart  = null;
     }
 
     function quickTag(t) {
@@ -346,14 +414,25 @@
         const box   = document.getElementById('cropBox');
         const iRect = img.getBoundingClientRect();
         const sRect = stage.getBoundingClientRect();
-        const pad   = 0.04;
-        box.style.left   = (iRect.left - sRect.left + iRect.width  * pad) + 'px';
-        box.style.top    = (iRect.top  - sRect.top  + iRect.height * pad) + 'px';
-        box.style.width  = (iRect.width  * (1 - 2 * pad)) + 'px';
-        box.style.height = (iRect.height * (1 - 2 * pad)) + 'px';
+
+        if (editCropRect && img.naturalWidth) {
+            // Restore previously saved crop
+            const sx = iRect.width  / img.naturalWidth;
+            const sy = iRect.height / img.naturalHeight;
+            box.style.left   = (iRect.left - sRect.left + editCropRect.x * sx) + 'px';
+            box.style.top    = (iRect.top  - sRect.top  + editCropRect.y * sy) + 'px';
+            box.style.width  = (editCropRect.w * sx) + 'px';
+            box.style.height = (editCropRect.h * sy) + 'px';
+        } else {
+            const pad = 0.04;
+            box.style.left   = (iRect.left - sRect.left + iRect.width  * pad) + 'px';
+            box.style.top    = (iRect.top  - sRect.top  + iRect.height * pad) + 'px';
+            box.style.width  = (iRect.width  * (1 - 2 * pad)) + 'px';
+            box.style.height = (iRect.height * (1 - 2 * pad)) + 'px';
+        }
     }
 
-    // Pointer-based crop interaction (mouse + touch)
+    // Pointer-based crop interaction — with image-bounds clamping
     (function() {
         const box    = document.getElementById('cropBox');
         const handle = document.getElementById('cropHandle');
@@ -367,21 +446,31 @@
         }
         handle.addEventListener('pointerdown', e => onDown(e, 'resize'));
         box.addEventListener('pointerdown', e => { if (e.target !== handle) onDown(e, 'move'); });
+
         stage.addEventListener('pointermove', e => {
             if (!cropAction) return;
-            const dx = e.clientX - cropStart.px, dy = e.clientY - cropStart.py;
+            const img   = document.getElementById('editorImg');
+            const iRect = img.getBoundingClientRect();
+            const sRect = stage.getBoundingClientRect();
+            const imgL  = iRect.left - sRect.left;
+            const imgT  = iRect.top  - sRect.top;
+            const imgR  = imgL + iRect.width;
+            const imgB  = imgT + iRect.height;
+            const dx = e.clientX - cropStart.px;
+            const dy = e.clientY - cropStart.py;
             if (cropAction === 'move') {
-                box.style.left = Math.max(0, cropStart.l + dx) + 'px';
-                box.style.top  = Math.max(0, cropStart.t + dy) + 'px';
+                box.style.left = Math.max(imgL, Math.min(imgR - box.offsetWidth,  cropStart.l + dx)) + 'px';
+                box.style.top  = Math.max(imgT, Math.min(imgB - box.offsetHeight, cropStart.t + dy)) + 'px';
             } else {
-                box.style.width  = Math.max(40, cropStart.w + dx) + 'px';
-                box.style.height = Math.max(40, cropStart.h + dy) + 'px';
+                box.style.width  = Math.min(imgR - box.offsetLeft, Math.max(40, cropStart.w + dx)) + 'px';
+                box.style.height = Math.min(imgB - box.offsetTop,  Math.max(40, cropStart.h + dy)) + 'px';
             }
         });
         window.addEventListener('pointerup', () => { cropAction = null; });
     })();
 
-    function getCroppedCanvas() {
+    // Returns crop rect in natural image pixel coordinates
+    function getCropRect() {
         const img   = document.getElementById('editorImg');
         const box   = document.getElementById('cropBox');
         const iRect = img.getBoundingClientRect();
@@ -392,34 +481,34 @@
         const y = Math.max(0, (bRect.top  - iRect.top)  * sy);
         const w = Math.min(img.naturalWidth  - x, bRect.width  * sx);
         const h = Math.min(img.naturalHeight - y, bRect.height * sy);
-        const out = document.createElement('canvas');
-        out.width  = Math.round(w);
-        out.height = Math.round(h);
-        out.getContext('2d').drawImage(img, x, y, w, h, 0, 0, out.width, out.height);
-        return out;
+        return { x: Math.round(x), y: Math.round(y), w: Math.round(w), h: Math.round(h) };
     }
 
     /* ------------------------------------------------------------------ */
     /* REDACT                                                               */
     /* ------------------------------------------------------------------ */
-    function initRedactCanvas() {
-        // Must be called while editorImg is still visible (before switchTab hides it)
-        const canvas  = document.getElementById('redactCanvas');
-        const cropped = getCroppedCanvas();
-        baseCroppedUrl = cropped.toDataURL('image/jpeg', 0.92); // store for clearRedactions
-        canvas.width  = cropped.width;
-        canvas.height = cropped.height;
+
+    // Redraws redact canvas from scratch: original → crop → stored redactions → drag preview
+    function redrawRedactCanvas(canvas, dragRect) {
+        const img  = document.getElementById('editorImg');
+        const crop = editCropRect || { x: 0, y: 0, w: img.naturalWidth, h: img.naturalHeight };
+        if (!crop.w || !crop.h) return;
+        canvas.width  = crop.w;
+        canvas.height = crop.h;
         const ctx = canvas.getContext('2d');
-        ctx.drawImage(cropped, 0, 0);
-        redactHistory = [ctx.getImageData(0, 0, canvas.width, canvas.height)];
-        redactReady = true;
+        ctx.drawImage(img, crop.x, crop.y, crop.w, crop.h, 0, 0, crop.w, crop.h);
+        ctx.fillStyle = '#000000';
+        editRedactions.forEach(r => {
+            ctx.fillRect(r.x - crop.x, r.y - crop.y, r.w, r.h);
+        });
+        if (dragRect) ctx.fillRect(dragRect.x, dragRect.y, dragRect.w, dragRect.h);
     }
 
-    // Pointer events for drawing on redact canvas
+    // Pointer events — normalized rects, RAF-throttled preview, stored in original image coords
     (function() {
         const canvas = document.getElementById('redactCanvas');
 
-        function pos(e) {
+        function canvasPos(e) {
             const r = canvas.getBoundingClientRect();
             return {
                 x: (e.clientX - r.left) * (canvas.width  / r.width),
@@ -429,54 +518,64 @@
 
         canvas.addEventListener('pointerdown', e => {
             if (currentMode !== 'redact') return;
-            redactStart    = pos(e);
-            redactSnapshot = canvas.getContext('2d').getImageData(0, 0, canvas.width, canvas.height);
+            editDragStart   = canvasPos(e);
+            editDragCurrent = { ...editDragStart };
             e.preventDefault();
         });
 
         canvas.addEventListener('pointermove', e => {
-            if (!redactStart) return;
-            const p   = pos(e);
-            const ctx = canvas.getContext('2d');
-            ctx.putImageData(redactSnapshot, 0, 0);
-            ctx.fillStyle = '#000000';
-            ctx.fillRect(redactStart.x, redactStart.y, p.x - redactStart.x, p.y - redactStart.y);
+            if (!editDragStart) return;
+            editDragCurrent = canvasPos(e);
+            if (!_rafPending) {
+                _rafPending = requestAnimationFrame(() => {
+                    _rafPending = null;
+                    const dragRect = {
+                        x: Math.min(editDragStart.x, editDragCurrent.x),
+                        y: Math.min(editDragStart.y, editDragCurrent.y),
+                        w: Math.abs(editDragCurrent.x - editDragStart.x),
+                        h: Math.abs(editDragCurrent.y - editDragStart.y)
+                    };
+                    redrawRedactCanvas(canvas, dragRect);
+                });
+            }
         });
 
         canvas.addEventListener('pointerup', e => {
-            if (!redactStart) return;
-            const p = pos(e);
-            if (Math.abs(p.x - redactStart.x) > 4 || Math.abs(p.y - redactStart.y) > 4) {
-                // Commit: push snapshot to history before this draw
-                redactHistory.push(canvas.getContext('2d').getImageData(0, 0, canvas.width, canvas.height));
-            } else {
-                // Tiny tap — restore, don't commit
-                canvas.getContext('2d').putImageData(redactSnapshot, 0, 0);
+            if (!editDragStart) return;
+            if (_rafPending) { cancelAnimationFrame(_rafPending); _rafPending = null; }
+            const p  = canvasPos(e);
+            const dx = p.x - editDragStart.x;
+            const dy = p.y - editDragStart.y;
+            if (Math.abs(dx) > 4 || Math.abs(dy) > 4) {
+                const crop = editCropRect || { x: 0, y: 0 };
+                editRedactions.push({
+                    x: Math.round(Math.min(editDragStart.x, p.x) + crop.x),
+                    y: Math.round(Math.min(editDragStart.y, p.y) + crop.y),
+                    w: Math.round(Math.abs(dx)),
+                    h: Math.round(Math.abs(dy))
+                });
             }
-            redactStart    = null;
-            redactSnapshot = null;
+            editDragStart   = null;
+            editDragCurrent = null;
+            redrawRedactCanvas(canvas, null);
+        });
+
+        canvas.addEventListener('pointercancel', () => {
+            if (_rafPending) { cancelAnimationFrame(_rafPending); _rafPending = null; }
+            editDragStart = null;
+            redrawRedactCanvas(canvas, null);
         });
     })();
 
     function undoRedaction() {
-        if (redactHistory.length <= 1) return;
-        redactHistory.pop();
-        const canvas = document.getElementById('redactCanvas');
-        canvas.getContext('2d').putImageData(redactHistory[redactHistory.length - 1], 0, 0);
+        if (!editRedactions.length) return;
+        editRedactions.pop();
+        redrawRedactCanvas(document.getElementById('redactCanvas'), null);
     }
 
     function clearRedactions() {
-        if (!baseCroppedUrl) return;
-        const canvas = document.getElementById('redactCanvas');
-        const img    = new Image();
-        img.onload = () => {
-            canvas.width  = img.naturalWidth;
-            canvas.height = img.naturalHeight;
-            const ctx = canvas.getContext('2d');
-            ctx.drawImage(img, 0, 0);
-            redactHistory = [ctx.getImageData(0, 0, canvas.width, canvas.height)];
-        };
-        img.src = baseCroppedUrl;
+        editRedactions = [];
+        redrawRedactCanvas(document.getElementById('redactCanvas'), null);
     }
 
     /* ------------------------------------------------------------------ */
@@ -485,9 +584,10 @@
     function switchTab(mode) {
         currentMode = mode;
 
-        // Init redact canvas BEFORE hiding editorImg — getBoundingClientRect needs it visible
-        if (mode === 'redact' && !redactReady) {
-            initRedactCanvas();
+        if (mode === 'redact') {
+            // Capture current crop from box BEFORE hiding editorImg
+            editCropRect = getCropRect();
+            redrawRedactCanvas(document.getElementById('redactCanvas'), null);
         }
 
         document.getElementById('tabCrop').classList.toggle('active',   mode === 'crop');
@@ -495,7 +595,6 @@
 
         const showCrop   = mode === 'crop';
         const showRedact = mode === 'redact';
-
         document.getElementById('editorImg').style.display       = showCrop   ? 'block' : 'none';
         document.getElementById('cropOverlay').style.display     = showCrop   ? 'block' : 'none';
         document.getElementById('redactCanvas').style.display    = showRedact ? 'block' : 'none';
@@ -504,32 +603,91 @@
     }
 
     /* ------------------------------------------------------------------ */
-    /* SAVE PAGE                                                            */
+    /* RENDER FINAL IMAGE                                                   */
+    /* Applies crop and redactions non-destructively; returns a canvas.    */
     /* ------------------------------------------------------------------ */
-    function confirmPage() {
-        showLoader(true);
-        setTimeout(() => {
-            try {
-                let finalUrl;
-                if (currentMode === 'redact' && redactReady) {
-                    finalUrl = document.getElementById('redactCanvas').toDataURL('image/jpeg', 0.85);
-                } else {
-                    finalUrl = getCroppedCanvas().toDataURL('image/jpeg', 0.85);
-                }
-                const title = document.getElementById('pageTitleInput').value.trim() || 'Untitled';
-                if (editingId) {
-                    const p = appData.pages.find(pg => pg.id === editingId);
-                    if (p) { p.title = title; p.img = finalUrl; }
-                } else {
-                    appData.pages.push({ id: Date.now(), title, img: finalUrl, date: new Date().toLocaleDateString() });
-                }
-                saveData();
-                render();
-                closeModal();
-            } finally {
-                showLoader(false);
+    function renderFinalImage(page) {
+        return new Promise((resolve, reject) => {
+            const sourceId = page.originalImageId || page.imageId;
+            let blobUrl    = null;
+
+            function draw(imgEl) {
+                const edits = page.edits || { crop: null, redactions: [] };
+                const crop  = edits.crop || { x: 0, y: 0, w: imgEl.naturalWidth, h: imgEl.naturalHeight };
+                const canvas = document.createElement('canvas');
+                canvas.width  = crop.w;
+                canvas.height = crop.h;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(imgEl, crop.x, crop.y, crop.w, crop.h, 0, 0, crop.w, crop.h);
+                ctx.fillStyle = '#000000';
+                (edits.redactions || []).forEach(r => {
+                    ctx.fillRect(r.x - crop.x, r.y - crop.y, r.w, r.h);
+                });
+                if (blobUrl) URL.revokeObjectURL(blobUrl);
+                resolve(canvas);
             }
-        }, 50);
+
+            if (sourceId) {
+                getImage(sourceId).then(blob => {
+                    if (!blob) { reject(new Error('Image not found in DB')); return; }
+                    blobUrl = URL.createObjectURL(blob);
+                    const img = new Image();
+                    img.onload  = () => draw(img);
+                    img.onerror = reject;
+                    img.src     = blobUrl;
+                }).catch(reject);
+            } else if (page.img) {
+                const img = new Image();
+                img.onload  = () => draw(img);
+                img.onerror = reject;
+                img.src     = page.img;
+            } else {
+                reject(new Error('No image source for page'));
+            }
+        });
+    }
+
+    /* ------------------------------------------------------------------ */
+    /* SAVE PAGE — non-destructive: stores edits + original ref only       */
+    /* ------------------------------------------------------------------ */
+    async function confirmPage() {
+        showLoader(true);
+        try {
+            const title = document.getElementById('pageTitleInput').value.trim() || 'Untitled';
+            const crop  = (currentMode === 'crop') ? getCropRect() : editCropRect;
+            const edits = { crop, redactions: [...editRedactions] };
+
+            if (editingId) {
+                const p = appData.pages.find(pg => pg.id === editingId);
+                if (p) {
+                    // Migrate legacy imageId → originalImageId on first re-edit
+                    if (p.imageId && !p.originalImageId) {
+                        p.originalImageId = p.imageId;
+                        delete p.imageId;
+                    }
+                    p.title = title;
+                    p.edits = edits;
+                }
+            } else {
+                const blob = dataURLtoBlob(pendingOriginalDataUrl);
+                const originalImageId = await saveImage(blob);
+                appData.pages.push({
+                    id: Date.now(),
+                    title,
+                    date: new Date().toLocaleDateString(),
+                    originalImageId,
+                    edits
+                });
+            }
+            saveData();
+            render();
+            closeModal();
+        } catch(err) {
+            console.error(err);
+            alert('Something went wrong saving the page.');
+        } finally {
+            showLoader(false);
+        }
     }
 
     /* ------------------------------------------------------------------ */
@@ -537,24 +695,29 @@
     /* ------------------------------------------------------------------ */
     async function compilePDF() {
         if (!appData.pages.length) return;
+        if (!window.jspdf || !window.jspdf.jsPDF) {
+            alert('PDF library failed to load. Check your connection and reload the page.');
+            return;
+        }
         showLoader(true);
         try {
             const { jsPDF } = window.jspdf;
-            const doc    = new jsPDF({ unit: 'mm', format: 'a4' });
-            const pageW  = 210, pageH = 297, margin = 12;
+            const doc   = new jsPDF({ unit: 'mm', format: 'a4' });
+            const pageW = 210, pageH = 297, margin = 12;
 
             for (let i = 0; i < appData.pages.length; i++) {
                 if (i > 0) doc.addPage();
-                const p    = appData.pages[i];
-                const dims = await getImageDimensions(p.img);
+                const p      = appData.pages[i];
+                const canvas  = await renderFinalImage(p);
+                const imgData = canvas.toDataURL('image/jpeg', 0.85);
                 const titleH  = p.title ? 8 : 0;
                 const availW  = pageW - margin * 2;
                 const availH  = pageH - margin * 2 - titleH;
-                const ratio   = Math.min(availW / dims.w, availH / dims.h);
-                const imgW    = dims.w * ratio;
-                const imgH    = dims.h * ratio;
-                const imgX    = margin + (availW - imgW) / 2; // center on page
-                doc.addImage(p.img, 'JPEG', imgX, margin, imgW, imgH);
+                const ratio   = Math.min(availW / canvas.width, availH / canvas.height);
+                const imgW    = canvas.width  * ratio;
+                const imgH    = canvas.height * ratio;
+                const imgX    = margin + (availW - imgW) / 2;
+                doc.addImage(imgData, 'JPEG', imgX, margin, imgW, imgH);
                 if (p.title) {
                     doc.setFontSize(9);
                     doc.setTextColor(130, 130, 130);
@@ -575,45 +738,82 @@
         }
     }
 
-    function getImageDimensions(dataUrl) {
-        return new Promise(resolve => {
-            const img = new Image();
-            img.onload = () => resolve({ w: img.naturalWidth, h: img.naturalHeight });
-            img.src = dataUrl;
-        });
-    }
-
     /* ------------------------------------------------------------------ */
     /* PAGE LIST                                                            */
     /* ------------------------------------------------------------------ */
     function render() {
+        _thumbUrls.forEach(u => URL.revokeObjectURL(u));
+        _thumbUrls = [];
         const stream = document.getElementById('stream');
         document.getElementById('emptyState').style.display = appData.pages.length ? 'none' : 'block';
         stream.querySelectorAll('.page-card').forEach(c => c.remove());
         appData.pages.forEach((p, i) => {
             const card = document.createElement('div');
             card.className = 'page-card';
-            card.innerHTML = `
-                <img src="${p.img}" class="page-thumb" alt="">
-                <div class="page-info">
-                    <div class="page-title">${i + 1}. ${p.title}</div>
-                    <div class="page-date">${p.date || ''}</div>
-                </div>
-                <button class="page-del" title="Remove">✕</button>`;
-            card.querySelector('.page-del').onclick = e => { e.stopPropagation(); deletePage(i); };
+
+            const thumb = document.createElement('img');
+            thumb.className = 'page-thumb';
+            thumb.alt = '';
+            if (!p.originalImageId && !p.imageId && p.img) {
+                // Pure legacy data-URL page with no edits stored
+                thumb.src = p.img;
+            } else {
+                renderFinalImage(p).then(canvas => {
+                    canvas.toBlob(blob => {
+                        if (!blob) return;
+                        const url = URL.createObjectURL(blob);
+                        _thumbUrls.push(url);
+                        thumb.src = url;
+                    }, 'image/jpeg', 0.75);
+                }).catch(() => {});
+            }
+
+            const info = document.createElement('div');
+            info.className = 'page-info';
+            const titleDiv = document.createElement('div');
+            titleDiv.className = 'page-title';
+            titleDiv.textContent = (i + 1) + '. ' + p.title;
+            const dateDiv = document.createElement('div');
+            dateDiv.className = 'page-date';
+            dateDiv.textContent = p.date || '';
+            info.appendChild(titleDiv);
+            info.appendChild(dateDiv);
+
+            const delBtn = document.createElement('button');
+            delBtn.className = 'page-del';
+            delBtn.title = 'Remove';
+            delBtn.textContent = '✕';
+            delBtn.onclick = e => { e.stopPropagation(); deletePage(i); };
+
+            card.appendChild(thumb);
+            card.appendChild(info);
+            card.appendChild(delBtn);
             card.onclick = () => openEditModal(p.id);
             stream.appendChild(card);
         });
     }
 
-    function deletePage(i) { appData.pages.splice(i, 1); saveData(); render(); }
+    async function deletePage(i) {
+        if (!confirm('Remove this page?')) return;
+        const p = appData.pages[i];
+        if (p.originalImageId) await deleteImage(p.originalImageId);
+        if (p.imageId)         await deleteImage(p.imageId);
+        appData.pages.splice(i, 1);
+        saveData();
+        render();
+    }
 
     function saveData() {
         appData.filename = document.getElementById('docName').value.trim() || 'Expense_Report';
         localStorage.setItem('nofn_pdfer', JSON.stringify(appData));
     }
 
-    function resetAll() {
+    async function resetAll() {
+        if (appData.pages.length && !confirm('Remove all pages and start over?')) return;
+        for (const p of appData.pages) {
+            if (p.originalImageId) await deleteImage(p.originalImageId);
+            if (p.imageId)         await deleteImage(p.imageId);
+        }
         appData.pages = [];
         saveData();
         render();
@@ -653,6 +853,7 @@ function shareThisPage() {
 }
 </script>
 <script src="privacy.js"></script>
+<script>if (typeof togglePrivacy === 'undefined') { window.togglePrivacy = () => { var p = document.getElementById('privacy-panel'); if (p) p.hidden = !p.hidden; }; }</script>
 <footer style="text-align:center; padding:8px 20px; font-size:0.65rem; color:var(--text-dim); border-top:1px solid var(--border); flex-shrink:0;">
     <div class="footer-share">
         <button class="footer-share-btn" onclick="shareThisPage()">You know who might like this?</button>

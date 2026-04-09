@@ -98,7 +98,7 @@
 <nav class="navbar">
     <a href="index" class="brand">NO<span>FN</span>WAY<span class="brand-sub"> // [FN] JPEGer</span></a>
     <div class="nav-controls">
-        <button id="resetBtn" class="nav-btn hidden" onclick="location.reload()">Reset</button>
+        <button id="resetBtn" class="nav-btn hidden" onclick="doReset()">Reset</button>
         <div id="filenameGroup" class="hidden">
             <label class="filename-label">Base Name</label>
             <input type="text" id="filenameInput" class="filename-input" placeholder="filename">
@@ -144,6 +144,8 @@
     const pdfjsLib = window['pdfjs-dist/build/pdf'];
     pdfjsLib.GlobalWorkerOptions.workerSrc = 'vendor/pdf.worker.min.js';
 
+    const MAX_PAGES = 50;
+
     const setup         = document.getElementById('setup'),
           fileInput     = document.getElementById('fileInput'),
           grid          = document.getElementById('previewGrid'),
@@ -157,6 +159,7 @@
 
     let exportList = [];
     let errorTimer = null;
+    let cancelled = false;
 
     /* --- PREVENT BROWSER NAVIGATION ON ACCIDENTAL DROPS --- */
     window.addEventListener('dragover', e => e.preventDefault());
@@ -167,15 +170,20 @@
     fileInput.addEventListener('change', e => processPdf(e.target.files[0]));
 
     /* --- DRAG AND DROP --- */
-    setup.addEventListener('dragover', e => {
+    let dragCounter = 0;
+    setup.addEventListener('dragenter', e => {
         e.preventDefault();
+        dragCounter++;
         setup.classList.add('drag-over');
     });
-    setup.addEventListener('dragleave', e => {
-        if (!setup.contains(e.relatedTarget)) setup.classList.remove('drag-over');
+    setup.addEventListener('dragleave', () => {
+        dragCounter--;
+        if (dragCounter === 0) setup.classList.remove('drag-over');
     });
+    setup.addEventListener('dragover', e => e.preventDefault());
     setup.addEventListener('drop', e => {
         e.preventDefault();
+        dragCounter = 0;
         setup.classList.remove('drag-over');
         const file = e.dataTransfer.files[0];
         if (file?.type === 'application/pdf') {
@@ -184,6 +192,12 @@
             showError("That doesn't look like a PDF. Drop a .pdf file and try again.");
         }
     });
+
+    /* --- RESET --- */
+    function doReset() {
+        cancelled = true;
+        location.reload();
+    }
 
     /* --- ERROR DISPLAY --- */
     function showError(msg) {
@@ -197,6 +211,7 @@
     async function processPdf(file) {
         if (!file) return;
 
+        cancelled = false;
         errorBanner.style.display = 'none';
         loader.style.display = 'grid';
         grid.innerHTML = '';
@@ -209,10 +224,26 @@
             const arrayBuffer = await file.arrayBuffer();
             const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
             const total = pdf.numPages;
-            const baseName = file.name.substring(0, file.name.lastIndexOf('.')) || file.name;
+
+            if (total > MAX_PAGES) {
+                loader.style.display = 'none';
+                showError(`This PDF has ${total} pages. The limit is ${MAX_PAGES} to prevent your browser from running out of memory.`);
+                return;
+            }
+
+            const dotIndex = file.name.lastIndexOf('.');
+            const baseName = dotIndex > 0 ? file.name.substring(0, dotIndex) : file.name;
 
             for (let i = 1; i <= total; i++) {
+                if (cancelled) break;
+
                 loadText.innerText = `Baking P${i} / ${total}`;
+
+                // Yield to the browser once per page to keep UI responsive
+                await new Promise(requestAnimationFrame);
+
+                if (cancelled) break;
+
                 const page = await pdf.getPage(i);
                 const viewport = page.getViewport({ scale: 2.5, rotation: page.rotate });
                 const canvas = document.createElement('canvas');
@@ -221,12 +252,21 @@
 
                 await page.render({ canvasContext: canvas.getContext('2d'), viewport }).promise;
 
+                if (cancelled) {
+                    canvas.width = 0;
+                    canvas.height = 0;
+                    break;
+                }
+
                 const blob = await new Promise(res => canvas.toBlob(res, 'image/jpeg', 0.92));
-                const url = URL.createObjectURL(blob);
 
                 // Free canvas memory immediately
                 canvas.width = 0;
                 canvas.height = 0;
+
+                if (!blob) throw new Error('Encoding failed');
+
+                const url = URL.createObjectURL(blob);
 
                 const pageIndex = i;
                 const img = document.createElement('img');
@@ -238,15 +278,21 @@
                 exportList.push({ url });
             }
 
-            filenameInput.value = baseName;
-            setup.classList.add('hidden');
-            filenameGroup.classList.remove('hidden');
-            dlBtn.classList.remove('hidden');
-            resetBtn.classList.remove('hidden');
+            if (!cancelled) {
+                filenameInput.value = baseName;
+                setup.classList.add('hidden');
+                filenameGroup.classList.remove('hidden');
+                dlBtn.classList.remove('hidden');
+                resetBtn.classList.remove('hidden');
+            }
 
         } catch (err) {
             console.error(err);
-            showError('Could not read that PDF. It may be encrypted or damaged.');
+            if (err.name === 'PasswordException') {
+                showError('This PDF is password protected.');
+            } else {
+                showError('Could not process this PDF.');
+            }
         } finally {
             loader.style.display = 'none';
         }
