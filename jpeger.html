@@ -100,7 +100,7 @@
     <div class="nav-controls">
         <button id="resetBtn" class="nav-btn hidden" onclick="doReset()">Reset</button>
         <div id="filenameGroup" class="hidden">
-            <label class="filename-label">Base Name</label>
+            <label class="filename-label" for="filenameInput">Base Name</label>
             <input type="text" id="filenameInput" class="filename-input" placeholder="filename">
         </div>
         <button id="dlBtn" onclick="downloadQueue()" class="btn-primary hidden">Save All JPEGs</button>
@@ -157,17 +157,23 @@
           filenameInput = document.getElementById('filenameInput'),
           errorBanner   = document.getElementById('errorBanner');
 
-    let exportList = [];
-    let errorTimer = null;
-    let cancelled = false;
+    let exportList   = [];
+    let errorTimer   = null;
+    let cancelled    = false;
+    let isProcessing = false;
+    let runId        = 0;
 
     /* --- PREVENT BROWSER NAVIGATION ON ACCIDENTAL DROPS --- */
     window.addEventListener('dragover', e => e.preventDefault());
     window.addEventListener('drop',     e => e.preventDefault());
 
     /* --- FILE INPUT --- */
-    setup.addEventListener('click', () => fileInput.click());
-    fileInput.addEventListener('change', e => processPdf(e.target.files[0]));
+    setup.addEventListener('click', () => { if (!isProcessing) fileInput.click(); });
+    fileInput.addEventListener('change', e => {
+        const file = e.target.files[0];
+        fileInput.value = '';
+        if (!isProcessing) processPdf(file);
+    });
 
     /* --- DRAG AND DROP --- */
     let dragCounter = 0;
@@ -185,6 +191,10 @@
         e.preventDefault();
         dragCounter = 0;
         setup.classList.remove('drag-over');
+        if (isProcessing) {
+            showError('Already converting — wait for it to finish, or click Reset.');
+            return;
+        }
         const file = e.dataTransfer.files[0];
         if (file?.type === 'application/pdf') {
             processPdf(file);
@@ -195,8 +205,22 @@
 
     /* --- RESET --- */
     function doReset() {
-        cancelled = true;
-        location.reload();
+        cancelled    = true;
+        isProcessing = false;
+        loader.style.display = 'none';
+        exportList.forEach(item => URL.revokeObjectURL(item.url));
+        exportList = [];
+        grid.innerHTML = '';
+        filenameInput.value = '';
+        fileInput.value = '';
+        setup.classList.remove('hidden');
+        filenameGroup.classList.add('hidden');
+        dlBtn.classList.add('hidden');
+        resetBtn.classList.add('hidden');
+        dlBtn.disabled = false;
+        dlBtn.textContent = 'Save All JPEGs';
+        clearTimeout(errorTimer);
+        errorBanner.style.display = 'none';
     }
 
     /* --- ERROR DISPLAY --- */
@@ -209,14 +233,17 @@
 
     /* --- CORE PROCESSOR --- */
     async function processPdf(file) {
-        if (!file) return;
+        if (!file || isProcessing) return;
 
-        cancelled = false;
+        cancelled    = false;
+        isProcessing = true;
+        const myRun  = ++runId;
+
         errorBanner.style.display = 'none';
         loader.style.display = 'grid';
         grid.innerHTML = '';
 
-        // Clean up any previous blob URLs
+        // Revoke previous session URLs before starting fresh
         exportList.forEach(item => URL.revokeObjectURL(item.url));
         exportList = [];
 
@@ -226,7 +253,6 @@
             const total = pdf.numPages;
 
             if (total > MAX_PAGES) {
-                loader.style.display = 'none';
                 showError(`This PDF has ${total} pages. The limit is ${MAX_PAGES} to prevent your browser from running out of memory.`);
                 return;
             }
@@ -237,45 +263,42 @@
             for (let i = 1; i <= total; i++) {
                 if (cancelled) break;
 
-                loadText.innerText = `Baking P${i} / ${total}`;
+                loadText.textContent = `Baking P${i} / ${total}`;
 
                 // Yield to the browser once per page to keep UI responsive
                 await new Promise(requestAnimationFrame);
-
                 if (cancelled) break;
 
                 const page = await pdf.getPage(i);
                 const viewport = page.getViewport({ scale: 2.5, rotation: page.rotate });
                 const canvas = document.createElement('canvas');
-                canvas.width = viewport.width;
+                canvas.width  = viewport.width;
                 canvas.height = viewport.height;
 
                 await page.render({ canvasContext: canvas.getContext('2d'), viewport }).promise;
+                page.cleanup();
 
-                if (cancelled) {
-                    canvas.width = 0;
-                    canvas.height = 0;
-                    break;
-                }
+                if (cancelled) { canvas.width = 0; canvas.height = 0; break; }
 
                 const blob = await new Promise(res => canvas.toBlob(res, 'image/jpeg', 0.92));
-
-                // Free canvas memory immediately
                 canvas.width = 0;
                 canvas.height = 0;
 
                 if (!blob) throw new Error('Encoding failed');
 
                 const url = URL.createObjectURL(blob);
+                exportList.push({ url, pageIndex: i, total });
 
-                const pageIndex = i;
                 const img = document.createElement('img');
                 img.src = url;
-                img.title = `Click to download page ${pageIndex}`;
-                img.addEventListener('click', () => triggerDownload(url, buildName(pageIndex, total)));
+                img.alt = `Page ${i}`;
+                img.title = `Click to download page ${i}`;
+                img.tabIndex = 0;
+                img.setAttribute('role', 'button');
+                const dl = () => triggerDownload(url, buildName(i, total));
+                img.addEventListener('click', dl);
+                img.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); dl(); } });
                 grid.appendChild(img);
-
-                exportList.push({ url });
             }
 
             if (!cancelled) {
@@ -288,20 +311,29 @@
 
         } catch (err) {
             console.error(err);
-            if (err.name === 'PasswordException') {
-                showError('This PDF is password protected.');
-            } else {
-                showError('Could not process this PDF.');
+            if (!cancelled) {
+                if (err.name === 'PasswordException') {
+                    showError('This PDF is password protected.');
+                } else if (err.message === 'Encoding failed') {
+                    showError('Failed to encode a page as JPEG. Try a different PDF.');
+                } else {
+                    showError('Could not process this PDF.');
+                }
             }
         } finally {
-            loader.style.display = 'none';
+            // Only clean up if this is still the active run (guards against a cancelled
+            // run's finally hiding the loader for a new run that started after reset)
+            if (runId === myRun) {
+                loader.style.display = 'none';
+                isProcessing = false;
+            }
         }
     }
 
     /* --- HELPERS --- */
-    function buildName(page, total) {
+    function buildName(pageIndex, total) {
         const base = filenameInput.value.trim() || 'export';
-        return `${base}_Page_${page}_of_${total}.jpg`;
+        return `${base}_Page_${pageIndex}_of_${total}.jpg`;
     }
 
     function triggerDownload(url, filename) {
@@ -315,24 +347,26 @@
 
     /* --- BATCH DOWNLOAD --- */
     async function downloadQueue() {
-        const total = exportList.length;
-        if (total === 0) return;
+        if (exportList.length === 0) return;
 
         dlBtn.disabled = true;
-
-        for (let i = 0; i < total; i++) {
-            dlBtn.innerText = `SAVING ${i + 1} / ${total}`;
-            triggerDownload(exportList[i].url, buildName(i + 1, total));
-            // Throttle to prevent browser .bin bug on rapid downloads
-            await new Promise(r => setTimeout(r, 400));
+        try {
+            for (let i = 0; i < exportList.length; i++) {
+                dlBtn.textContent = `SAVING ${i + 1} / ${exportList.length}`;
+                const { url, pageIndex, total } = exportList[i];
+                triggerDownload(url, buildName(pageIndex, total));
+                // Throttle to prevent browser .bin bug on rapid downloads
+                await new Promise(r => setTimeout(r, 400));
+            }
+        } catch (err) {
+            console.error(err);
+            showError('Download interrupted. Try downloading pages individually.');
+        } finally {
+            dlBtn.disabled = false;
+            dlBtn.textContent = 'Save All JPEGs';
         }
-
-        // Clean up blob URLs — no longer needed after download
-        exportList.forEach(item => URL.revokeObjectURL(item.url));
-        exportList = [];
-
-        dlBtn.disabled = false;
-        dlBtn.innerText = 'Save All JPEGs';
+        // NOTE: blob URLs are NOT revoked here — thumbnails and individual downloads
+        // still need them. They are revoked on reset or when a new PDF is loaded.
     }
 </script>
 <script>
