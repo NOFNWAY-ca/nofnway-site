@@ -198,6 +198,22 @@ body { height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
     white-space: nowrap;
 }
 
+.nav-btn {
+    background: transparent;
+    color: var(--text-dim);
+    border: 1px solid var(--border);
+    padding: 5px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.75rem;
+    font-weight: bold;
+    text-transform: uppercase;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+}
+.nav-btn:hover { color: var(--text-main); border-color: var(--text-dim); }
+
 .error-msg {
     text-align: center;
     color: var(--accent-red);
@@ -213,6 +229,7 @@ body { height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
     <a href="index" class="brand">NO<span>FN</span>WAY<span class="brand-sub"> // HOW [FN] MUCH?</span></a>
     <div class="nav-controls">
         <a href="index" class="nav-btn">← Hub</a>
+        <button class="theme-toggle" onclick="toggleTheme()">Light/Dark</button>
         <button class="privacy-btn" onclick="togglePrivacy()" aria-label="Privacy information"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><text x="12" y="16.5" text-anchor="middle" font-size="9" fill="currentColor" stroke="none" font-weight="700" font-family="sans-serif">?</text></svg></button>
     </div>
 </nav>
@@ -791,6 +808,14 @@ document.addEventListener('keydown', e => {
         lastUnit = null;
     }
 });
+
+// ── THEME ─────────────────────────────────────────
+
+function toggleTheme() {
+    const next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    localStorage.setItem('nofnway-theme', next);
+    document.documentElement.setAttribute('data-theme', next);
+}
 
 // ── INIT ──────────────────────────────────────────
 initRates();
