@@ -4,82 +4,112 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>HOW [FN] MUCH? – NOFNWAY</title>
-
+<meta name="description" content="Instant unit converter. Weight, length, volume, pressure. Works offline.">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@900&family=Roboto:wght@400;700&display=swap" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@900&family=Roboto:wght@400;700&display=swap"></noscript>
+<script>document.documentElement.setAttribute('data-theme', localStorage.getItem('nofnway-theme') || 'light');</script>
 <link rel="stylesheet" href="theme.css">
+<script>if ('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js').catch(() => {});</script>
 
 <style>
 :root {
-    --accent-yellow: #facc15;
-    --accent-green:  #4ade80;
-    --accent-red:    #f87171;
+    --accent-green: #4ade80;
+    --accent-red:   #f87171;
 }
 
-body { height: 100vh; display:flex; flex-direction:column; overflow:hidden; }
+body { height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
 
 .workspace {
-    flex:1; overflow-y:auto; padding:1rem;
-    max-width:600px; margin:0 auto; width:100%;
+    flex: 1; overflow-y: auto; padding: 1rem;
+    max-width: 600px; margin: 0 auto; width: 100%;
 }
 
-.hero-title { text-align:center; }
 #dynamic-title {
-    font-family:Montserrat, sans-serif;
-    font-weight:900;
-    font-size:3rem;
+    font-family: Montserrat, sans-serif;
+    font-weight: 900;
+    font-size: 3rem;
+    text-align: center;
 }
 
 .input-container {
-    border:3px solid var(--border);
-    border-radius:1rem;
-    padding:1rem;
-    margin:1rem 0;
-    transition:0.2s;
+    border: 3px solid var(--border);
+    border-radius: 1rem;
+    padding: 1rem;
+    margin: 1rem 0;
+    transition: border-color 0.2s;
 }
 
-.input-container.active { border-color:var(--brand); }
-.input-container.error  { border-color:var(--accent-red); }
+.input-container.active { border-color: var(--brand); }
+.input-container.error  { border-color: var(--accent-red); }
 
 .main-input {
-    width:100%;
-    border:none;
-    font-size:2.5rem;
-    text-align:center;
-    background:transparent;
-    outline:none;
+    width: 100%;
+    border: none;
+    font-size: 2.5rem;
+    text-align: center;
+    background: transparent;
+    color: var(--text-main);
+    font-family: inherit;
+    outline: none;
 }
 
 .results-grid {
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    gap:12px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
 }
 
 .result-card {
-    padding:1rem;
-    border-radius:0.75rem;
-    border-left:5px solid var(--brand);
-    cursor:pointer;
+    padding: 1rem;
+    border-radius: 0.75rem;
+    border-left: 5px solid var(--brand);
+    background: var(--card-bg);
+    cursor: pointer;
 }
 
 .toast {
-    position:fixed;
-    bottom:20px;
-    left:50%;
-    transform:translateX(-50%);
-    padding:10px 20px;
-    background:var(--accent-green);
-    display:none;
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 10px 20px;
+    background: var(--accent-green);
+    color: #000;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    display: none;
+    z-index: 100;
 }
 
 .error-msg {
-    text-align:center;
-    color:var(--accent-red);
-    font-size:0.8rem;
+    text-align: center;
+    color: var(--accent-red);
+    font-size: 0.8rem;
+    min-height: 1.2em;
 }
 </style>
 </head>
 
 <body>
+
+<nav class="navbar">
+    <a href="index" class="brand">NO<span>FN</span>WAY<span class="brand-sub"> // HOW [FN] MUCH?</span></a>
+    <div class="nav-controls">
+        <a href="index" class="nav-btn">← Hub</a>
+        <button class="privacy-btn" onclick="togglePrivacy()" aria-label="Privacy information"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><text x="12" y="16.5" text-anchor="middle" font-size="9" fill="currentColor" stroke="none" font-weight="700" font-family="sans-serif">?</text></svg></button>
+    </div>
+</nav>
+
+<div class="privacy-panel" id="privacy-panel" hidden>
+    <div class="privacy-panel-hd">
+        <div class="privacy-panel-title"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> Privacy &amp; Data</div>
+        <button class="privacy-close" onclick="document.getElementById('privacy-panel').hidden=true" aria-label="Close">&#x2715;</button>
+    </div>
+    <p>Everything happens in your browser. No data is sent anywhere. Nothing is stored. Close the tab and it is gone.</p>
+</div>
 
 <main class="workspace">
 
@@ -88,36 +118,42 @@ body { height: 100vh; display:flex; flex-direction:column; overflow:hidden; }
 <div id="box" class="input-container">
     <input id="userInput" class="main-input"
         placeholder="e.g. 10kg"
-        autofocus>
+        autofocus
+        autocomplete="off"
+        spellcheck="false">
 </div>
 
-<div id="error" class="error-msg"></div>
+<div id="error" class="error-msg" role="alert"></div>
 <div id="results" class="results-grid"></div>
 
 </main>
 
 <div id="toast" class="toast"></div>
 
+<footer style="text-align:center; padding:8px 20px; font-size:0.65rem; color:var(--text-dim); border-top:1px solid var(--border); flex-shrink:0;">
+    &copy; 2026 NOFNWAY. All Rights Reserved.
+</footer>
+
 <script>
 
 // ── UNIT DATA ─────────────────────────────────────
 
 const UnitData = {
-    weight: { lb:1, kg:0.453592, oz:16, g:453.592, st:0.0714286 },
-    length: { in:1, ft:1/12, yd:1/36, mi:1/63360, mm:25.4, cm:2.54, m:0.0254, km:1/39370 },
-    volume: { tsp:48, tbsp:16, floz:8, cup:1, pt:0.5, qt:0.25, gal:0.0625, ml:236.588, l:0.236588 },
-    pressure:{ psi:1, bar:0.0689476, kpa:6.89476 }
+    weight:   { lb:1, kg:0.453592, oz:16, g:453.592, st:0.0714286 },
+    length:   { in:1, ft:1/12, yd:1/36, mi:1/63360, mm:25.4, cm:2.54, m:0.0254, km:1/39370 },
+    volume:   { tsp:48, tbsp:16, floz:8, cup:1, pt:0.5, qt:0.25, gal:0.0625, ml:236.588, l:0.236588 },
+    pressure: { psi:1, bar:0.0689476, kpa:6.89476 }
 };
 
 // ── UNIT ALIASES ─────────────────────────────────
 
 const UnitAliases = {
-    kg:['kg','kgs','kilogram','kilograms'],
-    lb:['lb','lbs','pound','pounds'],
-    m:['m','meter','meters'],
-    km:['km','kilometer','kilometers'],
-    cm:['cm','centimeter','centimeters'],
-    mm:['mm','millimeter','millimeters']
+    kg: ['kg','kgs','kilogram','kilograms'],
+    lb: ['lb','lbs','pound','pounds'],
+    m:  ['m','meter','meters'],
+    km: ['km','kilometer','kilometers'],
+    cm: ['cm','centimeter','centimeters'],
+    mm: ['mm','millimeter','millimeters']
 };
 
 function normalizeUnit(input) {
@@ -131,25 +167,20 @@ function normalizeUnit(input) {
 
 function parseInput(raw) {
     const match = raw.match(/^(-?\d+(\.\d+)?)([a-zA-Z]+)$/);
-    if (!match) return { error:"Invalid format" };
-
-    return {
-        value: parseFloat(match[1]),
-        unit: match[3].toLowerCase()
-    };
+    if (!match) return { error: 'Invalid format' };
+    return { value: parseFloat(match[1]), unit: match[3].toLowerCase() };
 }
 
 // ── RESOLVE ─────────────────────────────────────
 
 function resolveUnit(unit) {
     unit = normalizeUnit(unit);
-
     for (const cat in UnitData) {
-        if (UnitData[cat][unit]) {
-            return { category:cat, unit };
+        if (UnitData[cat][unit] !== undefined) {
+            return { category: cat, unit };
         }
     }
-    return { error:"Unknown unit" };
+    return { error: 'Unknown unit' };
 }
 
 // ── CONVERT ─────────────────────────────────────
@@ -157,13 +188,9 @@ function resolveUnit(unit) {
 function convertValue(val, unit, cat) {
     const base = val / UnitData[cat][unit];
     const out = [];
-
     for (const u in UnitData[cat]) {
         if (u === unit) continue;
-        out.push({
-            unit:u,
-            value: base * UnitData[cat][u]
-        });
+        out.push({ unit: u, value: base * UnitData[cat][u] });
     }
     return out;
 }
@@ -171,53 +198,65 @@ function convertValue(val, unit, cat) {
 // ── FORMAT ──────────────────────────────────────
 
 function format(val) {
-    if (Math.abs(val) < 1) return val.toFixed(4);
+    if (Math.abs(val) < 1)   return val.toFixed(4);
     if (Math.abs(val) < 100) return val.toFixed(2);
-    return Math.round(val);
+    return Math.round(val).toString();
 }
 
 // ── RENDER ──────────────────────────────────────
 
-function render(state) {
-    const results = document.getElementById('results');
-    const error   = document.getElementById('error');
-    const box     = document.getElementById('box');
+const resultsEl = document.getElementById('results');
+const errorEl   = document.getElementById('error');
+const boxEl     = document.getElementById('box');
 
-    results.innerHTML = '';
-    error.textContent = '';
-    box.classList.remove('error','active');
+function render(state) {
+    resultsEl.textContent = '';
+    errorEl.textContent = '';
+    boxEl.classList.remove('error', 'active');
 
     if (state.error) {
-        error.textContent = state.error;
-        box.classList.add('error');
+        errorEl.textContent = state.error;
+        boxEl.classList.add('error');
         return;
     }
 
-    box.classList.add('active');
+    if (!state.results) return;
+
+    boxEl.classList.add('active');
 
     state.results.forEach(r => {
-        const div = document.createElement('div');
-        div.className = 'result-card';
-        div.innerHTML = `
-            <div>${r.unit}</div>
-            <div>${format(r.value)}</div>
-        `;
-        div.onclick = () => copy(r.value, r.unit);
-        results.appendChild(div);
+        const card = document.createElement('div');
+        card.className = 'result-card';
+
+        const unitEl = document.createElement('div');
+        unitEl.textContent = r.unit;
+
+        const valEl = document.createElement('div');
+        valEl.textContent = format(r.value);
+
+        card.appendChild(unitEl);
+        card.appendChild(valEl);
+        card.addEventListener('click', () => copy(r.value, r.unit));
+        resultsEl.appendChild(card);
     });
 }
 
 // ── COPY ────────────────────────────────────────
 
-function copy(val, unit) {
-    const text = `${val} ${unit}`;
-    navigator.clipboard.writeText(text);
+const toastEl = document.getElementById('toast');
+let toastTimer = null;
 
-    const toast = document.getElementById('toast');
-    toast.textContent = `${text} copied`;
-    toast.style.display = 'block';
-
-    setTimeout(()=>toast.style.display='none',1500);
+async function copy(val, unit) {
+    const text = `${format(val)} ${unit}`;
+    try {
+        await navigator.clipboard.writeText(text);
+    } catch(_) {
+        // Clipboard unavailable — skip silently
+    }
+    clearTimeout(toastTimer);
+    toastEl.textContent = `${text} copied`;
+    toastEl.style.display = 'block';
+    toastTimer = setTimeout(() => { toastEl.style.display = 'none'; }, 1500);
 }
 
 // ── CONTROLLER ──────────────────────────────────
@@ -226,11 +265,10 @@ let lastUnit = null;
 
 function handleInput() {
     const raw = document.getElementById('userInput').value.trim().toLowerCase();
+    if (!raw) { render({}); return; }
 
-    if (!raw) return render({});
-
-    // sticky unit
-    if (/^\d+$/.test(raw) && lastUnit) {
+    // Sticky unit — if the user types a bare number, reuse the last unit
+    if (/^\d+(\.\d+)?$/.test(raw) && lastUnit) {
         return process(raw + lastUnit);
     }
 
@@ -245,24 +283,22 @@ function process(raw) {
     if (resolved.error) return render(resolved);
 
     lastUnit = resolved.unit;
-
-    const results = convertValue(parsed.value, resolved.unit, resolved.category);
-
-    render({ results });
+    render({ results: convertValue(parsed.value, resolved.unit, resolved.category) });
 }
 
 // ── EVENTS ──────────────────────────────────────
 
 document.getElementById('userInput').addEventListener('input', handleInput);
 
-document.addEventListener('keydown', e=>{
+document.addEventListener('keydown', e => {
     if (e.key === 'Escape') {
-        document.getElementById('userInput').value='';
+        document.getElementById('userInput').value = '';
         render({});
     }
 });
 
 </script>
 
+<script src="privacy.js"></script>
 </body>
 </html>
