@@ -2,14 +2,15 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="author" content="Gerry McMahon">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>HOW [FN] MUCH? – NOFNWAY</title>
-<meta name="description" content="Instant unit converter. Weight, length, volume, pressure. Works offline.">
+<meta name="description" content="Unit and currency converter. Weight, length, area, speed, volume, data, temperature, pressure, and live exchange rates. Works offline.">
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@900&family=Roboto:wght@400;700&display=swap" media="print" onload="this.media='all'">
-<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@900&family=Roboto:wght@400;700&display=swap"></noscript>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bangers&family=Montserrat:wght@900&family=Roboto:wght@400;700&display=swap" media="print" onload="this.media='all'">
+<noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bangers&family=Montserrat:wght@900&family=Roboto:wght@400;700&display=swap"></noscript>
 <script>document.documentElement.setAttribute('data-theme', localStorage.getItem('nofnway-theme') || 'light');</script>
 <link rel="stylesheet" href="theme.css">
 <script>if ('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js').catch(() => {});</script>
@@ -20,6 +21,7 @@
     --accent-red:   #f87171;
 }
 
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 body { height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
 
 .workspace {
@@ -28,25 +30,44 @@ body { height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
 }
 
 #dynamic-title {
-    font-family: Montserrat, sans-serif;
-    font-weight: 900;
+    font-family: Bangers, sans-serif;
+    letter-spacing: 0.04em;
     font-size: 3rem;
     text-align: center;
+    color: var(--brand);
+    line-height: 1;
+    margin-bottom: 0.25rem;
+}
+
+.tool-hint {
+    text-align: center;
+    font-size: 0.7rem;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-weight: 700;
+    margin-bottom: 0.75rem;
 }
 
 .input-container {
     border: 3px solid var(--border);
     border-radius: 1rem;
-    padding: 1rem;
-    margin: 1rem 0;
+    padding: 0.75rem 1rem;
+    margin: 0 0 0.5rem;
     transition: border-color 0.2s;
 }
-
 .input-container.active { border-color: var(--brand); }
 .input-container.error  { border-color: var(--accent-red); }
 
+.input-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
 .main-input {
-    width: 100%;
+    flex: 1;
+    min-width: 0;
     border: none;
     font-size: 2.5rem;
     text-align: center;
@@ -56,20 +77,112 @@ body { height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
     outline: none;
 }
 
+/* ── Mic button ── */
+.mic-btn {
+    flex-shrink: 0;
+    width: 44px; height: 44px;
+    border-radius: 50%;
+    border: 2px solid var(--border);
+    background: transparent;
+    color: var(--text-dim);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    transition: border-color 0.2s, background 0.2s, color 0.2s;
+}
+.mic-btn:hover { border-color: var(--brand); color: var(--brand); }
+.mic-btn.listening {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+    animation: mic-pulse 1.2s ease-in-out infinite;
+}
+@keyframes mic-pulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(198,40,40,0.45); }
+    50%       { box-shadow: 0 0 0 9px rgba(198,40,40,0); }
+}
+
+/* ── Results ── */
 .results-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 12px;
+    gap: 10px;
 }
 
 .result-card {
-    padding: 1rem;
+    padding: 0.75rem 1rem;
     border-radius: 0.75rem;
     border-left: 5px solid var(--brand);
     background: var(--card-bg);
     cursor: pointer;
+    transition: border-color 0.15s;
+}
+.result-card:hover { border-left-color: var(--accent); }
+
+.result-unit {
+    font-size: 0.65rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-dim);
+    margin-bottom: 2px;
 }
 
+.result-value {
+    font-family: Montserrat, sans-serif;
+    font-weight: 900;
+    font-size: 1.4rem;
+    color: var(--text-main);
+    line-height: 1.1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* ── Rate bar (currency only) ── */
+.rate-bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 12px;
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    margin-top: 10px;
+    font-size: 0.7rem;
+}
+.rate-source {
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    flex-shrink: 0;
+}
+.rate-source.live   { color: var(--accent-green); }
+.rate-source.approx { color: var(--gold); }
+.rate-time {
+    flex: 1;
+    color: var(--text-dim);
+    font-size: 0.65rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.rate-toggle-btn {
+    flex-shrink: 0;
+    font-size: 0.65rem;
+    font-weight: 700;
+    color: var(--brand);
+    background: transparent;
+    border: 1px solid var(--brand);
+    border-radius: 4px;
+    padding: 3px 8px;
+    cursor: pointer;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+/* ── Toast ── */
 .toast {
     position: fixed;
     bottom: 20px;
@@ -82,6 +195,7 @@ body { height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
     font-size: 0.85rem;
     display: none;
     z-index: 100;
+    white-space: nowrap;
 }
 
 .error-msg {
@@ -108,52 +222,178 @@ body { height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
         <div class="privacy-panel-title"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> Privacy &amp; Data</div>
         <button class="privacy-close" onclick="document.getElementById('privacy-panel').hidden=true" aria-label="Close">&#x2715;</button>
     </div>
-    <p>Everything happens in your browser. No data is sent anywhere. Nothing is stored. Close the tab and it is gone.</p>
+    <p>All unit conversions happen in your browser — nothing is sent anywhere. When Live currency mode is on, exchange rates are fetched from open.er-api.com and cached in your session. No other data leaves your device. Close the tab and it is gone.</p>
 </div>
 
 <main class="workspace">
 
-<h1 id="dynamic-title">HOW MUCH?</h1>
+<h1 id="dynamic-title">HOW [FN] MUCH?</h1>
+<p class="tool-hint">Type a value &amp; unit &mdash; e.g. 10kg &middot; 5ft &middot; 98.6f &middot; 500sqft &middot; 60mph &middot; 100usd</p>
 
 <div id="box" class="input-container">
-    <input id="userInput" class="main-input"
-        placeholder="e.g. 10kg"
-        autofocus
-        autocomplete="off"
-        spellcheck="false">
+    <div class="input-row">
+        <input id="userInput" class="main-input"
+            placeholder="e.g. 10kg"
+            autofocus
+            autocomplete="off"
+            spellcheck="false"
+            inputmode="text">
+        <button id="micBtn" class="mic-btn" onclick="toggleMic()" aria-label="Speak a value" title="Speak a value">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <rect x="9" y="2" width="6" height="11" rx="3"/>
+                <path d="M5 10a7 7 0 0 0 14 0"/>
+                <line x1="12" y1="19" x2="12" y2="23"/>
+                <line x1="8" y1="23" x2="16" y2="23"/>
+            </svg>
+        </button>
+    </div>
 </div>
 
 <div id="error" class="error-msg" role="alert"></div>
 <div id="results" class="results-grid"></div>
 
+<div id="rate-bar" class="rate-bar" hidden>
+    <span id="rate-source" class="rate-source approx">APPROX</span>
+    <span id="rate-time" class="rate-time">Ballpark only — switch to Live for current rates</span>
+    <button class="rate-toggle-btn" id="rate-toggle" onclick="toggleRateMode()">Use Live</button>
+</div>
+
 </main>
 
 <div id="toast" class="toast"></div>
 
-<footer style="text-align:center; padding:8px 20px; font-size:0.65rem; color:var(--text-dim); border-top:1px solid var(--border); flex-shrink:0;">
-    &copy; 2026 NOFNWAY. All Rights Reserved.
+<footer class="site-footer" style="flex-shrink:0; padding:8px 20px; text-align:center;">
+    <span style="font-size:0.65rem; color:var(--text-dim);">&copy; 2026 NOFNWAY. All Rights Reserved.</span>
 </footer>
 
 <script>
 
 // ── UNIT DATA ─────────────────────────────────────
+// Values = how many of that unit per one base unit (first key in each category)
 
 const UnitData = {
     weight:   { lb:1, kg:0.453592, oz:16, g:453.592, st:0.0714286 },
     length:   { in:1, ft:1/12, yd:1/36, mi:1/63360, mm:25.4, cm:2.54, m:0.0254, km:1/39370 },
+    area:     { sqft:1, sqyd:1/9, sqm:0.092903, acre:1/43560, ha:9.2903e-6 },
     volume:   { tsp:48, tbsp:16, floz:8, cup:1, pt:0.5, qt:0.25, gal:0.0625, ml:236.588, l:0.236588 },
-    pressure: { psi:1, bar:0.0689476, kpa:6.89476 }
+    speed:    { mph:1, kph:1.60934, mps:0.44704, knot:0.868976 },
+    data:     { b:1, kb:1/1024, mb:1/1048576, gb:1/1073741824, tb:1/1099511627776 },
+    pressure: { psi:1, bar:0.0689476, kpa:6.89476 },
 };
 
+// ── TEMPERATURE (offset math, handled separately) ──
+const TempUnits = ['f','c','k'];
+
+// ── CURRENCY ──────────────────────────────────────
+const CurrencyCodes = ['usd','eur','gbp','cad','aud','jpy','chf','cny','inr','mxn','nzd','brl','hkd','sgd','krw','nok','sek','dkk','zar','aed'];
+const CurrencySet   = new Set(CurrencyCodes);
+
+// Approximate rates relative to USD (used when Live is off or unavailable)
+const StaticRates = {
+    USD:1,    EUR:0.91,  GBP:0.79,  CAD:1.37,  AUD:1.55,
+    JPY:149.5,CHF:0.88,  CNY:7.25,  INR:83.8,  MXN:18.5,
+    NZD:1.66, BRL:5.05,  HKD:7.79,  SGD:1.34,  KRW:1340,
+    NOK:10.7, SEK:10.4,  DKK:6.88,  ZAR:18.3,  AED:3.67
+};
+
+const CurrencySymbols = {
+    usd:'$', eur:'€', gbp:'£', cad:'C$', aud:'A$', jpy:'¥',
+    chf:'Fr', cny:'¥', inr:'₹', mxn:'$', nzd:'NZ$', brl:'R$',
+    hkd:'HK$', sgd:'S$', krw:'₩', nok:'kr', sek:'kr', dkk:'kr',
+    zar:'R', aed:'د.إ'
+};
+
+// Live rate state
+let liveRates       = null;
+let rateUpdatedText = '';
+let liveMode        = localStorage.getItem('nofnway-fx-live') !== 'false'; // default on
+
+// ── UNIT DISPLAY LABELS ───────────────────────────
+
+const UnitLabels = {
+    f:'°F', c:'°C', k:'K',
+    floz:'fl oz',
+    sqft:'sq ft', sqyd:'sq yd', sqm:'sq m',
+    mps:'m/s', kph:'km/h',
+};
+function getLabel(unit) {
+    return UnitLabels[unit] || unit.toUpperCase();
+}
+
 // ── UNIT ALIASES ─────────────────────────────────
+// Short codes resolve directly via UnitData lookup; aliases cover full word forms
 
 const UnitAliases = {
-    kg: ['kg','kgs','kilogram','kilograms'],
-    lb: ['lb','lbs','pound','pounds'],
-    m:  ['m','meter','meters'],
-    km: ['km','kilometer','kilometers'],
-    cm: ['cm','centimeter','centimeters'],
-    mm: ['mm','millimeter','millimeters']
+    // Weight
+    kg:   ['kg','kgs','kilogram','kilograms'],
+    lb:   ['lb','lbs','pound','pounds'],
+    oz:   ['oz','ounce','ounces'],
+    g:    ['gram','grams'],
+    st:   ['stone','stones'],
+    // Length
+    m:    ['m','meter','meters','metre','metres'],
+    km:   ['km','kilometer','kilometers','kilometre','kilometres'],
+    cm:   ['cm','centimeter','centimeters','centimetre','centimetres'],
+    mm:   ['mm','millimeter','millimeters','millimetre','millimetres'],
+    ft:   ['ft','foot','feet'],
+    in:   ['in','inch','inches'],
+    yd:   ['yd','yard','yards'],
+    mi:   ['mi','mile','miles'],
+    // Area
+    sqft: ['sqft','sq ft','sq feet','square feet','square foot'],
+    sqyd: ['sqyd','sq yd','square yard','square yards'],
+    sqm:  ['sqm','sq m','square meter','square meters','square metre','square metres'],
+    acre: ['acre','acres'],
+    ha:   ['ha','hectare','hectares'],
+    // Speed
+    mph:  ['mph','miles per hour'],
+    kph:  ['kph','kmh','km/h','kilometers per hour','kilometres per hour'],
+    mps:  ['mps','m/s','meters per second','metres per second'],
+    knot: ['knot','knots','kt','kts'],
+    // Temperature
+    f:    ['f','°f','fahrenheit'],
+    c:    ['c','°c','celsius','centigrade'],
+    k:    ['k','kelvin'],
+    // Volume
+    floz: ['floz','fl oz','fluid ounce','fluid ounces'],
+    tsp:  ['tsp','teaspoon','teaspoons'],
+    tbsp: ['tbsp','tablespoon','tablespoons'],
+    cup:  ['cup','cups'],
+    pt:   ['pt','pint','pints'],
+    qt:   ['qt','quart','quarts'],
+    gal:  ['gal','gallon','gallons'],
+    ml:   ['ml','milliliter','milliliters','millilitre','millilitres'],
+    l:    ['l','liter','liters','litre','litres'],
+    // Data
+    b:    ['b','byte','bytes'],
+    kb:   ['kb','kilobyte','kilobytes'],
+    mb:   ['mb','megabyte','megabytes'],
+    gb:   ['gb','gigabyte','gigabytes'],
+    tb:   ['tb','terabyte','terabytes'],
+    // Pressure
+    bar:  ['bar','bars'],
+    kpa:  ['kpa','kilopascal','kilopascals'],
+    // Currency
+    usd:  ['usd','dollar','dollars','us dollar','us dollars','american dollar'],
+    eur:  ['eur','euro','euros'],
+    gbp:  ['gbp','british pound','british pounds','pound sterling','pounds sterling'],
+    cad:  ['cad','canadian dollar','canadian dollars'],
+    aud:  ['aud','australian dollar','australian dollars'],
+    jpy:  ['jpy','yen'],
+    chf:  ['chf','swiss franc','swiss francs'],
+    cny:  ['cny','yuan','renminbi'],
+    inr:  ['inr','rupee','rupees'],
+    mxn:  ['mxn','peso','pesos'],
+    nzd:  ['nzd','new zealand dollar','new zealand dollars'],
+    brl:  ['brl','real','reais'],
+    hkd:  ['hkd','hong kong dollar','hong kong dollars'],
+    sgd:  ['sgd','singapore dollar','singapore dollars'],
+    krw:  ['krw','won','korean won'],
+    nok:  ['nok','norwegian krone','norwegian kroner'],
+    sek:  ['sek','swedish krona','swedish kronor'],
+    dkk:  ['dkk','danish krone','danish kroner'],
+    zar:  ['zar','rand'],
+    aed:  ['aed','dirham'],
 };
 
 function normalizeUnit(input) {
@@ -163,103 +403,355 @@ function normalizeUnit(input) {
     return input;
 }
 
-// ── PARSER ──────────────────────────────────────
+// ── SPEECH MAP ────────────────────────────────────
+// Ordered longest/most-specific phrases first to avoid partial substitution
+
+const SpeechMap = [
+    // Multi-word area
+    ['square feet','sqft'],   ['square foot','sqft'],
+    ['square meters','sqm'],  ['square meter','sqm'],
+    ['square metres','sqm'],  ['square metre','sqm'],
+    ['square yards','sqyd'],  ['square yard','sqyd'],
+    // Temperature with "degrees"
+    ['degrees fahrenheit','f'],['degrees celsius','c'],
+    ['degrees centigrade','c'],['degrees kelvin','k'],
+    // Speed
+    ['miles per hour','mph'],
+    ['kilometers per hour','kph'],['kilometres per hour','kph'],
+    ['meters per second','mps'],  ['metres per second','mps'],
+    // Volume
+    ['fluid ounces','floz'],['fluid ounce','floz'],
+    ['tablespoons','tbsp'], ['tablespoon','tbsp'],
+    ['teaspoons','tsp'],    ['teaspoon','tsp'],
+    // Currency multi-word (most specific first)
+    ['british pounds','gbp'],   ['british pound','gbp'],
+    ['pounds sterling','gbp'],  ['pound sterling','gbp'],
+    ['us dollars','usd'],       ['us dollar','usd'],
+    ['american dollars','usd'], ['american dollar','usd'],
+    ['canadian dollars','cad'], ['canadian dollar','cad'],
+    ['australian dollars','aud'],['australian dollar','aud'],
+    ['new zealand dollars','nzd'],['new zealand dollar','nzd'],
+    ['swiss francs','chf'],     ['swiss franc','chf'],
+    ['hong kong dollars','hkd'],['hong kong dollar','hkd'],
+    ['singapore dollars','sgd'],['singapore dollar','sgd'],
+    ['korean won','krw'],
+    ['south african rand','zar'],
+    ['norwegian krone','nok'],  ['norwegian kroner','nok'],
+    ['swedish krona','sek'],    ['swedish kronor','sek'],
+    ['danish krone','dkk'],     ['danish kroner','dkk'],
+    // Data
+    ['gigabytes','gb'],['gigabyte','gb'],
+    ['megabytes','mb'],['megabyte','mb'],
+    ['kilobytes','kb'],['kilobyte','kb'],
+    ['terabytes','tb'],['terabyte','tb'],
+    ['bytes','b'],     ['byte','b'],
+    // Weight
+    ['kilograms','kg'],['kilogram','kg'],
+    ['pounds','lb'],   ['pound','lb'],
+    ['ounces','oz'],   ['ounce','oz'],
+    ['grams','g'],     ['gram','g'],
+    ['stones','st'],   ['stone','st'],
+    // Length
+    ['kilometers','km'],['kilometer','km'],
+    ['kilometres','km'],['kilometre','km'],
+    ['centimeters','cm'],['centimeter','cm'],
+    ['millimeters','mm'],['millimeter','mm'],
+    ['meters','m'],     ['meter','m'],
+    ['metres','m'],     ['metre','m'],
+    ['inches','in'],    ['inch','in'],
+    ['yards','yd'],     ['yard','yd'],
+    ['miles','mi'],     ['mile','mi'],
+    ['feet','ft'],      ['foot','ft'],
+    // Area (single)
+    ['acres','acre'],['acre','acre'],
+    ['hectares','ha'],['hectare','ha'],
+    // Speed (single)
+    ['knots','knot'],['knot','knot'],
+    // Volume (single)
+    ['gallons','gal'],['gallon','gal'],
+    ['liters','l'],   ['liter','l'],
+    ['litres','l'],   ['litre','l'],
+    ['milliliters','ml'],['milliliter','ml'],
+    ['millilitres','ml'],
+    ['quarts','qt'],  ['quart','qt'],
+    ['pints','pt'],   ['pint','pt'],
+    ['cups','cup'],   ['cup','cup'],
+    // Temperature (single)
+    ['fahrenheit','f'],['celsius','c'],['centigrade','c'],['kelvin','k'],
+    // Currency (single / fallback)
+    ['dollars','usd'],
+    ['euros','eur'],   ['euro','eur'],
+    ['yen','jpy'],
+    ['yuan','cny'],    ['renminbi','cny'],
+    ['rupees','inr'],  ['rupee','inr'],
+    ['pesos','mxn'],   ['peso','mxn'],
+    ['rand','zar'],
+    ['dirham','aed'],
+    ['won','krw'],
+    // Strip leftover "degrees"
+    ['degrees',''],
+];
+
+function speechToInput(transcript) {
+    let s = transcript.toLowerCase().trim();
+    for (const [phrase, abbrev] of SpeechMap) {
+        if (s.includes(phrase)) s = s.replaceAll(phrase, abbrev);
+    }
+    return s.replace(/\s+/g, ' ').trim();
+}
+
+// ── PARSER ───────────────────────────────────────
 
 function parseInput(raw) {
-    const match = raw.match(/^(-?\d+(\.\d+)?)([a-zA-Z]+)$/);
-    if (!match) return { error: 'Invalid format' };
+    // Allow optional space between number and unit; support m/s and km/h notation
+    const match = raw.match(/^(-?\d+(\.\d+)?)\s*([a-zA-Z°][a-zA-Z°\/]*)$/);
+    if (!match) return { error: 'Try: 10kg  5ft  212f  100c  50usd  500sqft  60mph' };
     return { value: parseFloat(match[1]), unit: match[3].toLowerCase() };
 }
 
-// ── RESOLVE ─────────────────────────────────────
+// ── RESOLVE ──────────────────────────────────────
 
 function resolveUnit(unit) {
     unit = normalizeUnit(unit);
+    if (TempUnits.includes(unit))  return { category: 'temperature', unit };
+    if (CurrencySet.has(unit))     return { category: 'currency',    unit };
     for (const cat in UnitData) {
-        if (UnitData[cat][unit] !== undefined) {
-            return { category: cat, unit };
-        }
+        if (UnitData[cat][unit] !== undefined) return { category: cat, unit };
     }
-    return { error: 'Unknown unit' };
+    return { error: 'Unknown unit — try kg, ft, usd, sqft, mph, °f…' };
 }
 
-// ── CONVERT ─────────────────────────────────────
+// ── CONVERT ──────────────────────────────────────
+
+function toCelsius(val, unit) {
+    if (unit === 'c') return val;
+    if (unit === 'f') return (val - 32) * 5/9;
+    if (unit === 'k') return val - 273.15;
+}
+function fromCelsius(c, unit) {
+    if (unit === 'c') return c;
+    if (unit === 'f') return c * 9/5 + 32;
+    if (unit === 'k') return c + 273.15;
+}
+function convertTemp(val, unit) {
+    const c = toCelsius(val, unit);
+    return TempUnits.filter(u => u !== unit).map(u => ({ unit: u, value: fromCelsius(c, u) }));
+}
+
+function getActiveRates() {
+    return (liveMode && liveRates) ? liveRates : StaticRates;
+}
+function convertCurrency(val, fromUnit) {
+    const rates = getActiveRates();
+    const base  = val / rates[fromUnit.toUpperCase()];
+    return CurrencyCodes
+        .filter(u => u !== fromUnit)
+        .map(u => ({ unit: u, value: base * rates[u.toUpperCase()] }));
+}
 
 function convertValue(val, unit, cat) {
+    if (cat === 'temperature') return convertTemp(val, unit);
+    if (cat === 'currency')    return convertCurrency(val, unit);
     const base = val / UnitData[cat][unit];
-    const out = [];
-    for (const u in UnitData[cat]) {
-        if (u === unit) continue;
-        out.push({ unit: u, value: base * UnitData[cat][u] });
-    }
-    return out;
+    return Object.keys(UnitData[cat])
+        .filter(u => u !== unit)
+        .map(u => ({ unit: u, value: base * UnitData[cat][u] }));
 }
 
-// ── FORMAT ──────────────────────────────────────
+// ── FORMAT ───────────────────────────────────────
 
 function format(val) {
-    if (Math.abs(val) < 1)   return val.toFixed(4);
-    if (Math.abs(val) < 100) return val.toFixed(2);
-    return Math.round(val).toString();
+    if (val === 0) return '0';
+    const abs = Math.abs(val);
+    if (abs >= 1000)   return Math.round(val).toLocaleString();
+    if (abs >= 100)    return val.toFixed(1);
+    if (abs >= 1)      return val.toFixed(2);
+    if (abs >= 0.0001) return val.toFixed(4);
+    return val.toExponential(2);
 }
 
-// ── RENDER ──────────────────────────────────────
+// ── RENDER ────────────────────────────────────────
 
-const resultsEl = document.getElementById('results');
-const errorEl   = document.getElementById('error');
-const boxEl     = document.getElementById('box');
+const resultsEl  = document.getElementById('results');
+const errorEl    = document.getElementById('error');
+const boxEl      = document.getElementById('box');
+const rateBarEl  = document.getElementById('rate-bar');
+const rateSrcEl  = document.getElementById('rate-source');
+const rateTimeEl = document.getElementById('rate-time');
+
+let currentCategory = null;
 
 function render(state) {
     resultsEl.textContent = '';
-    errorEl.textContent = '';
+    errorEl.textContent   = '';
     boxEl.classList.remove('error', 'active');
+    rateBarEl.hidden = true;
 
     if (state.error) {
         errorEl.textContent = state.error;
         boxEl.classList.add('error');
+        currentCategory = null;
+        return;
+    }
+    if (!state.results) {
+        currentCategory = null;
         return;
     }
 
-    if (!state.results) return;
-
     boxEl.classList.add('active');
+    currentCategory = state.category;
 
     state.results.forEach(r => {
-        const card = document.createElement('div');
+        const card   = document.createElement('div');
         card.className = 'result-card';
 
         const unitEl = document.createElement('div');
-        unitEl.textContent = r.unit;
+        unitEl.className   = 'result-unit';
+        unitEl.textContent = getLabel(r.unit);
 
         const valEl = document.createElement('div');
-        valEl.textContent = format(r.value);
+        valEl.className = 'result-value';
+        if (state.category === 'currency' && CurrencySymbols[r.unit]) {
+            valEl.textContent = CurrencySymbols[r.unit] + format(r.value);
+        } else {
+            valEl.textContent = format(r.value);
+        }
 
         card.appendChild(unitEl);
         card.appendChild(valEl);
         card.addEventListener('click', () => copy(r.value, r.unit));
         resultsEl.appendChild(card);
     });
+
+    if (state.category === 'currency') {
+        updateRateBar();
+        rateBarEl.hidden = false;
+    }
 }
 
-// ── COPY ────────────────────────────────────────
+// ── COPY ─────────────────────────────────────────
 
 const toastEl = document.getElementById('toast');
 let toastTimer = null;
 
 async function copy(val, unit) {
-    const text = `${format(val)} ${unit}`;
-    try {
-        await navigator.clipboard.writeText(text);
-    } catch(_) {
-        // Clipboard unavailable — skip silently
-    }
+    const text = `${format(val)} ${getLabel(unit)}`;
+    try { await navigator.clipboard.writeText(text); } catch(_) {}
     clearTimeout(toastTimer);
-    toastEl.textContent = `${text} copied`;
-    toastEl.style.display = 'block';
+    toastEl.textContent    = `${text} copied`;
+    toastEl.style.display  = 'block';
     toastTimer = setTimeout(() => { toastEl.style.display = 'none'; }, 1500);
 }
 
-// ── CONTROLLER ──────────────────────────────────
+// ── CURRENCY / RATE MODE ──────────────────────────
+
+function updateRateBar() {
+    const hasLive  = liveMode && liveRates;
+    const pending  = liveMode && !liveRates;
+    const toggleBtn = document.getElementById('rate-toggle');
+
+    if (hasLive) {
+        rateSrcEl.textContent = 'LIVE';
+        rateSrcEl.className   = 'rate-source live';
+        rateTimeEl.textContent = rateUpdatedText ? 'Updated ' + rateUpdatedText : '';
+        toggleBtn.textContent  = 'Use Approx';
+    } else if (pending) {
+        rateSrcEl.textContent  = 'APPROX';
+        rateSrcEl.className    = 'rate-source approx';
+        rateTimeEl.textContent = 'Fetching live rates…';
+        toggleBtn.textContent  = 'Use Approx';
+    } else {
+        rateSrcEl.textContent  = 'APPROX';
+        rateSrcEl.className    = 'rate-source approx';
+        rateTimeEl.textContent = 'Ballpark only — switch for current rates';
+        toggleBtn.textContent  = 'Use Live';
+    }
+}
+
+function toggleRateMode() {
+    liveMode = !liveMode;
+    localStorage.setItem('nofnway-fx-live', String(liveMode));
+    if (liveMode && !liveRates) {
+        fetchLiveRates();
+    } else if (currentCategory === 'currency') {
+        handleInput();
+    }
+    updateRateBar();
+}
+
+async function fetchLiveRates() {
+    try {
+        const res  = await fetch('https://open.er-api.com/v6/latest/USD');
+        const data = await res.json();
+        if (data.result !== 'success') return;
+        liveRates       = data.rates;
+        rateUpdatedText = data.time_last_update_utc
+            ? new Date(data.time_last_update_utc).toLocaleDateString()
+            : '';
+        sessionStorage.setItem('nofnway-fx-rates',   JSON.stringify(data.rates));
+        sessionStorage.setItem('nofnway-fx-time',    String(Date.now()));
+        sessionStorage.setItem('nofnway-fx-updated', rateUpdatedText);
+        if (currentCategory === 'currency') handleInput();
+        if (!rateBarEl.hidden) updateRateBar();
+    } catch(_) {
+        // Stay on static rates silently
+    }
+}
+
+function initRates() {
+    const cached  = sessionStorage.getItem('nofnway-fx-rates');
+    const cacheTs = sessionStorage.getItem('nofnway-fx-time');
+    if (cached && cacheTs && Date.now() - Number(cacheTs) < 3600000) {
+        liveRates       = JSON.parse(cached);
+        rateUpdatedText = sessionStorage.getItem('nofnway-fx-updated') || '';
+    } else if (liveMode) {
+        fetchLiveRates();
+    }
+}
+
+// ── SPEECH RECOGNITION ────────────────────────────
+
+const SpeechAPI = window.SpeechRecognition || window.webkitSpeechRecognition;
+let recog     = null;
+let micActive = false;
+
+function stopMic() {
+    micActive = false;
+    document.getElementById('micBtn').classList.remove('listening');
+}
+
+function toggleMic() {
+    if (!recog) return;
+    if (micActive) {
+        recog.stop();
+    } else {
+        try {
+            recog.start();
+            micActive = true;
+            document.getElementById('micBtn').classList.add('listening');
+        } catch(_) { stopMic(); }
+    }
+}
+
+if (SpeechAPI) {
+    recog = new SpeechAPI();
+    recog.lang           = 'en-US';
+    recog.continuous     = false;
+    recog.interimResults = false;
+
+    recog.onresult = e => {
+        const raw    = e.results[0][0].transcript;
+        const mapped = speechToInput(raw);
+        document.getElementById('userInput').value = mapped;
+        handleInput();
+    };
+    recog.onend   = () => stopMic();
+    recog.onerror = () => stopMic();
+} else {
+    document.getElementById('micBtn').style.display = 'none';
+}
+
+// ── CONTROLLER ────────────────────────────────────
 
 let lastUnit = null;
 
@@ -267,11 +759,10 @@ function handleInput() {
     const raw = document.getElementById('userInput').value.trim().toLowerCase();
     if (!raw) { render({}); return; }
 
-    // Sticky unit — if the user types a bare number, reuse the last unit
-    if (/^\d+(\.\d+)?$/.test(raw) && lastUnit) {
+    // Sticky unit — bare number reuses the last successful unit
+    if (/^-?\d+(\.\d+)?$/.test(raw) && lastUnit) {
         return process(raw + lastUnit);
     }
-
     process(raw);
 }
 
@@ -283,10 +774,13 @@ function process(raw) {
     if (resolved.error) return render(resolved);
 
     lastUnit = resolved.unit;
-    render({ results: convertValue(parsed.value, resolved.unit, resolved.category) });
+    render({
+        results:  convertValue(parsed.value, resolved.unit, resolved.category),
+        category: resolved.category,
+    });
 }
 
-// ── EVENTS ──────────────────────────────────────
+// ── EVENTS ────────────────────────────────────────
 
 document.getElementById('userInput').addEventListener('input', handleInput);
 
@@ -294,8 +788,12 @@ document.addEventListener('keydown', e => {
     if (e.key === 'Escape') {
         document.getElementById('userInput').value = '';
         render({});
+        lastUnit = null;
     }
 });
+
+// ── INIT ──────────────────────────────────────────
+initRates();
 
 </script>
 
