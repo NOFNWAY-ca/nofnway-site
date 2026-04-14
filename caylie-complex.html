@@ -1,0 +1,240 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Caylie Planner — Complex</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;600&family=Source+Sans+3:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root{--navy:#2E3192;--sky:#00AEEF;--bg:#f4f7fc;--line:#d3deed}
+    *{box-sizing:border-box} body{margin:0;font-family:'Source Sans 3',sans-serif;background:var(--bg);color:#1f2937}
+    h1,h2,h3,h4{font-family:Oswald,sans-serif;margin:.2rem 0}
+    header{background:linear-gradient(120deg,var(--navy),#4148ae);color:#fff;padding:12px 16px;position:sticky;top:0;z-index:5}
+    .tabs{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+    .tabs button{border:none;border-radius:10px;padding:10px 13px;font-weight:700;cursor:pointer;min-height:40px;background:#fff;color:var(--navy)}
+    .tabs .on{background:var(--sky);color:#01384b}
+    .wrap{max-width:1180px;margin:auto;padding:12px}
+    .card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:12px}
+    .grid{display:grid;gap:10px}.jobs{grid-template-columns:repeat(auto-fill,minmax(320px,1fr))}.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+    .form{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+    .hidden{display:none!important}.muted{font-size:.9rem;color:#667085}
+    input,select,textarea,button{font:inherit} input,select,textarea{width:100%;padding:9px;border:1px solid #c4d0e1;border-radius:9px}
+    textarea{min-height:70px}
+    button{background:var(--navy);color:#fff;border:none;border-radius:9px;padding:9px 11px;cursor:pointer}
+    .alt{background:var(--sky);color:#00384f}.ghost{background:#ecf1ff;color:var(--navy)}
+    .badge{padding:3px 7px;border-radius:99px;color:#fff;font-size:.8rem;font-weight:700}
+    .Estimate{background:#64748b}.Scheduled{background:#0ea5e9}.Active{background:#f59e0b}.Complete{background:#16a34a}
+    .Available{background:#16a34a}.Onjob{background:#f59e0b}.Unavailable{background:#64748b}
+    .stats{display:grid;grid-template-columns:repeat(4,minmax(120px,1fr));gap:8px}.stat{background:#fff;border:1px solid var(--line);border-radius:11px;padding:9px}.stat b{display:block;color:var(--navy);font-size:1.15rem}
+    .table{width:100%;border-collapse:collapse}.table th,.table td{border-bottom:1px solid #e6edf7;padding:7px;text-align:left}
+    .toast{position:fixed;right:10px;bottom:10px;background:#111827;color:#fff;padding:10px;border-radius:9px;opacity:0;transition:.2s}.toast.show{opacity:1}
+    .modal{position:fixed;inset:0;background:#0008;display:none;align-items:center;justify-content:center;padding:12px}.modal.open{display:flex}.modal .card{width:min(700px,100%)}
+    .calendar{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px}
+    .dayhead{font-weight:700;color:var(--navy);font-size:.85rem;text-align:center}
+    .day{background:#fff;border:1px solid #dfe7f2;border-radius:10px;min-height:120px;padding:6px;cursor:pointer}
+    .day.off{opacity:.45}.day.selected{outline:2px solid var(--sky)}
+    .dot{display:block;padding:2px 6px;border-radius:999px;font-size:.72rem;margin:3px 0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:#fff}
+    .dot.job{background:#2E3192}.dot.crew{background:#00AEEF;color:#00384f}
+    .print-head{display:none} footer{text-align:center;color:#667085;margin:15px 0}
+    @media(max-width:860px){.form,.stats{grid-template-columns:1fr 1fr}} @media(max-width:560px){.form,.stats{grid-template-columns:1fr}}
+    @media print{header,.tabs,button,.no-print,footer{display:none!important}body{background:#fff}.print-head{display:block!important}}
+  </style>
+</head>
+<body>
+<header>
+  <h1 style="display:inline">Caylie Job Tracker — Complex</h1>
+  <button id="settingsBtn" class="ghost" style="float:right">⚙</button>
+  <div class="tabs">
+    <button class="on" data-tab="jobs">Jobs</button>
+    <button data-tab="reports">Reports</button>
+    <button data-tab="checklists">Checklists</button>
+    <button data-tab="crew">Crew</button>
+    <button data-tab="calendar">Calendar</button>
+    <button data-tab="season">Season</button>
+  </div>
+</header>
+<main class="wrap">
+  <div class="print-head">Caylie Wiebe · Student Works Painting · <span id="printDate"></span></div>
+  <section id="jobs" class="tab">
+    <div class="card">
+      <h2>Add Job</h2>
+      <form id="addJob" class="grid">
+        <div class="form">
+          <label>Name<input name="name" required></label><label>Address<input name="address" required></label><label>Value<input type="number" name="value" required></label>
+          <label>Start<input type="date" name="startDate" required></label><label>Status<select name="status"><option>Estimate</option><option>Scheduled</option><option>Active</option><option>Complete</option></select></label><label>Crew<input name="crew" placeholder="Jake + Priya"></label>
+        </div>
+        <label><input type="checkbox" name="discount"> 10% discount</label><button>Add</button>
+      </form>
+    </div>
+    <div id="jobCards" class="grid jobs"></div>
+  </section>
+  <section id="reports" class="tab hidden"></section>
+  <section id="checklists" class="tab hidden"></section>
+  <section id="crew" class="tab hidden"></section>
+  <section id="calendar" class="tab hidden"></section>
+  <section id="season" class="tab hidden"></section>
+  <footer>Built by Before It Breaks · beforeitbreaks.ca</footer>
+</main>
+
+<div id="settings" class="modal"><div class="card"><h3>Settings</h3>
+  <form id="settingsForm" class="form"><label>Operator<input name="operator"></label><label>Phone<input name="phone"></label><label>Territory<input name="territory"></label><label>Season year<input type="number" name="year"></label></form>
+  <div class="row"><button id="saveSettings">Save</button><button id="clearAll" class="alt">Clear all data</button><button id="closeSettings" class="ghost">Close</button></div>
+</div></div>
+<div id="toast" class="toast"></div>
+
+<script>
+const KEY='sw_caylie_complex';
+const STAT=['Estimate','Scheduled','Active','Complete'];
+const PRE=['Drop cloths down','Furniture moved/covered','Paint confirmed with client','Primer applied if needed','Trim taped','Equipment staged'];
+const END=['All surfaces covered evenly','Edges and trim clean','Hardware reattached','Full cleanup done','Walk-through completed with client','Client satisfied'];
+const RCHK=['Masking & prep done','Paint applied','Second coat done','Cleanup complete','Client called','On track to finish'];
+const seedJobs=[
+ ['Friesen Home','88 Maple Dr, Steinbach','Active',65,2100,'Jake + Priya','2026-04-10',false],
+ ['Wall Garage & House','15 Prairie Ave, Mitchell','Active',30,4400,'Sam + Lexi','2026-04-08',true],
+ ['Penner Property','42 Oak Cres, Steinbach','Scheduled',0,3200,'Jake + Priya','2026-04-15',false],
+ ['Reimer Residence','77 Elm Blvd, Grunthal','Scheduled',0,2600,'Sam + Lexi','2026-04-22',false],
+ ['McMahon Residence','610 Hanover St, Steinbach','Estimate',0,2850,'','2026-04-13',false],
+ ['Dyck Duplex','231 First St, Steinbach','Complete',100,1950,'Jake + Priya','2026-04-01',false]
+];
+
+let state=JSON.parse(localStorage.getItem(KEY)||'null')||{
+  jobs:seedJobs.map(x=>({id:crypto.randomUUID(),name:x[0],address:x[1],status:x[2],progress:x[3],value:x[4],crew:x[5],startDate:x[6],discount:x[7],supplies:[],holds:[],comms:[]})),
+  crew:[{id:crypto.randomUUID(),name:'Jake Wiebe',availability:'Available'},{id:crypto.randomUUID(),name:'Priya Sharma',availability:'Available'},{id:crypto.randomUUID(),name:'Sam Neufeld',availability:'Available'},{id:crypto.randomUUID(),name:'Lexi Harder',availability:'Available'}],
+  reports:{},checklists:{},calendarNotes:{},
+  settings:{operator:'Caylie Wiebe',phone:'204-381-2153',territory:'Steinbach, Manitoba',year:2026},
+  calendarView:new Date().toISOString().slice(0,7),
+  selectedDate:new Date().toISOString().slice(0,10)
+};
+
+const $=s=>document.querySelector(s);
+const today=()=>new Date().toISOString().slice(0,10);
+const money=n=>new Intl.NumberFormat('en-CA',{style:'currency',currency:'CAD',maximumFractionDigits:0}).format(n);
+const rk=(id,d)=>id+'|'+d;
+const save=()=>localStorage.setItem(KEY,JSON.stringify(state));
+function toast(t){const e=$('#toast');e.textContent=t;e.classList.add('show');setTimeout(()=>e.classList.remove('show'),1200)}
+function esc(t){return (t||'').replace(/</g,'&lt;').replace(/\n/g,'<br>')}
+function printWin(html){const w=window.open('','_blank');w.document.write(`<style>body{font-family:Arial;padding:18px;color:#000}</style>${html}`);w.print()}
+function tab(t){document.querySelectorAll('.tab').forEach(x=>x.classList.add('hidden'));$('#'+t).classList.remove('hidden');document.querySelectorAll('.tabs button').forEach(b=>b.classList.toggle('on',b.dataset.tab===t));render()}
+
+function renderJobs(){
+  const w=$('#jobCards');w.innerHTML='';
+  state.jobs.forEach(j=>{
+    const c=document.createElement('article');c.className='card';
+    c.innerHTML=`<div class=row><h3>${j.name}</h3><span class='badge ${j.status}'>${j.status}</span>${j.discount?'<span class=muted>10% discount</span>':''}</div>
+    <div>${j.address}</div><div class=row><strong>${money(j.value)}</strong><span>${j.crew||'No crew assigned'}</span><span>${j.startDate}</span></div>
+    ${j.status==='Active'?`<label>Progress ${j.progress}%<input type=range min=0 max=100 value='${j.progress}'></label>`:''}
+    <div class=row><button class='ghost cycle'>Cycle</button><button class='alt del'>Delete</button></div>
+    <details><summary>Paint & supply list</summary><div class='grid'><form class='supply form'><input name='product' placeholder='Product name' required><input name='qty' placeholder='Qty' required><input name='unit' placeholder='Unit'><input name='notes' placeholder='Notes'><button>Add</button></form><div>${j.supplies.map((s,i)=>`<div class=row><span>${s.product} (${s.qty} ${s.unit||''}) ${s.notes||''}</span><button data-i='${i}' class='ghost rs'>Remove</button></div>`).join('')||'<p class=muted>No supply items yet.</p>'}</div></div></details>
+    <details><summary>Weather holds</summary><form class='hold form'><input type='date' name='date' required><input name='reason' placeholder='Reason' required><button>Add hold</button></form>${j.holds.map(h=>`<div class=muted>${h.date}: ${h.reason}</div>`).join('')||'<p class=muted>No holds logged.</p>'}</details>
+    <details><summary>Client communication log</summary><form class='comm row'><input name='note' placeholder='Call/text/update note' required><button>Add note</button></form>${j.comms.map(n=>`<div class=muted>${n.ts} — ${n.note}</div>`).join('')||'<p class=muted>No client notes yet.</p>'}</details>`;
+    if(j.status==='Active') c.querySelector('input[type=range]').oninput=e=>{j.progress=+e.target.value;save()};
+    c.querySelector('.cycle').onclick=()=>{j.status=STAT[(STAT.indexOf(j.status)+1)%4];if(j.status==='Complete')j.progress=100;save();render();toast('Status updated')};
+    c.querySelector('.del').onclick=()=>{if(confirm('Delete '+j.name+'?')){state.jobs=state.jobs.filter(x=>x.id!==j.id);save();render();toast('Deleted')}};
+    c.querySelector('.supply').onsubmit=e=>{e.preventDefault();const f=new FormData(e.target);j.supplies.push({product:f.get('product'),qty:f.get('qty'),unit:f.get('unit'),notes:f.get('notes')});save();render();toast('Supply added')};
+    c.querySelectorAll('.rs').forEach(b=>b.onclick=()=>{j.supplies.splice(+b.dataset.i,1);save();render()});
+    c.querySelector('.hold').onsubmit=e=>{e.preventDefault();const f=new FormData(e.target);j.holds.push({date:f.get('date'),reason:f.get('reason')});save();render();toast('Weather hold logged')};
+    c.querySelector('.comm').onsubmit=e=>{e.preventDefault();const f=new FormData(e.target);j.comms.unshift({ts:new Date().toLocaleString('en-CA'),note:f.get('note')});save();render();toast('Client note added')};
+    w.append(c);
+  });
+}
+
+function renderReports(){
+  const sec=$('#reports');sec.innerHTML='<h2>Reports</h2>';
+  state.jobs.filter(j=>j.status==='Active').forEach(j=>{
+    const k=rk(j.id,today()),r=state.reports[k]||{checks:{},notes:'',next:''};
+    const c=document.createElement('article');c.className='card';
+    c.innerHTML=`<div class=row><h3>${j.name}</h3><span class='badge Active'>${state.reports[k]?'Today filed':'Missing today'}</span></div>
+    <details><summary>Internal daily report</summary>${RCHK.map(i=>`<label><input type='checkbox' data-k='${i}' ${r.checks[i]?'checked':''}> ${i}</label>`).join('')}
+    <label>Notes<textarea class='notes'>${r.notes}</textarea></label><div class=row><button class='save'>Save</button><button class='ghost printi'>Print internal</button></div></details>
+    <details><summary>Client-facing print view</summary><label>What was done today<textarea class='done'>${r.notes}</textarea></label><label>Next steps<textarea class='next'>${r.next||''}</textarea></label><button class='alt printc'>Print client report</button></details>`;
+    c.querySelectorAll("input[type='checkbox']").forEach(ch=>ch.onchange=()=>r.checks[ch.dataset.k]=ch.checked);
+    c.querySelector('.notes').oninput=e=>r.notes=e.target.value;
+    c.querySelector('.done').oninput=e=>r.notes=e.target.value;
+    c.querySelector('.next').oninput=e=>r.next=e.target.value;
+    c.querySelector('.save').onclick=()=>{state.reports[k]=r;save();renderReports();toast('Report saved')};
+    c.querySelector('.printi').onclick=()=>printWin(`<h2>${j.name}</h2><p>${j.address}</p><p>${today()}</p><ul>${Object.entries(r.checks).filter(([,v])=>v).map(([x])=>`<li>${x}</li>`).join('')}</ul><p>${esc(r.notes)}</p><p>Caylie Wiebe · Student Works Painting · 204-381-2153</p>`);
+    c.querySelector('.printc').onclick=()=>printWin(`<div style='border-top:8px solid #2E3192;border-bottom:4px solid #00AEEF;padding:12px'><h2 style='color:#2E3192'>Student Works Painting Daily Update</h2><h3>${j.name}</h3><p>${j.address}</p><p>Date: ${today()}</p><p><b>What was done today:</b><br>${esc(r.notes)}</p><p><b>Next steps:</b><br>${esc(r.next||'')}</p><p>Contact: Caylie Wiebe · 204-381-2153</p></div>`);
+    sec.append(c);
+  });
+}
+
+function renderChecklists(){
+  const sec=$('#checklists');sec.innerHTML='<h2>Checklists</h2>';
+  state.jobs.forEach(j=>{
+    const cl=state.checklists[j.id]||(state.checklists[j.id]={pre:{},end:{}});
+    const c=document.createElement('article');c.className='card';
+    c.innerHTML=`<h3>${j.name}</h3><div class='form'><div><h4>Pre-job</h4>${PRE.map(i=>`<label><input type='checkbox' data-t='pre' data-i='${i}' ${cl.pre[i]?'checked':''}> ${i}</label>`).join('')}</div><div><h4>End-of-job</h4>${END.map(i=>`<label><input type='checkbox' data-t='end' data-i='${i}' ${cl.end[i]?'checked':''}> ${i}</label>`).join('')}<button class='ghost p'>Print end checklist</button></div></div>`;
+    c.querySelectorAll("input[type='checkbox']").forEach(b=>b.onchange=()=>{cl[b.dataset.t][b.dataset.i]=b.checked;save()});
+    c.querySelector('.p').onclick=()=>printWin(`<h2>${j.name} End-of-job Checklist</h2><ul>${END.filter(i=>cl.end[i]).map(i=>`<li>${i}</li>`).join('')}</ul>`);
+    sec.append(c);
+  });
+  save();
+}
+
+function renderCrew(){
+  const sec=$('#crew');
+  sec.innerHTML=`<div class='card'><h2>Crew roster</h2><form id='addCrew' class='row'><input name='name' placeholder='Crew member name' required><select name='availability'><option>Available</option><option>On job</option><option>Unavailable</option></select><button>Add crew member</button></form></div>`;
+  state.crew.forEach(m=>{
+    const jobs=state.jobs.filter(j=>j.crew.includes(m.name)).map(j=>j.name).join(', ')||'No assigned jobs';
+    const c=document.createElement('article');c.className='card';
+    c.innerHTML=`<div class=row><h3>${m.name}</h3><span class='badge ${m.availability.replace(' ','')}'>${m.availability}</span></div><p class=muted>${jobs}</p><div class=row><select><option ${m.availability==='Available'?'selected':''}>Available</option><option ${m.availability==='On job'?'selected':''}>On job</option><option ${m.availability==='Unavailable'?'selected':''}>Unavailable</option></select><button class='ghost ren'>Rename</button><button class='alt rm'>Remove</button></div>`;
+    c.querySelector('select').onchange=e=>{m.availability=e.target.value;save();toast('Availability updated')};
+    c.querySelector('.ren').onclick=()=>{const n=prompt('New name',m.name);if(n){m.name=n;save();render()}};
+    c.querySelector('.rm').onclick=()=>{if(confirm('Remove crew member?')){state.crew=state.crew.filter(x=>x.id!==m.id);save();render()}};
+    sec.append(c);
+  });
+  $('#addCrew').onsubmit=e=>{e.preventDefault();const f=new FormData(e.target);state.crew.push({id:crypto.randomUUID(),name:f.get('name'),availability:f.get('availability')});save();render();toast('Crew member added')};
+}
+
+function monthMatrix(yyyyMm){
+  const [y,m]=yyyyMm.split('-').map(Number); const first=new Date(Date.UTC(y,m-1,1));
+  const startDay=(first.getUTCDay()+6)%7; const days=new Date(Date.UTC(y,m,0)).getUTCDate();
+  const cells=[];
+  for(let i=0;i<42;i++){
+    const day=i-startDay+1; const inMonth=day>0&&day<=days;
+    const dateStr=inMonth?`${y}-${String(m).padStart(2,'0')}-${String(day).padStart(2,'0')}`:'';
+    cells.push({inMonth,day,dateStr});
+  }
+  return cells;
+}
+
+function eventsForDate(d){
+  const jobs=state.jobs.filter(j=>j.startDate===d).map(j=>({type:'job',label:`${j.name} (${j.status})`}));
+  const crew=state.jobs.filter(j=>j.startDate===d&&j.crew).flatMap(j=>j.crew.split('+').map(n=>n.trim())).filter(Boolean).map(n=>({type:'crew',label:`${n} assigned`}));
+  return [...jobs,...crew];
+}
+
+function renderCalendar(){
+  const sec=$('#calendar');
+  const cells=monthMatrix(state.calendarView);
+  const label=new Date(state.calendarView+'-01T12:00:00').toLocaleDateString('en-CA',{month:'long',year:'numeric'});
+  sec.innerHTML=`<div class='card'><div class='row'><h2>Calendar</h2><button id='prevMonth' class='ghost'>◀</button><strong>${label}</strong><button id='nextMonth' class='ghost'>▶</button></div><p class='muted'>Tracks scheduled starts, job statuses, and crew assignments by date.</p><div class='calendar'>${['Mon','Tue','Wed','Thu','Fri','Sat','Sun'].map(d=>`<div class='dayhead'>${d}</div>`).join('')}${cells.map(c=>`<div class='day ${c.inMonth?'':'off'} ${c.dateStr===state.selectedDate?'selected':''}' data-date='${c.dateStr}'>${c.inMonth?`<div><strong>${c.day}</strong></div>${eventsForDate(c.dateStr).slice(0,3).map(e=>`<span class='dot ${e.type}'>${e.label}</span>`).join('')}${eventsForDate(c.dateStr).length>3?`<span class='muted'>+${eventsForDate(c.dateStr).length-3} more</span>`:''}`:''}</div>`).join('')}</div></div>
+  <div class='card'><h3>Selected date: ${state.selectedDate||'None'}</h3><div>${state.selectedDate?eventsForDate(state.selectedDate).map(e=>`<div class='dot ${e.type}'>${e.label}</div>`).join('')||'<p class=muted>No job/crew events.</p>':'<p class=muted>Select a date.</p>'}</div>${state.selectedDate?`<label>Calendar note<textarea id='calNote'>${state.calendarNotes[state.selectedDate]||''}</textarea></label><button id='saveCalNote'>Save note</button>`:''}</div>`;
+  sec.querySelectorAll('.day[data-date]').forEach(d=>d.onclick=()=>{if(!d.dataset.date)return;state.selectedDate=d.dataset.date;save();renderCalendar()});
+  $('#prevMonth').onclick=()=>{const dt=new Date(state.calendarView+'-01T12:00:00');dt.setMonth(dt.getMonth()-1);state.calendarView=dt.toISOString().slice(0,7);save();renderCalendar()};
+  $('#nextMonth').onclick=()=>{const dt=new Date(state.calendarView+'-01T12:00:00');dt.setMonth(dt.getMonth()+1);state.calendarView=dt.toISOString().slice(0,7);save();renderCalendar()};
+  const note=$('#calNote'); if(note) $('#saveCalNote').onclick=()=>{state.calendarNotes[state.selectedDate]=note.value;save();toast('Calendar note saved')};
+}
+
+function csv(){const rows=[['name','address','value','status','crew','start date','discount','progress'],...state.jobs.map(j=>[j.name,j.address,j.value,j.status,j.crew,j.startDate,j.discount?'yes':'no',j.progress])];return rows.map(r=>r.map(v=>`"${String(v).replaceAll('"','""')}"`).join(',')).join('\n')}
+function renderSeason(){
+  const sec=$('#season'),completed=state.jobs.filter(j=>j.status==='Complete');
+  sec.innerHTML=`<div class='stats'>${[['Total jobs',state.jobs.length],['Active',state.jobs.filter(j=>j.status==='Active').length],['Scheduled',state.jobs.filter(j=>j.status==='Scheduled').length],['Complete',completed.length],['Total season value',money(state.jobs.reduce((a,b)=>a+b.value,0))],['Earned',money(completed.reduce((a,b)=>a+b.value,0))],['Reports filed today',state.jobs.filter(j=>state.reports[rk(j.id,today())]).length]].map(([k,v])=>`<div class=stat>${k}<b>${v}</b></div>`).join('')}</div><div class='card'><h2>Season exports</h2><div class=row><button id='csv'>Export CSV</button><button class='alt' id='end'>Print end-of-season summary</button></div></div><div class='card'><table class='table'><thead><tr><th>Name</th><th>Value</th><th>Status</th><th>Date</th><th>Crew</th></tr></thead><tbody>${state.jobs.map(j=>`<tr><td>${j.name}</td><td>${money(j.value)}</td><td>${j.status}</td><td>${j.startDate}</td><td>${j.crew||'-'}</td></tr>`).join('')}</tbody></table></div>`;
+  $('#csv').onclick=()=>{const blob=new Blob([csv()],{type:'text/csv'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='caylie-season-jobs.csv';a.click();URL.revokeObjectURL(a.href);toast('CSV exported')};
+  $('#end').onclick=()=>printWin(`<h2>${state.settings.operator} — End of Season Summary</h2><p>${state.settings.territory} · ${state.settings.year}</p><p>Total completed jobs: ${completed.length}</p><p>Total earned: ${money(completed.reduce((a,b)=>a+b.value,0))}</p><ul>${completed.map(j=>`<li>${j.name}: ${money(j.value)}</li>`).join('')}</ul>`);
+}
+
+function render(){renderJobs();renderReports();renderChecklists();renderCrew();renderCalendar();renderSeason();$('#printDate').textContent=new Date().toLocaleDateString('en-CA')}
+
+$('#addJob').onsubmit=e=>{e.preventDefault();const f=new FormData(e.target);state.jobs.unshift({id:crypto.randomUUID(),name:f.get('name'),address:f.get('address'),status:f.get('status'),progress:f.get('status')==='Complete'?100:0,value:+f.get('value'),crew:f.get('crew'),startDate:f.get('startDate'),discount:f.get('discount')==='on',supplies:[],holds:[],comms:[]});save();e.target.reset();render();toast('Job added')};
+$('#settingsBtn').onclick=()=>{$('#settings').classList.add('open');Object.entries(state.settings).forEach(([k,v])=>$('#settingsForm').elements[k].value=v)};
+$('#closeSettings').onclick=e=>{e.preventDefault();$('#settings').classList.remove('open')};
+$('#saveSettings').onclick=e=>{e.preventDefault();const f=new FormData($('#settingsForm'));state.settings={operator:f.get('operator'),phone:f.get('phone'),territory:f.get('territory'),year:+f.get('year')};save();$('#settings').classList.remove('open');toast('Settings saved')};
+$('#clearAll').onclick=e=>{e.preventDefault();if(confirm('Clear all saved data?')){localStorage.removeItem(KEY);location.reload()}};
+document.querySelectorAll('.tabs button').forEach(b=>b.onclick=()=>tab(b.dataset.tab));
+render();
+</script>
+</body>
+</html>
