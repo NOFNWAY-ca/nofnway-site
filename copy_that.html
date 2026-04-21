@@ -146,6 +146,17 @@
             border-color: #ffc107;
         }
         .device-warning.visible { display: block; }
+        .device-warning.banner-success {
+            background: #e8f5e9;
+            border-color: #4caf50;
+            border-left-color: #4caf50;
+            color: #1b5e20;
+        }
+        [data-theme="dark"] .device-warning.banner-success {
+            background: rgba(76,175,80,0.10);
+            color: #81c784;
+            border-color: #4caf50;
+        }
         .device-warning a {
             color: inherit;
             font-weight: 700;
@@ -155,6 +166,58 @@
             border: none;
             padding: 0;
             font-size: inherit;
+        }
+
+        /* ── Copy All panel ──────────────────── */
+        .copy-all-panel {
+            display: none;
+            background: var(--card-bg);
+            border: 2px solid var(--brand);
+            border-radius: 6px;
+            padding: 14px 16px;
+            margin-bottom: 14px;
+            font-size: 0.88rem;
+            color: var(--text-main);
+            flex-direction: column;
+            gap: 10px;
+        }
+        .copy-all-panel.visible { display: flex; }
+        .copy-all-checklist {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            max-height: 260px;
+            overflow-y: auto;
+        }
+        .copy-all-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.88rem;
+        }
+        .copy-all-item input[type="checkbox"] {
+            accent-color: var(--brand);
+            width: 15px;
+            height: 15px;
+            flex-shrink: 0;
+            cursor: pointer;
+        }
+        .copy-all-item label {
+            cursor: pointer;
+            color: var(--text-main);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .copy-all-item label span {
+            color: var(--text-dim);
+            font-size: 0.82rem;
+            margin-left: 4px;
+        }
+        .copy-all-actions {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
         }
 
         /* ── Inline confirm strip ─────────────── */
@@ -282,6 +345,39 @@
         }
         .delete-btn:hover { color: var(--accent); }
 
+        .mask-btn {
+            background: transparent;
+            border: none;
+            color: var(--border);
+            font-size: 0.88rem;
+            line-height: 1;
+            padding: 4px 3px;
+            cursor: pointer;
+            flex-shrink: 0;
+            transition: color 0.15s;
+        }
+        .mask-btn:hover { color: var(--brand); }
+
+        .drag-handle {
+            background: transparent;
+            border: none;
+            color: var(--border);
+            font-size: 1rem;
+            line-height: 1;
+            padding: 4px 4px;
+            cursor: grab;
+            flex-shrink: 0;
+            transition: color 0.15s;
+            touch-action: none;
+        }
+        .drag-handle:hover { color: var(--brand); }
+        .drag-handle:active { cursor: grabbing; }
+        .drag-ghost {
+            opacity: 0.45;
+            border: 2px dashed var(--brand) !important;
+            box-shadow: none !important;
+        }
+
         /* ── Add-field row ────────────────────── */
         .add-row {
             display: none;
@@ -342,11 +438,191 @@
             font-size: 0.95rem;
         }
 
+        /* ── Group tag on field row ──────────── */
+        .group-tag-btn {
+            background: var(--brand);
+            color: white;
+            font-size: 0.65rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            padding: 2px 7px;
+            border-radius: 10px;
+            cursor: pointer;
+            white-space: nowrap;
+            flex-shrink: 0;
+            border: none;
+            transition: filter 0.15s;
+            max-width: 76px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            font-family: 'Roboto', sans-serif;
+        }
+        .group-tag-btn:hover { filter: brightness(1.15); }
+        .group-tag-btn.ungrouped {
+            background: transparent;
+            color: var(--border);
+            border: 1px dashed var(--border);
+            font-size: 0.9rem;
+            font-weight: 400;
+            padding: 0 5px;
+            letter-spacing: 0;
+        }
+        .group-tag-btn.ungrouped:hover { border-color: var(--brand); color: var(--brand); }
+
+        /* ── Group sections ──────────────────── */
+        #ungrouped-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        #groups-container {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 8px;
+        }
+        .group-section {
+            border-left: 3px solid var(--brand);
+            border-radius: 4px;
+        }
+        .group-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 7px 10px;
+            background: var(--card-bg);
+            border-bottom: 1px solid var(--border);
+            border-radius: 2px 2px 0 0;
+        }
+        .group-name {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 900;
+            font-size: 0.78rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--brand);
+            flex: 1;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .group-collapse-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-dim);
+            font-size: 0.7rem;
+            cursor: pointer;
+            padding: 2px 6px;
+            border-radius: 4px;
+            transition: color 0.15s;
+            flex-shrink: 0;
+        }
+        .group-collapse-btn:hover { color: var(--brand); }
+        .group-drag-handle {
+            background: transparent;
+            border: none;
+            color: var(--border);
+            font-size: 1rem;
+            line-height: 1;
+            padding: 4px 4px;
+            cursor: grab;
+            flex-shrink: 0;
+            transition: color 0.15s;
+            touch-action: none;
+        }
+        .group-drag-handle:hover { color: var(--brand); }
+        .group-drag-handle:active { cursor: grabbing; }
+        .group-body {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            padding: 8px 8px 8px 10px;
+        }
+        .group-body.collapsed { display: none; }
+
+        /* ── Group assignment popover ────────── */
+        .group-popover {
+            background: var(--card-bg);
+            border: 2px solid var(--brand);
+            border-radius: 8px;
+            padding: 4px 0;
+            min-width: 170px;
+            box-shadow: 3px 3px 0 var(--brand);
+        }
+        .group-popover-item {
+            display: block;
+            width: 100%;
+            background: none;
+            border: none;
+            text-align: left;
+            padding: 7px 14px;
+            font-size: 0.85rem;
+            color: var(--text-main);
+            cursor: pointer;
+            font-family: 'Roboto', sans-serif;
+        }
+        .group-popover-item:hover { background: var(--brand); color: white; }
+        .group-popover-item.active { color: var(--brand); font-weight: 700; }
+        .group-popover-remove { color: var(--accent) !important; }
+        .group-popover-remove:hover { background: var(--accent) !important; color: white !important; }
+        .group-popover-sep {
+            height: 1px;
+            background: var(--border);
+            margin: 4px 0;
+        }
+        .group-popover-new-form {
+            padding: 6px 10px;
+            display: flex;
+            gap: 6px;
+        }
+        .group-popover-new-form input {
+            flex: 1;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            padding: 4px 6px;
+            font-size: 0.82rem;
+            background: var(--bg);
+            color: var(--text-main);
+            font-family: 'Roboto', sans-serif;
+            outline: none;
+            min-width: 0;
+        }
+        .group-popover-new-form input:focus { border-color: var(--brand); }
+        .group-popover-new-form button {
+            background: var(--brand);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 4px 8px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+
+        /* ── Copy All grouped display ────────── */
+        .copy-all-group-label {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 900;
+            font-size: 0.72rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--brand);
+            padding: 4px 0 2px;
+            margin-top: 4px;
+            border-top: 1px solid var(--border);
+        }
+        .copy-all-item-grouped {
+            padding-left: 10px;
+        }
+
         @media (max-width: 580px) {
             .field-label-input { width: 110px; font-size: 0.72rem; }
             .copy-btn { min-width: 58px; padding: 7px 10px; font-size: 0.72rem; }
             .save-toggle-wrap { margin-left: 0; }
             .controls-bar { gap: 8px; }
+            .group-tag-btn { max-width: 56px; padding: 2px 5px; }
         }
 
         /* ── How it works ─────────────────────── */
@@ -463,12 +739,16 @@
     <div class="controls-bar">
         <button class="btn-add-field" onclick="showAddRow()">+ Add Field</button>
         <button class="btn-clear-values" onclick="requestClear()">Clear Values</button>
+        <button class="btn-clear-values" id="btn-copy-all" onclick="openCopyAll()">Copy All</button>
+        <button class="btn-clear-values" onclick="exportFields()">Export</button>
+        <button class="btn-clear-values" onclick="importFields()">Import</button>
         <div class="save-toggle-wrap">
             <span class="toggle-label">Session</span>
             <div class="toggle-track"
                  id="save-toggle"
                  role="switch"
                  aria-checked="false"
+                 aria-label="Save to device"
                  tabindex="0"
                  onclick="toggleMode()"
                  onkeydown="if(event.key===' '||event.key==='Enter'){event.preventDefault();toggleMode();}">
@@ -478,16 +758,26 @@
         </div>
     </div>
 
+    <input type="file" id="import-file-input" accept=".json" style="display:none;" aria-hidden="true">
+    <div class="device-warning" id="import-banner"></div>
     <div class="device-warning" id="device-warning">
         ⚠️ <strong>Your info is now saved on this device.</strong>
         Don't use this option on shared or public computers.
-        <button class="a" onclick="toggleMode()" style="margin-left:8px;background:none;border:none;font:inherit;cursor:pointer;text-decoration:underline;font-weight:700;color:inherit;padding:0;">Turn off</button>
+        <button onclick="toggleMode()" style="margin-left:8px;background:none;border:none;font:inherit;cursor:pointer;text-decoration:underline;font-weight:700;color:inherit;padding:0;">Turn off</button>
     </div>
 
     <div class="confirm-strip" id="confirm-strip">
         <span>Wipe all saved values? Your field names stay, values go.</span>
         <button class="btn-confirm-yes" onclick="confirmClear()">Yes, clear</button>
         <button class="btn-confirm-no"  onclick="cancelClear()">Never mind</button>
+    </div>
+
+    <div class="copy-all-panel" id="copy-all-panel">
+        <div class="copy-all-checklist" id="copy-all-checklist"></div>
+        <div class="copy-all-actions">
+            <button class="btn-confirm-yes" onclick="confirmCopyAll()">Copy selected</button>
+            <button class="btn-confirm-no"  onclick="closeCopyAll()">Cancel</button>
+        </div>
     </div>
 
     <div id="field-list"></div>
@@ -501,12 +791,14 @@
 
 </div>
 
+<script src="vendor/Sortable.min.js"></script>
 <script>
     // ============================================
     // CONSTANTS
     // ============================================
     const FIELDS_KEY = 'nofnway-copythat-v1';
     const MODE_KEY   = 'nofnway-copythat-mode';
+    const GROUPS_KEY = 'nofnway-copythat-groups';
 
     // Pre-loaded fields with stable IDs — these IDs must never change
     const DEFAULT_FIELDS = [
@@ -528,11 +820,17 @@
     // STATE
     // ============================================
     let state = {
-        fields:       [],
-        mode:         'session',   // 'session' | 'device'
-        addRowOpen:   false,
-        confirmOpen:  false,
+        fields:          [],
+        groups:          [],        // ordered group name strings
+        collapsedGroups: new Set(), // UI-only, not persisted
+        mode:            'session', // 'session' | 'device'
+        addRowOpen:      false,
+        confirmOpen:     false,
+        copyAllOpen:     false,
     };
+
+    let _copyAllFields = []; // ordered list built by buildCopyAllChecklist
+    let _activePopover = null;
 
     // ============================================
     // STORAGE — validate everything we read back
@@ -557,6 +855,7 @@
                     id:    f.id.slice(0, 64),
                     label: f.label.slice(0, 128),
                     value: f.value.slice(0, 512),
+                    group: typeof f.group === 'string' ? f.group.slice(0, 64) : '',
                 }));
             return valid.length > 0 ? valid : null;
         } catch (e) {
@@ -564,15 +863,34 @@
         }
     }
 
+    function readGroupsFromStorage() {
+        try {
+            const raw = state.mode === 'device'
+                ? localStorage.getItem(GROUPS_KEY)
+                : sessionStorage.getItem(GROUPS_KEY);
+            if (!raw) return [];
+            const parsed = JSON.parse(raw);
+            if (!Array.isArray(parsed)) return [];
+            return parsed
+                .filter(g => typeof g === 'string' && g.trim())
+                .map(g => g.slice(0, 64));
+        } catch (e) {
+            return [];
+        }
+    }
+
     function writeToStorage() {
-        const data = JSON.stringify(
-            state.fields.map(f => ({ id: f.id, label: f.label, value: f.value }))
+        const fieldsData = JSON.stringify(
+            state.fields.map(f => ({ id: f.id, label: f.label, value: f.value, group: f.group || '' }))
         );
+        const groupsData = JSON.stringify(state.groups);
         try {
             if (state.mode === 'device') {
-                localStorage.setItem(FIELDS_KEY, data);
+                localStorage.setItem(FIELDS_KEY, fieldsData);
+                localStorage.setItem(GROUPS_KEY, groupsData);
             } else {
-                sessionStorage.setItem(FIELDS_KEY, data);
+                sessionStorage.setItem(FIELDS_KEY, fieldsData);
+                sessionStorage.setItem(GROUPS_KEY, groupsData);
             }
         } catch (e) { /* quota exceeded or blocked */ }
     }
@@ -580,18 +898,302 @@
     function clearDeviceStorage() {
         try {
             localStorage.removeItem(FIELDS_KEY);
+            localStorage.removeItem(GROUPS_KEY);
             localStorage.removeItem(MODE_KEY);
         } catch (e) {}
     }
 
     function defaultFields() {
-        return DEFAULT_FIELDS.map(f => ({ ...f }));
+        return DEFAULT_FIELDS.map(f => ({ ...f, masked: false, group: '' }));
+    }
+
+    function pruneEmptyGroups() {
+        const usedGroups = new Set(state.fields.map(f => f.group).filter(g => g));
+        state.groups = state.groups.filter(g => usedGroups.has(g));
+        for (const g of state.collapsedGroups) {
+            if (!usedGroups.has(g)) state.collapsedGroups.delete(g);
+        }
+    }
+
+    // ============================================
+    // SORTABLE — reconcile DOM → state after drag
+    // ============================================
+    function reconcileFieldsFromDOM() {
+        const newOrder = [];
+        document.querySelectorAll('#ungrouped-list .field-row[data-field-id]').forEach(row => {
+            const f = state.fields.find(f => f.id === row.dataset.fieldId);
+            if (f) { f.group = ''; newOrder.push(f); }
+        });
+        document.querySelectorAll('#groups-container .group-section').forEach(section => {
+            const groupName = section.dataset.groupName;
+            section.querySelectorAll('.group-body .field-row[data-field-id]').forEach(row => {
+                const f = state.fields.find(f => f.id === row.dataset.fieldId);
+                if (f) { f.group = groupName; newOrder.push(f); }
+            });
+        });
+        state.fields = newOrder;
+        pruneEmptyGroups();
+        writeToStorage();
+        // Re-render after SortableJS finishes to remove any now-empty group sections
+        setTimeout(() => renderFields(), 0);
+    }
+
+    function reconcileGroupsFromDOM() {
+        const sections = document.querySelectorAll('#groups-container .group-section');
+        state.groups = Array.from(sections).map(s => s.dataset.groupName);
+        writeToStorage();
+    }
+
+    function initAllSortables() {
+        if (typeof Sortable === 'undefined') return;
+
+        const ungrouped = document.getElementById('ungrouped-list');
+        if (ungrouped) {
+            Sortable.create(ungrouped, {
+                group:      { name: 'ct-fields', pull: true, put: true },
+                handle:     '.drag-handle',
+                animation:  150,
+                ghostClass: 'drag-ghost',
+                onEnd:      () => reconcileFieldsFromDOM(),
+            });
+        }
+
+        document.querySelectorAll('.group-body').forEach(body => {
+            Sortable.create(body, {
+                group:      { name: 'ct-fields', pull: true, put: true },
+                handle:     '.drag-handle',
+                animation:  150,
+                ghostClass: 'drag-ghost',
+                onEnd:      () => reconcileFieldsFromDOM(),
+            });
+        });
+
+        const groupsContainer = document.getElementById('groups-container');
+        if (groupsContainer) {
+            Sortable.create(groupsContainer, {
+                handle:     '.group-drag-handle',
+                animation:  150,
+                ghostClass: 'drag-ghost',
+                onEnd:      () => reconcileGroupsFromDOM(),
+            });
+        }
+    }
+
+    // ============================================
+    // GROUP POPOVER
+    // ============================================
+    function openGroupPopover(fieldId, anchorBtn) {
+        closeGroupPopover();
+        const field = state.fields.find(f => f.id === fieldId);
+        if (!field) return;
+
+        const pop = document.createElement('div');
+        pop.className = 'group-popover';
+        pop.setAttribute('role', 'dialog');
+        pop.setAttribute('aria-label', 'Assign group');
+
+        // Existing groups
+        state.groups.forEach(gName => {
+            const btn = document.createElement('button');
+            btn.className = 'group-popover-item' + (field.group === gName ? ' active' : '');
+            btn.textContent = gName;
+            btn.addEventListener('click', () => {
+                field.group = gName;
+                writeToStorage();
+                closeGroupPopover();
+                renderFields();
+            });
+            pop.appendChild(btn);
+        });
+
+        // New group inline form
+        const newForm = document.createElement('div');
+        newForm.className = 'group-popover-new-form';
+        const newInput = document.createElement('input');
+        newInput.type        = 'text';
+        newInput.placeholder = 'New group\u2026';
+        newInput.maxLength   = 64;
+        newInput.setAttribute('aria-label', 'New group name');
+        const newBtn = document.createElement('button');
+        newBtn.textContent = '+ Add';
+        newBtn.addEventListener('click', () => {
+            const name = newInput.value.trim().slice(0, 64);
+            if (!name) { newInput.focus(); return; }
+            if (!state.groups.includes(name)) state.groups.push(name);
+            field.group = name;
+            writeToStorage();
+            closeGroupPopover();
+            renderFields();
+        });
+        newInput.addEventListener('keydown', e => {
+            if (e.key === 'Enter') newBtn.click();
+            if (e.key === 'Escape') closeGroupPopover();
+        });
+        newForm.appendChild(newInput);
+        newForm.appendChild(newBtn);
+        pop.appendChild(newForm);
+
+        // Remove from group option
+        if (field.group) {
+            const sep = document.createElement('div');
+            sep.className = 'group-popover-sep';
+            pop.appendChild(sep);
+            const removeBtn = document.createElement('button');
+            removeBtn.className = 'group-popover-item group-popover-remove';
+            removeBtn.textContent = 'Remove from group';
+            removeBtn.addEventListener('click', () => {
+                field.group = '';
+                pruneEmptyGroups();
+                writeToStorage();
+                closeGroupPopover();
+                renderFields();
+            });
+            pop.appendChild(removeBtn);
+        }
+
+        // Position below the anchor button
+        const rect = anchorBtn.getBoundingClientRect();
+        pop.style.cssText = 'position:fixed;top:' + (rect.bottom + 4) + 'px;left:' + rect.left + 'px;z-index:1000;';
+        document.body.appendChild(pop);
+        _activePopover = pop;
+
+        // Focus new-group input if there are no existing groups to pick from
+        if (state.groups.length === 0) {
+            setTimeout(() => newInput.focus(), 0);
+        }
+
+        setTimeout(() => {
+            document.addEventListener('click', _popoverOutsideHandler);
+        }, 0);
+    }
+
+    function _popoverOutsideHandler(e) {
+        if (_activePopover && !_activePopover.contains(e.target)) {
+            closeGroupPopover();
+        }
+    }
+
+    function closeGroupPopover() {
+        if (_activePopover) {
+            _activePopover.remove();
+            _activePopover = null;
+        }
+        document.removeEventListener('click', _popoverOutsideHandler);
     }
 
     // ============================================
     // RENDERING — user data via textContent/.value only
     // ============================================
+    function makeFieldRow(field) {
+        const row = document.createElement('div');
+        row.className = 'field-row';
+        row.dataset.fieldId = field.id;
+
+        // Drag handle
+        const handle = document.createElement('button');
+        handle.className = 'drag-handle';
+        handle.textContent = '⠿';
+        handle.setAttribute('aria-label', 'Drag to reorder');
+        handle.setAttribute('tabindex', '-1');
+
+        // Group tag
+        const groupTag = document.createElement('button');
+        groupTag.className = field.group ? 'group-tag-btn' : 'group-tag-btn ungrouped';
+        groupTag.setAttribute('aria-label', field.group
+            ? 'In group: ' + field.group + '. Click to change.'
+            : 'Add to a group');
+        if (field.group) {
+            groupTag.textContent = field.group.length > 12
+                ? field.group.slice(0, 12) + '\u2026'
+                : field.group;
+        } else {
+            groupTag.textContent = '+';
+        }
+        groupTag.addEventListener('click', e => {
+            e.stopPropagation();
+            openGroupPopover(field.id, groupTag);
+        });
+
+        // Label input — styled to look like a tag, always editable
+        const labelIn = document.createElement('input');
+        labelIn.type      = 'text';
+        labelIn.className = 'field-label-input';
+        labelIn.value     = field.label;
+        labelIn.maxLength = 128;
+        labelIn.setAttribute('autocomplete', 'off');
+        labelIn.setAttribute('aria-label', 'Field name');
+        labelIn.addEventListener('change', () => {
+            field.label = labelIn.value.slice(0, 128);
+            writeToStorage();
+        });
+
+        // Value input
+        const valueIn = document.createElement('input');
+        valueIn.type        = field.masked ? 'password' : 'text';
+        valueIn.className   = 'field-value-input';
+        valueIn.value       = field.value;
+        valueIn.maxLength   = 512;
+        valueIn.placeholder = 'Add value\u2026';
+        valueIn.setAttribute('autocomplete', 'off');
+        valueIn.setAttribute('autocorrect', 'off');
+        valueIn.setAttribute('spellcheck', 'false');
+        valueIn.setAttribute('aria-label', 'Value for ' + field.label);
+        valueIn.addEventListener('input', () => {
+            field.value = valueIn.value;
+            copyBtn.disabled = !field.value.trim();
+            writeToStorage();
+        });
+        valueIn.addEventListener('keydown', e => {
+            if (e.key === 'Enter' && field.value.trim()) doCopy(field.value, copyBtn);
+        });
+
+        // Copy button
+        const copyBtn = document.createElement('button');
+        copyBtn.className   = 'copy-btn';
+        copyBtn.textContent = 'Copy';
+        copyBtn.disabled    = !field.value.trim();
+        copyBtn.setAttribute('aria-label', 'Copy ' + field.label);
+        copyBtn.addEventListener('click', () => doCopy(field.value, copyBtn));
+
+        // Mask toggle
+        const maskBtn = document.createElement('button');
+        maskBtn.className   = 'mask-btn';
+        maskBtn.textContent = field.masked ? '🙈' : '👁';
+        maskBtn.setAttribute('aria-label', field.masked ? 'Show value' : 'Hide value');
+        maskBtn.addEventListener('click', () => {
+            field.masked   = !field.masked;
+            valueIn.type   = field.masked ? 'password' : 'text';
+            maskBtn.textContent = field.masked ? '🙈' : '👁';
+            maskBtn.setAttribute('aria-label', field.masked ? 'Show value' : 'Hide value');
+        });
+
+        row.appendChild(handle);
+        row.appendChild(groupTag);
+        row.appendChild(labelIn);
+        row.appendChild(valueIn);
+        row.appendChild(maskBtn);
+        row.appendChild(copyBtn);
+
+        // Delete button — custom fields only
+        if (!DEFAULT_IDS.has(field.id)) {
+            const delBtn = document.createElement('button');
+            delBtn.className   = 'delete-btn';
+            delBtn.textContent = '✕';
+            delBtn.setAttribute('aria-label', 'Remove field');
+            delBtn.addEventListener('click', () => {
+                state.fields = state.fields.filter(f => f.id !== field.id);
+                pruneEmptyGroups();
+                writeToStorage();
+                renderFields();
+            });
+            row.appendChild(delBtn);
+        }
+
+        return row;
+    }
+
     function renderFields() {
+        closeGroupPopover();
         const list = document.getElementById('field-list');
         while (list.firstChild) list.removeChild(list.firstChild);
 
@@ -603,88 +1205,89 @@
             return;
         }
 
-        state.fields.forEach(field => {
-            const row = document.createElement('div');
-            row.className = 'field-row';
-
-            // Label input — styled to look like a tag, always editable
-            const labelIn = document.createElement('input');
-            labelIn.type      = 'text';
-            labelIn.className = 'field-label-input';
-            labelIn.value     = field.label;    // .value is safe — never innerHTML
-            labelIn.maxLength = 128;
-            labelIn.setAttribute('autocomplete', 'off');
-            labelIn.setAttribute('aria-label', 'Field name');
-            labelIn.addEventListener('change', () => {
-                field.label = labelIn.value.slice(0, 128);
-                writeToStorage();
-            });
-
-            // Value input
-            const valueIn = document.createElement('input');
-            valueIn.type      = 'text';
-            valueIn.className = 'field-value-input';
-            valueIn.value     = field.value;    // .value is safe — never innerHTML
-            valueIn.maxLength = 512;
-            valueIn.placeholder = 'Add value…';
-            valueIn.setAttribute('autocomplete', 'off');
-            valueIn.setAttribute('autocorrect', 'off');
-            valueIn.setAttribute('spellcheck', 'false');
-            valueIn.setAttribute('aria-label', 'Value for ' + field.label);
-            valueIn.addEventListener('input', () => {
-                field.value = valueIn.value;
-                copyBtn.disabled = !field.value.trim();
-                writeToStorage();
-            });
-
-            // Copy button
-            const copyBtn = document.createElement('button');
-            copyBtn.className = 'copy-btn';
-            copyBtn.textContent = 'Copy';       // static string — safe
-            copyBtn.disabled    = !field.value.trim();
-            copyBtn.setAttribute('aria-label', 'Copy ' + field.label);
-            copyBtn.addEventListener('click', () => doCopy(field.value, copyBtn));
-
-            row.appendChild(labelIn);
-            row.appendChild(valueIn);
-            row.appendChild(copyBtn);
-
-            // Delete button — custom fields only
-            if (!DEFAULT_IDS.has(field.id)) {
-                const delBtn = document.createElement('button');
-                delBtn.className = 'delete-btn';
-                delBtn.textContent = '✕';       // static string — safe
-                delBtn.setAttribute('aria-label', 'Remove field');
-                delBtn.addEventListener('click', () => {
-                    state.fields = state.fields.filter(f => f.id !== field.id);
-                    writeToStorage();
-                    renderFields();
-                });
-                row.appendChild(delBtn);
-            }
-
-            list.appendChild(row);
+        // Ungrouped fields
+        const ungroupedList = document.createElement('div');
+        ungroupedList.id = 'ungrouped-list';
+        state.fields.filter(f => !f.group).forEach(field => {
+            ungroupedList.appendChild(makeFieldRow(field));
         });
+        list.appendChild(ungroupedList);
+
+        // Group sections
+        const groupsContainer = document.createElement('div');
+        groupsContainer.id = 'groups-container';
+        state.groups.forEach(groupName => {
+            const groupFields = state.fields.filter(f => f.group === groupName);
+            if (groupFields.length === 0) return;
+
+            const section = document.createElement('div');
+            section.className = 'group-section';
+            section.dataset.groupName = groupName;
+
+            // Header
+            const header = document.createElement('div');
+            header.className = 'group-header';
+
+            const groupHandle = document.createElement('button');
+            groupHandle.className = 'group-drag-handle';
+            groupHandle.textContent = '⠿';
+            groupHandle.setAttribute('aria-label', 'Drag to reorder group');
+            groupHandle.setAttribute('tabindex', '-1');
+
+            const nameSpan = document.createElement('span');
+            nameSpan.className = 'group-name';
+            nameSpan.textContent = groupName;
+
+            const isCollapsed = state.collapsedGroups.has(groupName);
+            const collapseBtn = document.createElement('button');
+            collapseBtn.className = 'group-collapse-btn';
+            collapseBtn.textContent = isCollapsed ? '\u25b6' : '\u25bc';
+            collapseBtn.setAttribute('aria-label', isCollapsed ? 'Expand group' : 'Collapse group');
+            collapseBtn.addEventListener('click', () => {
+                if (state.collapsedGroups.has(groupName)) {
+                    state.collapsedGroups.delete(groupName);
+                } else {
+                    state.collapsedGroups.add(groupName);
+                }
+                renderFields();
+            });
+
+            header.appendChild(groupHandle);
+            header.appendChild(nameSpan);
+            header.appendChild(collapseBtn);
+            section.appendChild(header);
+
+            // Body
+            const body = document.createElement('div');
+            body.className = isCollapsed ? 'group-body collapsed' : 'group-body';
+            body.dataset.groupName = groupName;
+            groupFields.forEach(field => body.appendChild(makeFieldRow(field)));
+            section.appendChild(body);
+
+            groupsContainer.appendChild(section);
+        });
+        list.appendChild(groupsContainer);
+
+        initAllSortables();
     }
 
     function renderUI() {
-        // Toggle track
         const track = document.getElementById('save-toggle');
         const isDevice = state.mode === 'device';
         track.classList.toggle('on', isDevice);
         track.setAttribute('aria-checked', String(isDevice));
 
-        // Warning banner
         document.getElementById('device-warning')
             .classList.toggle('visible', isDevice);
 
-        // Confirm strip
         document.getElementById('confirm-strip')
             .classList.toggle('visible', state.confirmOpen);
 
-        // Add row
         document.getElementById('add-row')
             .classList.toggle('visible', state.addRowOpen);
+
+        document.getElementById('copy-all-panel')
+            .classList.toggle('visible', state.copyAllOpen);
     }
 
     function render() {
@@ -699,10 +1302,10 @@
         if (!text.trim()) return;
 
         function flashCopied() {
-            btn.textContent = 'Copied!';        // static string — safe
+            btn.textContent = 'Copied!';
             btn.classList.add('copied');
             setTimeout(() => {
-                btn.textContent = 'Copy';       // static string — safe
+                btn.textContent = 'Copy';
                 btn.classList.remove('copied');
             }, 1400);
         }
@@ -716,7 +1319,7 @@
 
     function fallbackCopy(text, cb) {
         const el = document.createElement('textarea');
-        el.value = text;                        // .value is safe — never innerHTML
+        el.value = text;
         el.style.cssText = 'position:fixed;opacity:0;pointer-events:none;top:0;left:0;';
         document.body.appendChild(el);
         el.select();
@@ -728,8 +1331,9 @@
     // FIELD MANAGEMENT
     // ============================================
     function showAddRow() {
-        state.addRowOpen = true;
+        state.addRowOpen  = true;
         state.confirmOpen = false;
+        state.copyAllOpen = false;
         renderUI();
         setTimeout(() => document.getElementById('new-label').focus(), 50);
     }
@@ -749,9 +1353,11 @@
         if (!label) { labelEl.focus(); return; }
 
         state.fields.push({
-            id:    'ct_custom_' + Date.now(),
-            label: label,
-            value: value,
+            id:     'ct_custom_' + Date.now(),
+            label:  label,
+            value:  value,
+            masked: false,
+            group:  '',
         });
         writeToStorage();
         state.addRowOpen = false;
@@ -765,9 +1371,10 @@
     // ============================================
     function requestClear() {
         const hasValues = state.fields.some(f => f.value.trim());
-        if (!hasValues) return;   // nothing to clear
+        if (!hasValues) return;
         state.confirmOpen = true;
         state.addRowOpen  = false;
+        state.copyAllOpen = false;
         renderUI();
     }
 
@@ -794,10 +1401,198 @@
         } else {
             state.mode = 'session';
             clearDeviceStorage();
-            writeToStorage();    // save current data to sessionStorage instead
+            writeToStorage();
         }
         renderUI();
     }
+
+    // ============================================
+    // COPY ALL
+    // ============================================
+    function openCopyAll() {
+        const withValues = state.fields.filter(f => f.value.trim());
+        if (withValues.length === 0) return;
+        state.copyAllOpen = true;
+        state.confirmOpen = false;
+        state.addRowOpen  = false;
+        renderUI();
+        buildCopyAllChecklist();
+    }
+
+    function buildCopyAllChecklist() {
+        _copyAllFields = [];
+        const list = document.getElementById('copy-all-checklist');
+        while (list.firstChild) list.removeChild(list.firstChild);
+        let i = 0;
+
+        function makeCheckItem(field) {
+            const item = document.createElement('div');
+            item.className = 'copy-all-item';
+            const cb = document.createElement('input');
+            cb.type    = 'checkbox';
+            cb.checked = true;
+            cb.id      = 'ca-cb-' + i;
+            const lbl = document.createElement('label');
+            lbl.setAttribute('for', 'ca-cb-' + i);
+            const strong = document.createElement('strong');
+            strong.textContent = field.label;
+            const preview = document.createElement('span');
+            preview.textContent = field.masked ? '●●●●●' : field.value;
+            lbl.appendChild(strong);
+            lbl.appendChild(preview);
+            item.appendChild(cb);
+            item.appendChild(lbl);
+            _copyAllFields.push(field);
+            i++;
+            return item;
+        }
+
+        // Ungrouped first
+        state.fields.filter(f => !f.group && f.value.trim()).forEach(field => {
+            list.appendChild(makeCheckItem(field));
+        });
+
+        // Then each group
+        state.groups.forEach(groupName => {
+            const groupFields = state.fields.filter(f => f.group === groupName && f.value.trim());
+            if (groupFields.length === 0) return;
+
+            const groupLabel = document.createElement('div');
+            groupLabel.className = 'copy-all-group-label';
+            groupLabel.textContent = groupName;
+            list.appendChild(groupLabel);
+
+            groupFields.forEach(field => {
+                const item = makeCheckItem(field);
+                item.classList.add('copy-all-item-grouped');
+                list.appendChild(item);
+            });
+        });
+    }
+
+    function confirmCopyAll() {
+        const checkboxes = document.querySelectorAll('#copy-all-checklist input[type="checkbox"]');
+        const lines = [];
+        _copyAllFields.forEach((field, i) => {
+            if (checkboxes[i] && checkboxes[i].checked) {
+                lines.push(field.label + ': ' + field.value);
+            }
+        });
+        if (lines.length === 0) { closeCopyAll(); return; }
+        const text = lines.join('\n');
+        const btn = document.querySelector('#copy-all-panel .btn-confirm-yes');
+        function flash() {
+            btn.textContent = 'Copied!';
+            setTimeout(() => { closeCopyAll(); }, 1400);
+        }
+        if (navigator.clipboard && window.isSecureContext) {
+            navigator.clipboard.writeText(text).then(flash).catch(() => { fallbackCopy(text, flash); });
+        } else {
+            fallbackCopy(text, flash);
+        }
+    }
+
+    function closeCopyAll() {
+        state.copyAllOpen = false;
+        renderUI();
+    }
+
+    // ============================================
+    // EXPORT
+    // ============================================
+    function exportFields() {
+        const data = JSON.stringify({
+            fields: state.fields.map(f => ({ id: f.id, label: f.label, value: f.value, group: f.group || '' })),
+            groups: state.groups,
+        }, null, 2);
+        const blob = new Blob([data], { type: 'application/json' });
+        const url  = URL.createObjectURL(blob);
+        const a    = document.createElement('a');
+        a.href     = url;
+        a.download = 'copythat-backup.json';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    }
+
+    // ============================================
+    // IMPORT
+    // ============================================
+    function importFields() {
+        document.getElementById('import-file-input').click();
+    }
+
+    function showImportBanner(msg, isError) {
+        const banner = document.getElementById('import-banner');
+        banner.textContent = msg;
+        banner.classList.toggle('banner-success', !isError);
+        banner.classList.add('visible');
+        clearTimeout(banner._dismissTimer);
+        banner._dismissTimer = setTimeout(() => {
+            banner.classList.remove('visible');
+        }, 3000);
+    }
+
+    document.getElementById('import-file-input').addEventListener('change', function() {
+        const file = this.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            try {
+                const raw = JSON.parse(e.target.result);
+                let fieldsData, groupsData;
+
+                if (Array.isArray(raw)) {
+                    // Legacy format: just a fields array
+                    fieldsData = raw;
+                    groupsData = [];
+                } else if (raw && typeof raw === 'object' && Array.isArray(raw.fields)) {
+                    fieldsData = raw.fields;
+                    groupsData = Array.isArray(raw.groups) ? raw.groups : [];
+                } else {
+                    throw new Error('invalid format');
+                }
+
+                const validFields = fieldsData
+                    .filter(f =>
+                        f !== null &&
+                        typeof f === 'object' &&
+                        typeof f.id    === 'string' &&
+                        typeof f.label === 'string' &&
+                        typeof f.value === 'string'
+                    )
+                    .map(f => ({
+                        id:     f.id.slice(0, 64),
+                        label:  f.label.slice(0, 128),
+                        value:  f.value.slice(0, 512),
+                        group:  typeof f.group === 'string' ? f.group.slice(0, 64) : '',
+                        masked: false,
+                    }));
+
+                if (validFields.length === 0) throw new Error('no valid fields');
+
+                const validGroups = groupsData
+                    .filter(g => typeof g === 'string' && g.trim())
+                    .map(g => g.slice(0, 64));
+
+                // Any groups referenced by fields but absent from the groups list get appended
+                const referencedGroups = [...new Set(validFields.map(f => f.group).filter(g => g))];
+                const mergedGroups = [...validGroups];
+                referencedGroups.forEach(g => { if (!mergedGroups.includes(g)) mergedGroups.push(g); });
+
+                state.fields = validFields;
+                state.groups = mergedGroups;
+                writeToStorage();
+                render();
+                showImportBanner('Imported ' + validFields.length + ' field' + (validFields.length === 1 ? '' : 's') + '.');
+            } catch (err) {
+                showImportBanner("Couldn't read that file. Is it a valid backup?", true);
+            }
+        };
+        reader.readAsText(file);
+        this.value = '';
+    });
 
     // ============================================
     // ADD ROW KEYBOARD SHORTCUTS
@@ -824,29 +1619,30 @@
     // INIT
     // ============================================
     (function init() {
-        // Determine storage mode
         try {
             if (localStorage.getItem(MODE_KEY) === 'device') state.mode = 'device';
         } catch (e) {}
 
-        // Load fields
-        const saved = readFromStorage();
+        const saved       = readFromStorage();
+        state.groups      = readGroupsFromStorage();
 
         if (saved) {
-            // Merge saved data back onto stable default IDs where possible
-            // so adding new default fields in future doesn't lose existing values
             const savedMap = Object.fromEntries(saved.map(f => [f.id, f]));
             state.fields = DEFAULT_FIELDS.map(f => ({
                 ...f,
-                label: savedMap[f.id] ? savedMap[f.id].label : f.label,
-                value: savedMap[f.id] ? savedMap[f.id].value : f.value,
+                masked: false,
+                group:  savedMap[f.id] ? (savedMap[f.id].group || '') : '',
+                label:  savedMap[f.id] ? savedMap[f.id].label : f.label,
+                value:  savedMap[f.id] ? savedMap[f.id].value : f.value,
             }));
-            // Append any custom fields that were saved
-            saved.filter(f => !DEFAULT_IDS.has(f.id)).forEach(f => state.fields.push(f));
+            saved.filter(f => !DEFAULT_IDS.has(f.id)).forEach(f => {
+                state.fields.push({ ...f, masked: false, group: f.group || '' });
+            });
         } else {
             state.fields = defaultFields();
         }
 
+        pruneEmptyGroups();
         render();
     })();
 </script>

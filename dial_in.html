@@ -144,7 +144,8 @@
             letter-spacing: 0.5px;
             color: var(--text-dim);
         }
-        .fill-field input[type="text"] {
+        .fill-field input[type="text"],
+        .fill-field input[type="tel"] {
             background: var(--card-bg);
             border: 2px solid var(--border);
             border-radius: 7px;
@@ -158,11 +159,13 @@
             width: 100%;
             box-sizing: border-box;
         }
-        .fill-field input[type="text"]:focus {
+        .fill-field input[type="text"]:focus,
+        .fill-field input[type="tel"]:focus {
             border-color: var(--brand);
             box-shadow: 2px 2px 0 var(--brand);
         }
-        .fill-field input[type="text"]::placeholder { color: var(--text-dim); opacity: 0.5; }
+        .fill-field input[type="text"]::placeholder,
+        .fill-field input[type="tel"]::placeholder { color: var(--text-dim); opacity: 0.5; }
 
         /* Choice button group */
         .choice-group { display: flex; gap: 8px; flex-wrap: wrap; }
@@ -339,6 +342,111 @@
         .btn-copy-notes:hover { border-color: var(--brand); color: var(--brand); }
         .btn-copy-notes.copied { border-color: var(--ready); color: var(--ready); pointer-events: none; }
 
+        /* ── Phone dial ─────────────────────────── */
+        .phone-row { display: flex; gap: 8px; align-items: stretch; }
+        .phone-row input { flex: 1; width: auto; }
+        .btn-dial {
+            background: var(--brand);
+            border: 2px solid var(--brand);
+            border-radius: 7px;
+            padding: 0 14px;
+            font-size: 1.1rem;
+            color: white;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            box-shadow: 2px 2px 0 var(--border);
+            transition: opacity 0.15s;
+            line-height: 1;
+        }
+        .btn-dial:hover { opacity: 0.85; }
+        .btn-dial.empty { opacity: 0.35; pointer-events: none; }
+
+        /* ── Beats progress ──────────────────────── */
+        .beats-progress {
+            float: right;
+            font-weight: 700;
+            font-size: 0.68rem;
+            letter-spacing: 0.5px;
+            color: var(--text-dim);
+            font-family: 'Roboto', sans-serif;
+        }
+        .beats-progress.done { color: var(--ready); }
+
+        /* ── Custom scenario setup ──────────────── */
+        .custom-setup-form { max-width: 560px; display: flex; flex-direction: column; gap: 18px; }
+        .custom-beats-list { display: flex; flex-direction: column; gap: 8px; }
+        .custom-beat-row { display: flex; gap: 8px; align-items: center; }
+        .custom-beat-row input {
+            flex: 1;
+            background: var(--card-bg);
+            border: 2px solid var(--border);
+            border-radius: 7px;
+            padding: 10px 12px;
+            font-family: 'Roboto', sans-serif;
+            font-size: 0.95rem;
+            color: var(--text-main);
+            outline: none;
+            box-shadow: 2px 2px 0 var(--border);
+            box-sizing: border-box;
+            transition: border-color 0.15s, box-shadow 0.15s;
+        }
+        .custom-beat-row input:focus { border-color: var(--brand); box-shadow: 2px 2px 0 var(--brand); }
+        .custom-beat-row input::placeholder { color: var(--text-dim); opacity: 0.5; }
+        .btn-remove-beat {
+            background: transparent;
+            border: 2px solid var(--border);
+            border-radius: 6px;
+            width: 34px;
+            height: 40px;
+            cursor: pointer;
+            color: var(--text-dim);
+            font-size: 1.1rem;
+            transition: border-color 0.15s, color 0.15s;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+        }
+        .btn-remove-beat:hover { border-color: var(--accent); color: var(--accent); }
+        .btn-add-beat {
+            background: transparent;
+            border: 2px dashed var(--border);
+            border-radius: 7px;
+            padding: 10px 16px;
+            font-family: 'Roboto', sans-serif;
+            font-size: 0.88rem;
+            font-weight: 700;
+            color: var(--text-dim);
+            cursor: pointer;
+            text-align: left;
+            transition: border-color 0.15s, color 0.15s;
+        }
+        .btn-add-beat:hover { border-color: var(--brand); color: var(--brand); }
+        .btn-add-beat:disabled { opacity: 0.35; cursor: default; pointer-events: none; }
+        .btn-start-call {
+            background: var(--brand);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 13px 28px;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 900;
+            font-size: 0.95rem;
+            cursor: pointer;
+            box-shadow: 3px 3px 0 var(--border);
+            transition: opacity 0.15s;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            align-self: flex-start;
+            margin-top: 6px;
+        }
+        .btn-start-call:hover { opacity: 0.85; }
+        .btn-start-call:disabled { opacity: 0.35; cursor: default; }
+
         @media (max-width: 680px) {
             .active-wrap { grid-template-columns: 1fr; }
             .beats-col { position: static; }
@@ -440,6 +548,7 @@
                          id="save-toggle"
                          role="switch"
                          aria-checked="false"
+                         aria-label="Save to device"
                          tabindex="0"
                          onclick="toggleSaveMode()"
                          onkeydown="if(event.key===' '||event.key==='Enter'){event.preventDefault();toggleSaveMode();}">
@@ -449,13 +558,22 @@
                 </div>
             </div>
             <div class="beats-col">
-                <p class="col-head">What to cover</p>
+                <p class="col-head">What to cover <span id="beats-progress" class="beats-progress"></span></p>
                 <div id="beats-list" class="beats-list"></div>
                 <div class="copy-notes-wrap">
                     <button class="btn-copy-notes" id="copy-notes-btn" onclick="copyNotes()">Copy notes</button>
                 </div>
             </div>
         </div>
+    </div>
+
+    <!-- ═══ SCREEN 3: CUSTOM SETUP ═══ -->
+    <div id="screen-custom-setup" hidden>
+        <div class="active-header">
+            <button class="btn-back" onclick="goBack()">← Back</button>
+            <h2 class="active-title">Set up your call</h2>
+        </div>
+        <div class="custom-setup-form" id="custom-setup-form"></div>
     </div>
 
 <script>
@@ -472,8 +590,9 @@
                 { id: 'who',      label: "Who you're calling",    placeholder: "e.g. Dr. Singh's office",                  required: true,  type: 'text', maxlength: 100 },
                 { id: 'datetime', label: 'Appointment date/time', placeholder: 'e.g. Thursday the 6th at 2pm  (optional)', required: false, type: 'text', maxlength: 100 },
                 { id: 'action',   label: 'What do you need?',     type: 'choice', options: ['Reschedule', 'Cancel'], defaultIdx: 0 },
+                { id: 'phone',   label: 'Phone number',           placeholder: 'Optional — tap to dial',                  required: false, type: 'tel',  maxlength: 50  },
             ],
-            defaults: { name: '', who: '', datetime: '', action: 'Reschedule' },
+            defaults: { name: '', who: '', datetime: '', action: 'Reschedule', phone: '' },
             beats: [
                 { id: 'intro',   label: f => f.name   ? 'Say your name, ' + f.name                  : 'Say your name' },
                 { id: 'who',     label: f => f.who    ? 'Calling about your appointment with ' + f.who : 'Say who you have an appointment with' },
@@ -492,8 +611,9 @@
                 { id: 'dob',         label: 'Date of birth',  placeholder: 'e.g. January 15, 1985',  required: true,  type: 'text', maxlength: 100 },
                 { id: 'medication',  label: 'Medication',     placeholder: 'e.g. metformin 500mg',   required: true,  type: 'text', maxlength: 200 },
                 { id: 'destination', label: 'Calling:',       type: 'choice', options: ['Pharmacy', "Doctor's office"], defaultIdx: 0 },
+                { id: 'phone',       label: 'Phone number',   placeholder: 'Optional — tap to dial', required: false, type: 'tel', maxlength: 50 },
             ],
-            defaults: { name: '', dob: '', medication: '', destination: 'Pharmacy' },
+            defaults: { name: '', dob: '', medication: '', destination: 'Pharmacy', phone: '' },
             beats: [
                 { id: 'intro',      label: f => [f.name, f.dob ? 'DOB ' + f.dob : ''].filter(Boolean).join(', ') || 'Your name and date of birth' },
                 { id: 'medication', label: f => f.medication ? 'Medication: ' + f.medication           : 'Name the medication' },
@@ -511,8 +631,9 @@
                 { id: 'company', label: 'Company name',    placeholder: 'e.g. Netflix',                             required: true, type: 'text', maxlength: 100 },
                 { id: 'amount',  label: 'Amount',          placeholder: 'e.g. $47.99',                              required: true, type: 'text', maxlength: 50  },
                 { id: 'reason',  label: 'Reason (brief)',  placeholder: 'e.g. I cancelled before the billing date', required: true, type: 'text', maxlength: 200 },
+                { id: 'phone',   label: 'Phone number',    placeholder: 'Optional — tap to dial',                   required: false, type: 'tel',  maxlength: 50  },
             ],
-            defaults: { name: '', company: '', amount: '', reason: '' },
+            defaults: { name: '', company: '', amount: '', reason: '', phone: '' },
             beats: [
                 { id: 'intro',  label: f => f.name    ? 'Your name: ' + f.name                              : 'Give your name' },
                 { id: 'charge', label: f => [f.amount, f.company].filter(Boolean).join(' from ')             || 'State the charge amount and company' },
@@ -531,8 +652,9 @@
                 { id: 'address', label: 'Your unit/address', placeholder: 'e.g. Unit 4B, 123 Main St',                  required: true, type: 'text', maxlength: 200 },
                 { id: 'issue',   label: 'What needs fixing', placeholder: 'e.g. the kitchen tap is dripping constantly', required: true, type: 'text', maxlength: 300 },
                 { id: 'urgency', label: 'How urgent?',       type: 'choice', options: ['Not urgent', 'Urgent', 'Emergency'], defaultIdx: 0 },
+                { id: 'phone',   label: 'Phone number',     placeholder: 'Optional — tap to dial',                     required: false, type: 'tel', maxlength: 50 },
             ],
-            defaults: { name: '', address: '', issue: '', urgency: 'Not urgent' },
+            defaults: { name: '', address: '', issue: '', urgency: 'Not urgent', phone: '' },
             beats: [
                 { id: 'intro',   label: f => [f.name, f.address].filter(Boolean).join(', ')             || 'Your name and address' },
                 { id: 'issue',   label: f => f.issue   ? f.issue                                        : 'Describe what needs fixing' },
@@ -554,11 +676,12 @@
     // STATE
     // ============================================
     let state = {
-        screen:    'pick',
-        scenario:  null,
-        fields:    {},
-        beatState: {},   // { [beatId]: { checked: bool, note: string, noteOpen: bool } }
-        saveMode:  'session',
+        screen:      'pick',
+        scenario:    null,
+        fields:      {},
+        beatState:   {},   // { [beatId]: { checked: bool, note: string, noteOpen: bool } }
+        saveMode:    'session',
+        customSetup: { callName: '', beats: [''] },
     };
 
     // ============================================
@@ -624,6 +747,7 @@
         state.fields   = {};
         state.beatState = {};
         render();
+        window.scrollTo(0, 0);
     }
 
     // ============================================
@@ -632,7 +756,12 @@
     function toggleBeat(id) {
         state.beatState[id].checked = !state.beatState[id].checked;
         const item = document.getElementById('beat-' + id);
-        if (item) item.classList.toggle('covered', state.beatState[id].checked);
+        if (item) {
+            item.classList.toggle('covered', state.beatState[id].checked);
+            const btn = item.querySelector('.beat-check');
+            if (btn) btn.setAttribute('aria-label', state.beatState[id].checked ? 'Mark as not covered' : 'Mark as covered');
+        }
+        updateProgress();
     }
 
     function toggleBeatNote(id) {
@@ -645,6 +774,20 @@
         btn.textContent = open ? '−' : '+';
         area.classList.toggle('open', open);
         if (open) { area.focus(); }
+    }
+
+    // ============================================
+    // PROGRESS COUNTER
+    // ============================================
+    function updateProgress() {
+        if (!state.scenario) return;
+        const beats = SCENARIOS[state.scenario].beats;
+        const total = beats.length;
+        const done  = beats.filter(b => state.beatState[b.id] && state.beatState[b.id].checked).length;
+        const el = document.getElementById('beats-progress');
+        if (!el) return;
+        el.classList.toggle('done', done === total);
+        el.textContent = done === total ? '✓ All covered' : (done + ' of ' + total);
     }
 
     // ============================================
@@ -685,6 +828,8 @@
     function copyNotes() {
         if (!state.scenario) return;
         const lines = [];
+        const phone = state.fields && state.fields.phone ? state.fields.phone.trim() : '';
+        if (phone) lines.push('Called: ' + phone, '');
         SCENARIOS[state.scenario].beats.forEach(beat => {
             const bs = state.beatState[beat.id];
             const label = beat.label(state.fields);
@@ -730,7 +875,7 @@
 
             const lbl = document.createElement('label');
             lbl.textContent = fd.label;
-            if (fd.type === 'text') lbl.setAttribute('for', 'field-' + fd.id);
+            if (fd.type === 'text' || fd.type === 'tel') lbl.setAttribute('for', 'field-' + fd.id);
             wrap.appendChild(lbl);
 
             if (fd.type === 'text') {
@@ -749,6 +894,40 @@
                     updateBeatLabels();
                 });
                 wrap.appendChild(input);
+
+            } else if (fd.type === 'tel') {
+                const phoneRow = document.createElement('div');
+                phoneRow.className = 'phone-row';
+
+                const input = document.createElement('input');
+                input.type        = 'tel';
+                input.id          = 'field-' + fd.id;
+                input.inputMode   = 'tel';
+                input.maxLength   = fd.maxlength || 50;
+                input.placeholder = fd.placeholder || '';
+                input.value       = state.fields[fd.id] || '';
+                input.setAttribute('autocomplete', 'tel');
+
+                const dialLink = document.createElement('a');
+                dialLink.className = 'btn-dial' + (input.value.trim() ? '' : ' empty');
+                dialLink.href = input.value.trim() ? 'tel:' + input.value.trim() : '#';
+                dialLink.tabIndex = input.value.trim() ? 0 : -1;
+                dialLink.textContent = '📞';
+                dialLink.setAttribute('aria-label', 'Call this number');
+                dialLink.title = 'Call this number';
+
+                input.addEventListener('input', () => {
+                    state.fields[fd.id] = input.value;
+                    writeFields();
+                    const val = input.value.trim();
+                    dialLink.href = val ? 'tel:' + val : '#';
+                    dialLink.tabIndex = val ? 0 : -1;
+                    dialLink.classList.toggle('empty', !val);
+                });
+
+                phoneRow.appendChild(input);
+                phoneRow.appendChild(dialLink);
+                wrap.appendChild(phoneRow);
 
             } else if (fd.type === 'choice') {
                 const group = document.createElement('div');
@@ -832,14 +1011,16 @@
 
             list.appendChild(item);
         });
+        updateProgress();
     }
 
     // ============================================
     // MAIN RENDER
     // ============================================
     function render() {
-        document.getElementById('screen-pick').hidden   = state.screen !== 'pick';
-        document.getElementById('screen-active').hidden = state.screen !== 'active';
+        document.getElementById('screen-pick').hidden         = state.screen !== 'pick';
+        document.getElementById('screen-active').hidden       = state.screen !== 'active';
+        document.getElementById('screen-custom-setup').hidden = state.screen !== 'custom-setup';
 
         if (state.screen === 'active') {
             document.getElementById('active-title').textContent = SCENARIOS[state.scenario].label;
@@ -851,7 +1032,140 @@
             }
             renderFields();
             renderBeats();
+        } else if (state.screen === 'custom-setup') {
+            renderCustomSetup();
         }
+    }
+
+    // ============================================
+    // CUSTOM SCENARIO
+    // ============================================
+    function makeBeatLabel(text) { return () => text; }
+
+    function renderCustomBeats(list) {
+        while (list.firstChild) list.removeChild(list.firstChild);
+        state.customSetup.beats.forEach((beatText, i) => {
+            const row = document.createElement('div');
+            row.className = 'custom-beat-row';
+
+            const input = document.createElement('input');
+            input.type = 'text';
+            input.maxLength = 200;
+            input.placeholder = i === 0 ? 'e.g. your name, account number' : 'e.g. ask about next steps';
+            input.value = beatText;
+            input.setAttribute('autocomplete', 'off');
+            input.setAttribute('autocorrect', 'off');
+            input.addEventListener('input', () => { state.customSetup.beats[i] = input.value; });
+            row.appendChild(input);
+
+            if (state.customSetup.beats.length > 1) {
+                const removeBtn = document.createElement('button');
+                removeBtn.className = 'btn-remove-beat';
+                removeBtn.textContent = '×';
+                removeBtn.setAttribute('aria-label', 'Remove this item');
+                removeBtn.addEventListener('click', () => {
+                    state.customSetup.beats.splice(i, 1);
+                    const listEl = document.getElementById('custom-beats-list');
+                    renderCustomBeats(listEl);
+                    const addBtnEl = document.getElementById('custom-add-beat-btn');
+                    if (addBtnEl) addBtnEl.disabled = state.customSetup.beats.length >= 7;
+                });
+                row.appendChild(removeBtn);
+            }
+            list.appendChild(row);
+        });
+    }
+
+    function renderCustomSetup() {
+        const form = document.getElementById('custom-setup-form');
+        while (form.firstChild) form.removeChild(form.firstChild);
+
+        // Who are you calling?
+        const nameGroup = document.createElement('div');
+        nameGroup.className = 'fill-field';
+        const nameLbl = document.createElement('label');
+        nameLbl.textContent = 'Who are you calling?';
+        nameLbl.setAttribute('for', 'custom-call-name');
+        const nameInput = document.createElement('input');
+        nameInput.type = 'text';
+        nameInput.id = 'custom-call-name';
+        nameInput.maxLength = 100;
+        nameInput.placeholder = 'e.g. The insurance company';
+        nameInput.value = state.customSetup.callName;
+        nameInput.setAttribute('autocomplete', 'off');
+        nameInput.addEventListener('input', () => { state.customSetup.callName = nameInput.value; });
+        nameGroup.appendChild(nameLbl);
+        nameGroup.appendChild(nameInput);
+        form.appendChild(nameGroup);
+
+        // Beats section
+        const beatsLbl = document.createElement('p');
+        beatsLbl.className = 'col-head';
+        beatsLbl.style.marginBottom = '2px';
+        beatsLbl.textContent = 'What do you need to cover?';
+        form.appendChild(beatsLbl);
+
+        const beatsList = document.createElement('div');
+        beatsList.className = 'custom-beats-list';
+        beatsList.id = 'custom-beats-list';
+        form.appendChild(beatsList);
+        renderCustomBeats(beatsList);
+
+        const addBtn = document.createElement('button');
+        addBtn.className = 'btn-add-beat';
+        addBtn.id = 'custom-add-beat-btn';
+        addBtn.textContent = '+ Add another thing to cover';
+        addBtn.disabled = state.customSetup.beats.length >= 7;
+        addBtn.addEventListener('click', () => {
+            if (state.customSetup.beats.length < 7) {
+                state.customSetup.beats.push('');
+                const listEl = document.getElementById('custom-beats-list');
+                renderCustomBeats(listEl);
+                addBtn.disabled = state.customSetup.beats.length >= 7;
+                const inputs = listEl.querySelectorAll('input');
+                if (inputs.length) inputs[inputs.length - 1].focus();
+            }
+        });
+        form.appendChild(addBtn);
+
+        const startBtn = document.createElement('button');
+        startBtn.className = 'btn-start-call';
+        startBtn.textContent = 'Start Call Prep';
+        startBtn.addEventListener('click', startCustomScenario);
+        form.appendChild(startBtn);
+
+        nameInput.focus();
+    }
+
+    function startCustomScenario() {
+        const callName = state.customSetup.callName.trim() || 'Custom call';
+        const beats = state.customSetup.beats.map(t => t.trim()).filter(t => t.length > 0);
+        if (beats.length === 0) {
+            const listEl = document.getElementById('custom-beats-list');
+            if (listEl) {
+                const inputs = listEl.querySelectorAll('input');
+                inputs.forEach(inp => {
+                    inp.style.borderColor = 'var(--accent)';
+                    inp.style.boxShadow   = '2px 2px 0 var(--accent)';
+                    setTimeout(() => { inp.style.borderColor = ''; inp.style.boxShadow = ''; }, 1200);
+                });
+                if (inputs[0]) inputs[0].focus();
+            }
+            return;
+        }
+
+        SCENARIOS.custom = {
+            label:    callName,
+            desc:     '',
+            icon:     '📞',
+            fields: [
+                { id: 'name',  label: 'Your name',   placeholder: 'e.g. Alex',              required: false, type: 'text', maxlength: 100 },
+                { id: 'phone', label: 'Phone number', placeholder: 'Optional — tap to dial', required: false, type: 'tel',  maxlength: 50  },
+            ],
+            defaults: { name: '', phone: '' },
+            beats: beats.map((text, i) => ({ id: 'cb_' + i, label: makeBeatLabel(text) })),
+        };
+        pickScenario('custom');
     }
 
     // ============================================
@@ -871,6 +1185,22 @@
             card.appendChild(desc);
             grid.appendChild(card);
         });
+
+        // Custom scenario card
+        const customCard = document.createElement('button');
+        customCard.className = 'scenario-card';
+        customCard.addEventListener('click', () => {
+            state.screen = 'custom-setup';
+            state.customSetup = { callName: '', beats: [''] };
+            render();
+        });
+        const ci = document.createElement('div'); ci.className = 'scenario-icon';  ci.textContent = '📞';
+        const ct = document.createElement('div'); ct.className = 'scenario-title'; ct.textContent = 'Something else';
+        const cd = document.createElement('div'); cd.className = 'scenario-desc';  cd.textContent = 'Name the call and add what you need to cover.';
+        customCard.appendChild(ci);
+        customCard.appendChild(ct);
+        customCard.appendChild(cd);
+        grid.appendChild(customCard);
     }
 
     // ============================================

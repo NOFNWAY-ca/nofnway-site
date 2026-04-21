@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="author" content="Gerry McMahon">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Free PECS Tile & Visual Schedule Maker – NOFNWAY</title>
     <meta name="description" content="Design and print custom picture tiles for visual schedules, labels, and PECS communication boards. Free, private, no account needed.">
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
@@ -86,6 +86,70 @@
         .btn-icon:hover { background: var(--bg); }
         .btn-style { background: var(--bg); color: var(--text-main); border: 1px solid var(--border); font-weight: bold; width: 30px; height: 30px; cursor: pointer; border-radius: 4px; display: inline-flex; align-items: center; justify-content: center; font-family: 'Roboto', sans-serif; }
         .btn-style.active { background: var(--border); }
+        .draft-status { font-size: 0.72rem; color: var(--text-dim); min-height: 1em; margin-top: 6px; }
+        .draft-status.error { color: var(--accent); }
+        .draft-banner {
+            max-width: 1100px;
+            margin: 0 auto 16px;
+            padding: 12px 14px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: var(--card-bg);
+            display: none;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .draft-banner.visible { display: flex; }
+        .draft-banner-text { font-size: 0.88rem; color: var(--text-main); }
+        .draft-banner-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+        .btn-secondary { background: var(--bg); color: var(--text-main); border: 1px solid var(--border); }
+        .quick-build {
+            max-width: 1100px;
+            margin: 0 auto 18px;
+            padding: 16px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: var(--card-bg);
+        }
+        .quick-build-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 12px; }
+        .quick-build-title { font-family: 'Montserrat', sans-serif; font-size: 0.95rem; font-weight: 900; color: var(--text-main); text-transform: uppercase; }
+        .quick-build-copy { font-size: 0.86rem; color: var(--text-dim); max-width: 740px; }
+        .quick-build-grid { display: grid; grid-template-columns: minmax(280px, 1.8fr) minmax(220px, 1fr); gap: 14px; align-items: start; }
+        .quick-build textarea {
+            width: 100%;
+            min-height: 122px;
+            resize: vertical;
+            background: var(--bg);
+            color: var(--text-main);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 10px 12px;
+            font: 0.9rem 'Roboto', sans-serif;
+        }
+        .quick-build-actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+        .quick-build-presets { display: grid; gap: 10px; }
+        .quick-build-note { font-size: 0.78rem; color: var(--text-dim); }
+        .page-manager {
+            max-width: 1100px;
+            margin: 0 auto 18px;
+            padding: 14px 16px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: var(--card-bg);
+            display: flex;
+            flex-wrap: wrap;
+            align-items: end;
+            gap: 12px;
+        }
+        .page-manager .control-group { border-right: none; padding-right: 0; }
+        .page-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+        .page-manager input[type="text"] { width: 180px; }
+        @media (max-width: 820px) {
+            .quick-build-grid { grid-template-columns: 1fr; }
+            .page-manager { align-items: stretch; }
+        }
 
         .batch-link { font-size: 0.65rem; color: var(--brand); cursor: pointer; text-decoration: underline; margin-left: 4px; }
         .batch-link:hover { opacity: 0.8; }
@@ -186,7 +250,7 @@
 
         /* Print */
         @media print {
-            .navbar, .toolbar, .modal-overlay, .confirm-overlay, .how-it-works { display: none !important; }
+            .navbar, .toolbar, .modal-overlay, .confirm-overlay, .how-it-works, .draft-banner, .quick-build, .page-manager { display: none !important; }
             body { background: white; height: auto; overflow: visible; }
             .workspace { display: block !important; padding: 0; overflow: visible; }
             .workspace:not(.active) { display: none !important; }
@@ -194,6 +258,11 @@
             .circle.selected { box-shadow: none; }
             .circle { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
             body.hide-empty .circle:not(.has-content) { display: none !important; }
+            body.print-all-mode #circle-container { display: none !important; }
+            body.print-all-mode #print-pages { display: block !important; }
+            #print-pages { display: none; }
+            #print-pages .page-sheet { page-break-after: always; break-after: page; margin-bottom: 0.25in; }
+            #print-pages .page-sheet:last-child { page-break-after: auto; break-after: auto; }
         }
     </style>
     <!-- Open Graph / social sharing -->
@@ -259,6 +328,13 @@
 
 <!-- ── PICTURE DISCS TAB ─────────────────────────────────────────────────── -->
 <div id="tab-images" class="workspace active">
+    <div class="draft-banner" id="draftBanner">
+        <div class="draft-banner-text" id="draftBannerText">A saved draft is available on this device.</div>
+        <div class="draft-banner-actions">
+            <button class="btn-action btn-file" onclick="restoreDraft()">Restore Draft</button>
+            <button class="btn-action btn-secondary" onclick="discardDraft()">Discard Draft</button>
+        </div>
+    </div>
     <div class="how-it-works" style="max-width:640px;">
         <p><strong>Design and print picture tiles for visual schedules, PECS boards, and custom labels.</strong></p>
         <ul>
@@ -269,6 +345,64 @@
             <li>Nothing is uploaded. Your images stay on your device.</li>
         </ul>
     </div>
+    <section class="quick-build">
+        <div class="quick-build-head">
+            <div>
+                <div class="quick-build-title">Quick Build</div>
+                <div class="quick-build-copy">Paste a routine, chore list, or choice board and get a printable starter sheet fast. Use commas or line breaks. This builds text-first tiles you can print as-is or dress up with images later.</div>
+            </div>
+        </div>
+        <div class="quick-build-grid">
+            <div>
+                <label class="control-label" for="quickBuildInput">Paste Labels</label>
+                <textarea id="quickBuildInput" placeholder="wake up&#10;toilet&#10;brush teeth&#10;breakfast&#10;shoes&#10;backpack"></textarea>
+                <div class="quick-build-actions">
+                    <button class="btn-action btn-file" onclick="buildTilesFromInput()">Build Tiles</button>
+                    <button class="btn-action btn-secondary" onclick="appendQuickBuildInputToWords()">Send To Word Tiles</button>
+                </div>
+            </div>
+            <div class="quick-build-presets">
+                <div>
+                    <label class="control-label" for="starterSetSelect">Starter Set</label>
+                    <select id="starterSetSelect">
+                        <option value="morning">Morning Routine</option>
+                        <option value="bedtime">Bedtime Routine</option>
+                        <option value="firstThen">First / Then Board</option>
+                        <option value="chores">Chore Strip</option>
+                        <option value="feelings">Feelings Board</option>
+                    </select>
+                </div>
+                <div class="quick-build-actions">
+                    <button class="btn-action" onclick="loadStarterSet()">Load Starter Set</button>
+                </div>
+                <div class="quick-build-note">Starter sets use simple text cards first so you can get something printable in one pass.</div>
+            </div>
+        </div>
+    </section>
+    <section class="page-manager">
+        <div class="control-group">
+            <div>
+                <label class="control-label" for="pageSelect">Page</label>
+                <select id="pageSelect" onchange="switchProjectPage(Number(this.value))"></select>
+            </div>
+        </div>
+        <div class="control-group">
+            <div>
+                <label class="control-label" for="pageNameInput">Page Name</label>
+                <input type="text" id="pageNameInput" value="Page 1" onfocus="pushHistory()" onchange="renameCurrentPage(this.value)">
+            </div>
+        </div>
+        <div class="control-group">
+            <div>
+                <span class="control-label">Pages</span>
+                <div class="page-actions">
+                    <button class="btn-action btn-file" onclick="addProjectPage()">+ New</button>
+                    <button class="btn-action btn-file" onclick="duplicateProjectPage()">Duplicate</button>
+                    <button class="btn-action btn-secondary" onclick="requestDeleteProjectPage()">Delete</button>
+                </div>
+            </div>
+        </div>
+    </section>
     <div class="toolbar">
         <div class="tools-global">
 
@@ -281,6 +415,7 @@
                         <button class="btn-action btn-undo" id="btnUndo" onclick="performUndo()" disabled title="Undo (Ctrl+Z)">↶</button>
                         <button class="btn-action btn-undo" id="btnRedo" onclick="performRedo()" disabled title="Redo (Ctrl+Y)">↷</button>
                     </div>
+                    <div class="draft-status" id="draftStatus">Draft autosave off</div>
                 </div>
             </div>
 
@@ -314,7 +449,13 @@
                         <input type="checkbox" id="hideEmptyCheck" onchange="toggleHideEmpty()" checked>
                         <strong>Hide Empty</strong>
                     </label>
-                    <button class="btn-action btn-print" onclick="window.print()">🖨️ Print</button>
+                    <div style="display:flex; gap:6px; align-items:center; flex-wrap:wrap;">
+                        <select id="printScopeSelect" style="width:92px;">
+                            <option value="current">Current</option>
+                            <option value="all">All Pages</option>
+                        </select>
+                        <button class="btn-action btn-print" onclick="triggerPrint()">🖨️ Print</button>
+                    </div>
                 </div>
             </div>
 
@@ -334,6 +475,7 @@
                         <div style="display:flex; gap:3px;">
                             <button class="btn-icon" onclick="pushHistory(); rotateActiveImage();" title="Rotate 90°">⟳</button>
                             <button class="btn-icon" onclick="pushHistory(); centerActiveImage();" title="Center Image">✛</button>
+                            <button class="btn-icon" onclick="pushHistory(); duplicateActiveTile();" title="Duplicate Tile">⧉</button>
                         </div>
                     </div>
                 </div>
@@ -357,10 +499,16 @@
 
             <div class="control-group">
                 <div>
-                    <span class="control-label">Label <span class="batch-link" onclick="pushHistory(); batchApply('label')">[All]</span></span>
+                    <span class="control-label">Label Style <span class="batch-link" onclick="pushHistory(); batchApply('label-style')">[All]</span></span>
                     <div style="display:flex; gap:5px; align-items:center;">
                         <input type="text"  id="labelInput" placeholder="Label…" onfocus="pushHistory()" oninput="updateActiveLabel()" style="width:80px;">
                         <input type="color" id="labelColorPicker" value="#ffffff" onchange="pushHistory(); updateActiveLabel();">
+                        <select id="labelFontPicker" onfocus="pushHistory()" onchange="updateActiveLabel()" style="width:105px;">
+                            <option value="'Roboto', sans-serif">Modern</option>
+                            <option value="'Comic Neue', cursive">Playful</option>
+                            <option value="'Lora', serif">Classic</option>
+                            <option value="'Anton', sans-serif">Bold</option>
+                        </select>
                         <input type="range" id="labelSizeSlider" min="0.5" max="1.5" step="0.1" value="0.8"
                                onpointerdown="pushHistory()" oninput="updateActiveLabel()" style="width:40px;">
                     </div>
@@ -374,6 +522,7 @@
     </div>
 
     <div class="page-sheet shape-circle" id="circle-container"></div>
+    <div id="print-pages"></div>
 </div>
 
 <!-- ── WORD TILES TAB ─────────────────────────────────────────────────────── -->
@@ -468,6 +617,18 @@
     let wordStyles        = { bold: false, italic: false };
     let hasUnsavedChanges = false;
     const capacityMap     = { '1in': 35, '1.25in': 24, '1.5in': 20, '2.25in': 12, '3in': 6 };
+    const AUTOSAVE_KEY    = 'nofnway-magnet-autosave-v1';
+    const STARTER_SETS    = {
+        morning: ['wake up', 'toilet', 'brush teeth', 'get dressed', 'breakfast', 'shoes', 'backpack', 'go'],
+        bedtime: ['bath', 'pajamas', 'toilet', 'brush teeth', 'story', 'bed'],
+        firstThen: ['first', 'then', 'choice', 'finished'],
+        chores: ['make bed', 'feed pet', 'tidy room', 'laundry', 'take out trash', 'done'],
+        feelings: ['happy', 'sad', 'mad', 'worried', 'tired', 'calm', 'need help']
+    };
+    const STARTER_COLORS  = ['#dcecff', '#fff0cc', '#e3f7df', '#ffe2df', '#efe4ff', '#fff8bf', '#dff5f2', '#f8e7f0'];
+    let projectPages      = [createBlankPage('Page 1')];
+    let currentPageIndex  = 0;
+    let autosaveTimer     = null;
 
     // ── History ───────────────────────────────────────────────────────────────
     let historyStack = [], redoStack = [];
@@ -483,12 +644,14 @@
         if (!historyStack.length) return;
         redoStack.push(getCurrentState());
         loadProject(historyStack.pop(), false);
+        markDirty();
         updateHistoryButtons();
     }
     function performRedo() {
         if (!redoStack.length) return;
         historyStack.push(getCurrentState());
         loadProject(redoStack.pop(), false);
+        markDirty();
         updateHistoryButtons();
     }
     function updateHistoryButtons() {
@@ -501,10 +664,20 @@
     });
 
     // ── State snapshot ────────────────────────────────────────────────────────
-    function getCurrentState() {
+    function createBlankPage(title) {
+        return {
+            title,
+            size: '1in',
+            shape: 'shape-circle',
+            circles: []
+        };
+    }
+
+    function getCurrentPageStateFromDom() {
         const data = {
-            size:    document.getElementById('magnetSizeSelect').value,
-            shape:   document.getElementById('shapeSelect').value,
+            title: document.getElementById('pageNameInput').value.trim() || `Page ${currentPageIndex + 1}`,
+            size:  document.getElementById('magnetSizeSelect').value,
+            shape: document.getElementById('shapeSelect').value,
             circles: []
         };
         document.querySelectorAll('.circle').forEach(c => {
@@ -512,25 +685,57 @@
                 const img = c.querySelector('img');
                 const lbl = c.querySelector('.circle-label');
                 data.circles.push({
-                    imgSrc:      img ? img.src : null,
-                    imgStyle:    img ? { w: img.style.width, l: img.style.left, t: img.style.top, rot: img.getAttribute('data-rotation'), scale: img.getAttribute('data-scale') } : null,
-                    label:       lbl.textContent,
-                    labelColor:  lbl.style.color,
-                    labelSize:   lbl.getAttribute('data-font-size'),
-                    fillColor:   c.style.backgroundColor,
+                    imgSrc: img ? img.src : null,
+                    imgStyle: img ? { w: img.style.width, l: img.style.left, t: img.style.top, rot: img.getAttribute('data-rotation'), scale: img.getAttribute('data-scale') } : null,
+                    label: lbl.textContent,
+                    labelColor: lbl.style.color,
+                    labelSize: lbl.getAttribute('data-font-size'),
+                    labelFont: lbl.style.fontFamily,
+                    fillColor: c.style.backgroundColor,
                     borderColor: c.style.borderColor,
                     borderWidth: c.style.borderWidth,
-                    hasContent:  true
+                    hasContent: true
                 });
             } else {
                 data.circles.push({ hasContent: false });
             }
         });
+        return data;
+    }
+
+    function syncCurrentPageToState() {
+        projectPages[currentPageIndex] = getCurrentPageStateFromDom();
+        updatePageSelector();
+    }
+
+    function getCurrentState() {
+        syncCurrentPageToState();
+        const data = {
+            pages: JSON.parse(JSON.stringify(projectPages)),
+            currentPageIndex,
+            words: {
+                text: document.getElementById('word-input').value,
+                styles: { ...wordStyles },
+                font: document.getElementById('fontPicker').value,
+                colors: {
+                    text: document.getElementById('textColorPicker').value,
+                    bg: document.getElementById('bgColorPicker').value
+                }
+            }
+        };
         return JSON.parse(JSON.stringify(data));
     }
 
     window.onbeforeunload = () => { if (hasUnsavedChanges) return 'You have unsaved changes.'; };
-    function markDirty() { hasUnsavedChanges = true; }
+    function markDirty() {
+        hasUnsavedChanges = true;
+        updateDraftStatus('Unsaved changes');
+        scheduleAutosave();
+    }
+    function handleWordStateChange() {
+        markDirty();
+        renderWords();
+    }
 
     // ── Tabs & modal ──────────────────────────────────────────────────────────
     function switchTab(tabId, btn) {
@@ -554,6 +759,99 @@
     function resolveConfirm(result) {
         document.getElementById('confirm-overlay').classList.remove('open');
         if (confirmResolve) { confirmResolve(result); confirmResolve = null; }
+    }
+
+    function updateDraftStatus(message, isError = false) {
+        const el = document.getElementById('draftStatus');
+        if (!el) return;
+        el.textContent = message;
+        el.classList.toggle('error', isError);
+    }
+
+    function formatTimestamp(value) {
+        try {
+            return new Date(value).toLocaleString([], {
+                month: 'short',
+                day: 'numeric',
+                hour: 'numeric',
+                minute: '2-digit'
+            });
+        } catch (err) {
+            return 'recently';
+        }
+    }
+
+    function getStoredDraft() {
+        try {
+            const raw = localStorage.getItem(AUTOSAVE_KEY);
+            return raw ? JSON.parse(raw) : null;
+        } catch (err) {
+            return null;
+        }
+    }
+
+    function showDraftBanner(savedAt) {
+        const banner = document.getElementById('draftBanner');
+        document.getElementById('draftBannerText').textContent = `A draft from ${formatTimestamp(savedAt)} is saved on this device.`;
+        banner.classList.add('visible');
+    }
+
+    function hideDraftBanner() {
+        document.getElementById('draftBanner').classList.remove('visible');
+    }
+
+    function scheduleAutosave() {
+        clearTimeout(autosaveTimer);
+        autosaveTimer = setTimeout(writeAutosaveDraft, 700);
+    }
+
+    function parseQuickBuildItems(text) {
+        return text
+            .split(/[\n,]+/)
+            .map(item => item.trim())
+            .filter(Boolean);
+    }
+
+    function updatePageSelector() {
+        const select = document.getElementById('pageSelect');
+        select.replaceChildren();
+        projectPages.forEach((page, index) => {
+            const option = document.createElement('option');
+            option.value = String(index);
+            option.textContent = page.title || `Page ${index + 1}`;
+            option.selected = index === currentPageIndex;
+            select.appendChild(option);
+        });
+        document.getElementById('pageNameInput').value = projectPages[currentPageIndex]?.title || `Page ${currentPageIndex + 1}`;
+    }
+
+    function writeAutosaveDraft() {
+        try {
+            localStorage.setItem(AUTOSAVE_KEY, JSON.stringify({
+                savedAt: Date.now(),
+                data: getCurrentState()
+            }));
+            updateDraftStatus(`Draft autosaved ${formatTimestamp(Date.now())}`);
+            hideDraftBanner();
+        } catch (err) {
+            updateDraftStatus('Draft autosave failed on this device', true);
+        }
+    }
+
+    function restoreDraft() {
+        const draft = getStoredDraft();
+        if (!draft || !draft.data) return;
+        pushHistory();
+        loadProject(draft.data);
+        hasUnsavedChanges = true;
+        updateDraftStatus(`Draft restored from ${formatTimestamp(draft.savedAt)}`);
+        hideDraftBanner();
+    }
+
+    function discardDraft() {
+        localStorage.removeItem(AUTOSAVE_KEY);
+        hideDraftBanner();
+        updateDraftStatus(hasUnsavedChanges ? 'Unsaved changes' : 'Draft cleared');
     }
 
     // ── Circle management ─────────────────────────────────────────────────────
@@ -581,6 +879,109 @@
             }
         } else {
             for (let i = current.length; i < needed; i++) createCircle();
+        }
+    }
+
+    function getCircleSnapshot(circleEl) {
+        if (!circleEl.classList.contains('has-content')) return { hasContent: false };
+        const img = circleEl.querySelector('img');
+        const lbl = circleEl.querySelector('.circle-label');
+        return {
+            imgSrc:      img ? img.src : null,
+            imgStyle:    img ? { w: img.style.width, l: img.style.left, t: img.style.top, rot: img.getAttribute('data-rotation'), scale: img.getAttribute('data-scale') } : null,
+            label:       lbl.textContent,
+            labelColor:  lbl.style.color,
+            labelSize:   lbl.getAttribute('data-font-size'),
+            labelFont:   lbl.style.fontFamily,
+            fillColor:   circleEl.style.backgroundColor,
+            borderColor: circleEl.style.borderColor,
+            borderWidth: circleEl.style.borderWidth,
+            hasContent:  true
+        };
+    }
+
+    function ensureCircleCapacity(count) {
+        while (circleContainer.children.length < count) createCircle();
+    }
+
+    function applyTextOnlyTile(circleEl, labelText, index) {
+        applyCircleSnapshot(circleEl, {
+            hasContent: true,
+            imgSrc: null,
+            imgStyle: null,
+            label: labelText,
+            labelColor: '#111111',
+            labelSize: '0.8',
+            labelFont: "'Roboto', sans-serif",
+            fillColor: STARTER_COLORS[index % STARTER_COLORS.length],
+            borderColor: '#2c3e50',
+            borderWidth: '3px'
+        });
+    }
+
+    function fillCirclesFromLabels(labels) {
+        if (!labels.length) return;
+        ensureCircleCapacity(labels.length);
+        Array.from(circleContainer.children).forEach((circle, index) => {
+            if (index < labels.length) applyTextOnlyTile(circle, labels[index], index);
+            else applyCircleSnapshot(circle, { hasContent: false });
+        });
+        if (activeCircle) activeCircle.classList.remove('selected');
+        activeCircle = circleContainer.children[0] || null;
+        if (activeCircle) {
+            activeCircle.classList.add('selected');
+            showEditTools();
+            syncControlsToActive();
+        }
+        markDirty();
+    }
+
+    function loadPageIntoDom(pageData) {
+        document.getElementById('magnetSizeSelect').value = pageData.size || '1in';
+        updateMagnetSize();
+        document.getElementById('shapeSelect').value = pageData.shape || 'shape-circle';
+        updateShape();
+        ensureCircleCapacity(pageData.circles.length || capacityMap[document.getElementById('magnetSizeSelect').value] || 20);
+        const circles = Array.from(circleContainer.children);
+        circles.forEach((circle, index) => {
+            applyCircleSnapshot(circle, pageData.circles[index] || { hasContent: false });
+        });
+        document.getElementById('pageNameInput').value = pageData.title || `Page ${currentPageIndex + 1}`;
+        editToolbar.classList.remove('visible');
+        if (activeCircle) activeCircle.classList.remove('selected');
+        activeCircle = null;
+        updatePageSelector();
+    }
+
+    function applyCircleSnapshot(circleEl, item) {
+        circleEl.className = 'circle';
+        circleEl.innerHTML = '<span class="circle-hint">+</span><span class="circle-label"></span>';
+        circleEl.style.cssText = '';
+        if (!item || !item.hasContent) return;
+        circleEl.classList.add('has-content');
+        if (item.borderColor) applyBorderStyle(circleEl, item.borderColor, item.borderWidth);
+        if (item.fillColor) circleEl.style.backgroundColor = item.fillColor;
+        const lbl = circleEl.querySelector('.circle-label');
+        lbl.textContent = item.label || '';
+        if (item.labelColor || item.labelSize || item.labelFont) {
+            applyLabelStyle(circleEl, item.labelColor || '#ffffff', item.labelSize, item.labelFont || "'Roboto', sans-serif");
+        }
+        if (item.imgSrc) {
+            const img = document.createElement('img');
+            img.src = item.imgSrc;
+            if (item.imgStyle) {
+                img.style.width = item.imgStyle.w;
+                img.style.left  = item.imgStyle.l;
+                img.style.top   = item.imgStyle.t;
+                if (item.imgStyle.rot) {
+                    img.setAttribute('data-rotation', item.imgStyle.rot);
+                    img.style.transform = `rotate(${item.imgStyle.rot}deg)`;
+                }
+                if (item.imgStyle.scale) img.setAttribute('data-scale', item.imgStyle.scale);
+            }
+            img.onload = () => img.setAttribute('data-natural-width', img.naturalWidth);
+            circleEl.prepend(img);
+            setupDragZoom(img);
         }
     }
 
@@ -622,9 +1023,14 @@
         if (!activeCircle) return;
         const label = activeCircle.querySelector('.circle-label');
         document.getElementById('labelInput').value = label.textContent;
+        document.getElementById('labelColorPicker').value = toHexColor(label.style.color, '#ffffff');
+        document.getElementById('labelFontPicker').value = normalizeFontValue(label.style.fontFamily, "'Roboto', sans-serif");
         const img = activeCircle.querySelector('img');
         document.getElementById('zoomSlider').value      = img ? (img.getAttribute('data-scale') || 1) : 1;
         document.getElementById('labelSizeSlider').value = label.getAttribute('data-font-size') || 0.8;
+        document.getElementById('fillColorPicker').value = toHexColor(activeCircle.style.backgroundColor, '#fafafa');
+        document.getElementById('borderColorPicker').value = toHexColor(activeCircle.style.borderColor, '#dddddd');
+        document.getElementById('borderWidthPicker').value = parseInt(activeCircle.style.borderWidth, 10) || 2;
     }
 
     uploader.onchange = e => {
@@ -651,10 +1057,15 @@
                 if (w > h) { if (w > maxDim) { h = Math.round(h * maxDim / w); w = maxDim; } }
                 else       { if (h > maxDim) { w = Math.round(w * maxDim / h); h = maxDim; } }
                 resizer.width = w; resizer.height = h;
-                resizer.getContext('2d').drawImage(imgObj, 0, 0, w, h);
+                const ctx = resizer.getContext('2d');
+                ctx.clearRect(0, 0, w, h);
+                ctx.drawImage(imgObj, 0, 0, w, h);
 
                 const finalImg = document.createElement('img');
-                finalImg.src = resizer.toDataURL('image/jpeg', 0.85);
+                const preserveTransparency = hasTransparency(ctx, w, h);
+                finalImg.src = preserveTransparency
+                    ? resizer.toDataURL('image/png')
+                    : resizer.toDataURL('image/jpeg', 0.9);
                 finalImg.setAttribute('data-rotation', '0');
                 finalImg.setAttribute('data-scale', '1');
                 finalImg.onload = () => {
@@ -710,18 +1121,107 @@
             activeCircle.appendChild(label);
         }
     }
+    function duplicateActiveTile() {
+        if (!activeCircle || !activeCircle.classList.contains('has-content')) return;
+        const snapshot = getCircleSnapshot(activeCircle);
+        let targetCircle = Array.from(circleContainer.children).find(c => !c.classList.contains('has-content') && c !== activeCircle);
+        if (!targetCircle) {
+            createCircle();
+            targetCircle = circleContainer.lastElementChild;
+        }
+        applyCircleSnapshot(targetCircle, snapshot);
+        if (activeCircle) activeCircle.classList.remove('selected');
+        activeCircle = targetCircle;
+        targetCircle.classList.add('selected');
+        showEditTools();
+        syncControlsToActive();
+        markDirty();
+    }
+    function switchProjectPage(nextIndex) {
+        if (nextIndex === currentPageIndex || !projectPages[nextIndex]) return;
+        syncCurrentPageToState();
+        currentPageIndex = nextIndex;
+        loadPageIntoDom(projectPages[currentPageIndex]);
+    }
+    function renameCurrentPage(value) {
+        const nextTitle = value.trim() || `Page ${currentPageIndex + 1}`;
+        projectPages[currentPageIndex].title = nextTitle;
+        document.getElementById('pageNameInput').value = nextTitle;
+        updatePageSelector();
+        markDirty();
+    }
+    function addProjectPage() {
+        syncCurrentPageToState();
+        pushHistory();
+        currentPageIndex = projectPages.length;
+        projectPages.push(createBlankPage(`Page ${projectPages.length + 1}`));
+        loadPageIntoDom(projectPages[currentPageIndex]);
+        markDirty();
+    }
+    function duplicateProjectPage() {
+        syncCurrentPageToState();
+        pushHistory();
+        const sourcePage = JSON.parse(JSON.stringify(projectPages[currentPageIndex]));
+        sourcePage.title = `${sourcePage.title || `Page ${currentPageIndex + 1}`} Copy`;
+        projectPages.splice(currentPageIndex + 1, 0, sourcePage);
+        currentPageIndex += 1;
+        loadPageIntoDom(projectPages[currentPageIndex]);
+        markDirty();
+    }
+    async function requestDeleteProjectPage() {
+        if (projectPages.length <= 1) {
+            if (!await showConfirm('Delete everything on this only page instead?')) return;
+            requestClearAll();
+            return;
+        }
+        if (!await showConfirm(`Delete ${projectPages[currentPageIndex].title || `Page ${currentPageIndex + 1}`}?`)) return;
+        syncCurrentPageToState();
+        pushHistory();
+        projectPages.splice(currentPageIndex, 1);
+        currentPageIndex = Math.max(0, currentPageIndex - 1);
+        loadPageIntoDom(projectPages[currentPageIndex]);
+        markDirty();
+    }
+    function buildTilesFromInput() {
+        const labels = parseQuickBuildItems(document.getElementById('quickBuildInput').value);
+        if (!labels.length) return;
+        pushHistory();
+        fillCirclesFromLabels(labels);
+    }
+    function loadStarterSet() {
+        const presetKey = document.getElementById('starterSetSelect').value;
+        const labels = STARTER_SETS[presetKey] || [];
+        if (!labels.length) return;
+        document.getElementById('quickBuildInput').value = labels.join('\n');
+        pushHistory();
+        fillCirclesFromLabels(labels);
+    }
+    function appendQuickBuildInputToWords() {
+        const labels = parseQuickBuildItems(document.getElementById('quickBuildInput').value);
+        if (!labels.length) return;
+        const wordInput = document.getElementById('word-input');
+        pushHistory();
+        wordInput.value = labels.map(label => label.includes(' ') ? `"${label}"` : label).join(' ');
+        handleWordStateChange();
+        switchTab('tab-words', document.querySelectorAll('.tab-btn')[1]);
+    }
     function updateActiveLabel() {
         if (!activeCircle) return;
         activeCircle.classList.add('has-content');
         const lbl = activeCircle.querySelector('.circle-label');
         lbl.textContent = document.getElementById('labelInput').value;
-        applyLabelStyle(activeCircle, document.getElementById('labelColorPicker').value, document.getElementById('labelSizeSlider').value);
+        applyLabelStyle(
+            activeCircle,
+            document.getElementById('labelColorPicker').value,
+            document.getElementById('labelSizeSlider').value,
+            document.getElementById('labelFontPicker').value
+        );
         markDirty();
     }
-    function applyLabelStyle(circleEl, color, size) {
+    function applyLabelStyle(circleEl, color, size, fontFamily) {
         const lbl = circleEl.querySelector('.circle-label');
         lbl.style.color      = color;
-        lbl.style.fontFamily = document.getElementById('fontPicker').value;
+        lbl.style.fontFamily = fontFamily || document.getElementById('labelFontPicker').value;
         if (size) { lbl.style.fontSize = size + 'rem'; lbl.setAttribute('data-font-size', size); }
         lbl.style.textShadow = (color === '#000000' || color === 'rgb(0, 0, 0)')
             ? '1px 1px 0 #fff, -1px -1px 0 #fff'
@@ -748,10 +1248,41 @@
         markDirty();
         document.querySelectorAll('.circle').forEach(c => {
             c.classList.add('has-content');
-            if      (type === 'label')  applyLabelStyle(c, document.getElementById('labelColorPicker').value, document.getElementById('labelSizeSlider').value);
+            if      (type === 'label-style')  applyLabelStyle(c, document.getElementById('labelColorPicker').value, document.getElementById('labelSizeSlider').value, document.getElementById('labelFontPicker').value);
             else if (type === 'border') applyBorderStyle(c, document.getElementById('borderColorPicker').value, document.getElementById('borderWidthPicker').value);
             else if (type === 'fill')   c.style.backgroundColor = document.getElementById('fillColorPicker').value;
         });
+    }
+
+    function buildPrintPage(pageData) {
+        const page = document.createElement('div');
+        page.className = `page-sheet ${pageData.shape || 'shape-circle'}`;
+        const size = pageData.size || '1in';
+        page.style.setProperty('--magnet-size', size);
+        const pageCapacity = Math.max(capacityMap[size] || 20, pageData.circles.length);
+        for (let i = 0; i < pageCapacity; i++) {
+            const circle = document.createElement('div');
+            circle.className = 'circle';
+            applyCircleSnapshot(circle, pageData.circles[i] || { hasContent: false });
+            page.appendChild(circle);
+        }
+        return page;
+    }
+
+    function triggerPrint() {
+        syncCurrentPageToState();
+        const printAll = document.getElementById('printScopeSelect').value === 'all';
+        document.body.classList.toggle('print-all-mode', printAll);
+        const printPages = document.getElementById('print-pages');
+        printPages.replaceChildren();
+        if (printAll) {
+            projectPages.forEach(page => printPages.appendChild(buildPrintPage(page)));
+        }
+        window.print();
+        setTimeout(() => {
+            document.body.classList.remove('print-all-mode');
+            printPages.replaceChildren();
+        }, 0);
     }
 
     // ── Drag / zoom image within tile ─────────────────────────────────────────
@@ -799,19 +1330,15 @@
     function saveProject() {
         hasUnsavedChanges = false;
         const data = {
-            version: 1.0,
-            ...getCurrentState(),
-            words: {
-                text:   document.getElementById('word-input').value,
-                styles: { ...wordStyles },
-                font:   document.getElementById('fontPicker').value,
-                colors: { text: document.getElementById('textColorPicker').value, bg: document.getElementById('bgColorPicker').value }
-            }
+            version: 2.0,
+            ...getCurrentState()
         };
         const a = document.createElement('a');
         a.href     = URL.createObjectURL(new Blob([JSON.stringify(data)], { type: 'application/json' }));
         a.download = `nofn-project-${new Date().toISOString().slice(0,10)}.nofn`;
         a.click();
+        writeAutosaveDraft();
+        updateDraftStatus(`Project downloaded ${formatTimestamp(Date.now())}`);
     }
 
     document.getElementById('projectLoader').onchange = e => {
@@ -823,6 +1350,8 @@
                 pushHistory();
                 loadProject(JSON.parse(ev.target.result));
                 hasUnsavedChanges = false;
+                writeAutosaveDraft();
+                updateDraftStatus(`Project loaded ${formatTimestamp(Date.now())}`);
             } catch(err) { alert('Error loading project file.'); }
         };
         reader.readAsText(file);
@@ -830,37 +1359,15 @@
     };
 
     function loadProject(data) {
-        document.getElementById('magnetSizeSelect').value = data.size || '1in';
-        updateMagnetSize();
-        if (data.shape) { document.getElementById('shapeSelect').value = data.shape; updateShape(); }
-
-        const circles = Array.from(circleContainer.children);
-        circles.forEach(c => { c.className = 'circle'; c.innerHTML = '<span class="circle-hint">+</span><span class="circle-label"></span>'; c.style.cssText = ''; });
-
-        data.circles.forEach((item, i) => {
-            if (i >= circleContainer.children.length) createCircle();
-            const c = circleContainer.children[i];
-            if (item.hasContent) c.classList.add('has-content');
-            if (item.borderColor) applyBorderStyle(c, item.borderColor, item.borderWidth);
-            if (item.fillColor)   c.style.backgroundColor = item.fillColor;
-            const lbl = c.querySelector('.circle-label');
-            lbl.textContent = item.label || '';
-            if (item.labelColor) applyLabelStyle(c, item.labelColor, item.labelSize);
-            if (item.imgSrc) {
-                const img = document.createElement('img');
-                img.src = item.imgSrc;
-                if (item.imgStyle) {
-                    img.style.width = item.imgStyle.w;
-                    img.style.left  = item.imgStyle.l;
-                    img.style.top   = item.imgStyle.t;
-                    if (item.imgStyle.rot)   { img.setAttribute('data-rotation', item.imgStyle.rot);   img.style.transform = `rotate(${item.imgStyle.rot}deg)`; }
-                    if (item.imgStyle.scale)   img.setAttribute('data-scale', item.imgStyle.scale);
-                }
-                img.onload = () => img.setAttribute('data-natural-width', img.naturalWidth);
-                c.prepend(img);
-                setupDragZoom(img);
-            }
-        });
+        const legacyPage = data.pages ? null : {
+            title: 'Page 1',
+            size: data.size || '1in',
+            shape: data.shape || 'shape-circle',
+            circles: data.circles || []
+        };
+        projectPages = JSON.parse(JSON.stringify(data.pages || [legacyPage || createBlankPage('Page 1')]));
+        currentPageIndex = Math.min(data.currentPageIndex || 0, projectPages.length - 1);
+        loadPageIntoDom(projectPages[currentPageIndex]);
 
         if (data.words) {
             document.getElementById('word-input').value = data.words.text || '';
@@ -871,7 +1378,9 @@
                 document.getElementById('bgColorPicker').value   = data.words.colors.bg;
             }
             renderWords();
+            syncWordStyleButtons();
         }
+        document.getElementById('printScopeSelect').value = 'current';
     }
 
     async function requestClearAll() {
@@ -882,7 +1391,7 @@
         toggleHideEmpty();
         editToolbar.classList.remove('visible');
         activeCircle = null;
-        hasUnsavedChanges = false;
+        markDirty();
     }
 
     // ── Word tiles ────────────────────────────────────────────────────────────
@@ -890,7 +1399,7 @@
     const wordOutput = document.getElementById('word-output');
 
     function renderWords() {
-        wordOutput.innerHTML = '';
+        wordOutput.replaceChildren();
         const text = wordInput.value.trim();
         if (!text) return;
         const matches = text.match(/("[^"]+"|[^"\s]+)/g);
@@ -912,18 +1421,60 @@
      document.getElementById('textColorPicker'),
      document.getElementById('bgColorPicker'),
      document.getElementById('fontPicker')
-    ].forEach(el => el.addEventListener('input', renderWords));
+    ].forEach(el => el.addEventListener('input', handleWordStateChange));
+    [wordInput,
+     document.getElementById('textColorPicker'),
+     document.getElementById('bgColorPicker'),
+     document.getElementById('fontPicker')
+    ].forEach(el => el.addEventListener('focus', pushHistory));
 
     function toggleStyle(style) {
+        pushHistory();
         wordStyles[style] = !wordStyles[style];
-        document.getElementById('btn' + style.charAt(0).toUpperCase() + style.slice(1)).classList.toggle('active');
-        renderWords();
+        syncWordStyleButtons();
+        handleWordStateChange();
+    }
+
+    function syncWordStyleButtons() {
+        document.getElementById('btnBold').classList.toggle('active', wordStyles.bold);
+        document.getElementById('btnItalic').classList.toggle('active', wordStyles.italic);
+    }
+
+    function toHexColor(value, fallback) {
+        if (!value) return fallback;
+        if (value.startsWith('#')) return value;
+        const match = value.match(/\d+/g);
+        if (!match || match.length < 3) return fallback;
+        return '#' + match.slice(0, 3).map(part => Number(part).toString(16).padStart(2, '0')).join('');
+    }
+
+    function normalizeFontValue(value, fallback) {
+        return value && value.trim() ? value : fallback;
+    }
+
+    function hasTransparency(ctx, width, height) {
+        try {
+            const alpha = ctx.getImageData(0, 0, width, height).data;
+            for (let i = 3; i < alpha.length; i += 4) {
+                if (alpha[i] < 255) return true;
+            }
+        } catch (err) {
+            return false;
+        }
+        return false;
     }
 
     // ── Init ──────────────────────────────────────────────────────────────────
     circleContainer.innerHTML = '';
-    updateMagnetSize();
+    loadPageIntoDom(projectPages[currentPageIndex]);
     toggleHideEmpty();
+    syncWordStyleButtons();
+    document.getElementById('printScopeSelect').value = 'current';
+    const existingDraft = getStoredDraft();
+    if (existingDraft && existingDraft.savedAt) {
+        showDraftBanner(existingDraft.savedAt);
+        updateDraftStatus(`Draft found from ${formatTimestamp(existingDraft.savedAt)}`);
+    }
 </script>
 <script>
 function shareThisPage() {

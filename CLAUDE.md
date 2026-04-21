@@ -63,4 +63,9 @@ Always check `MEMORY.md` for full voice and visual guidelines. Short version:
 - **Voice:** Personal and dry, never corporate or preachy. Lead with vulnerability. Match the About strip tone.
 - **[FN]** notation is the implicit swear — preserve it, don't replace it with actual profanity or sanitize it away
 
-## See also: lessons.md
+## Agent Sync
+
+- Read `SYNC.md` before starting work.
+- Update `SYNC.md` after meaningful changes so Codex and Claude share the current state.
+
+## See also: lessons.md, SYNC.md
