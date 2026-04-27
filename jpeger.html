@@ -2,10 +2,10 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="author" content="Gerry McMahon">
-    <title>Free PDF to JPEG Converter – NOFNWAY</title>
-    <meta name="description" content="Free, private PDF to JPEG converter. Works entirely in your browser. No uploads, no accounts, nothing leaves your device.">
+    <title>Free PDF to JPEG Converter - NOFNWAY</title>
+    <meta name="description" content="Free, private PDF to JPEG converter with size and sharpness controls. Works in your browser. No uploads, no accounts, nothing leaves your device.">
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -14,7 +14,7 @@
     <script>document.documentElement.setAttribute('data-theme', localStorage.getItem('nofnway-theme') || 'light');</script>
     <link rel="stylesheet" href="theme.css">
     <style>
-        body { height: 100vh; display: flex; flex-direction: column; overflow: hidden; }
+        body { min-height: 100vh; min-height: 100dvh; display: flex; flex-direction: column; overflow: hidden; }
 
         .hidden { display: none !important; }
 
@@ -40,30 +40,48 @@
         .drop-title { font-family: 'Montserrat', sans-serif; font-weight: 900; font-size: 1.2rem; text-transform: uppercase; letter-spacing: -0.5px; color: var(--text-dim); }
         .drop-sub { font-size: 0.7rem; color: var(--text-dim); margin-top: 8px; text-transform: uppercase; letter-spacing: 0.1em; opacity: 0.6; }
 
+        .output-controls { width: 100%; max-width: 680px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin: 0 0 16px; }
+        .control-field { background: var(--card-bg); border: 2px solid var(--border); border-radius: 8px; padding: 12px; box-sizing: border-box; }
+        .control-field label { display: block; margin-bottom: 6px; font-size: 0.65rem; font-weight: 900; text-transform: uppercase; letter-spacing: 0.1em; color: var(--text-dim); }
+        .control-field select { width: 100%; background: var(--bg); color: var(--text-main); border: 1px solid var(--border); border-radius: 4px; padding: 8px 10px; font: 700 0.85rem 'Roboto', sans-serif; }
+        .control-field select:focus { outline: 2px solid var(--brand); outline-offset: 2px; }
+        .control-help { display: block; margin-top: 6px; color: var(--text-dim); font-size: 0.72rem; line-height: 1.35; }
+        .result-summary { width: 100%; max-width: 680px; margin: 0 0 8px; padding: 10px 14px; box-sizing: border-box; border: 2px solid var(--border); border-left: 5px solid var(--brand); border-radius: 8px; background: var(--card-bg); color: var(--text-dim); font-size: 0.85rem; }
+
         .preview-grid { width: 100%; display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; margin-top: 1rem; }
         @media (min-width: 640px)  { .preview-grid { grid-template-columns: repeat(3, 1fr); } }
         @media (min-width: 1024px) { .preview-grid { grid-template-columns: repeat(5, 1fr); } }
-        .preview-grid button { background: none; border: none; padding: 0; cursor: pointer; display: block; width: 100%; border-radius: 4px; }
-        .preview-grid button:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
-        .preview-grid button img { width: 100%; display: block; border-radius: 4px; border: 1px solid var(--border); box-shadow: 0 4px 12px rgba(0,0,0,0.1); transition: border-color 0.15s; }
-        .preview-grid button:hover img, .preview-grid button:focus-visible img { border-color: var(--brand); }
+        .page-card { background: var(--card-bg); border: 2px solid var(--border); border-radius: 8px; padding: 8px; box-sizing: border-box; }
+        .page-card button { background: none; border: none; padding: 0; cursor: pointer; display: block; width: 100%; border-radius: 4px; }
+        .page-card button:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
+        .page-card button img { width: 100%; display: block; border-radius: 4px; border: 1px solid var(--border); box-shadow: 4px 4px 0 rgba(0,0,0,0.18); transition: border-color 0.15s; background: #fff; }
+        .page-card button:hover img, .page-card button:focus-visible img { border-color: var(--brand); }
+        .page-meta { display: flex; justify-content: space-between; gap: 8px; margin-top: 8px; color: var(--text-dim); font-size: 0.72rem; font-weight: 700; }
+        .page-name { color: var(--text-main); }
 
         .loading-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.92); display: none; place-items: center; z-index: 3000; }
         .load-text { font-family: 'Montserrat', sans-serif; font-weight: 900; color: var(--brand); font-size: 1.5rem; text-transform: uppercase; animation: pulse 1.5s ease-in-out infinite; }
         @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
 
         #errorBanner { display: none; background: rgba(220,38,38,0.1); border: 1px solid rgba(220,38,38,0.4); color: #fca5a5; padding: 10px 20px; border-radius: 6px; margin: 0 auto 16px; max-width: 640px; width: 100%; text-align: center; font-size: 0.85rem; box-sizing: border-box; }
+
+        @media (max-width: 720px) {
+            #filenameGroup { width: 100%; order: 3; }
+            .filename-input { flex: 1; min-width: 0; }
+            .output-controls { grid-template-columns: 1fr; }
+            .drop-zone { padding: 3rem 1rem; }
+        }
     </style>
     <!-- Open Graph / social sharing -->
     <meta property="og:type"        content="website">
     <meta property="og:url"         content="https://nofnway.ca/jpeger">
-    <meta property="og:title"       content="Free PDF to JPEG Converter – NOFNWAY">
-    <meta property="og:description" content="Free, private PDF to JPEG converter. Works entirely in your browser. No uploads, no accounts, nothing leaves your device.">
+    <meta property="og:title"       content="Free PDF to JPEG Converter - NOFNWAY">
+    <meta property="og:description" content="Free, private PDF to JPEG converter with size and sharpness controls. Works in your browser. No uploads, no accounts, nothing leaves your device.">
     <meta property="og:site_name"   content="NOFNWAY">
     <meta property="og:image"       content="https://nofnway.ca/og-image.png">
     <meta name="twitter:card"       content="summary_large_image">
-    <meta name="twitter:title"      content="Free PDF to JPEG Converter – NOFNWAY">
-    <meta name="twitter:description" content="Free, private PDF to JPEG converter. Works entirely in your browser. No uploads, no accounts, nothing leaves your device.">
+    <meta name="twitter:title"      content="Free PDF to JPEG Converter - NOFNWAY">
+    <meta name="twitter:description" content="Free, private PDF to JPEG converter with size and sharpness controls. Works in your browser. No uploads, no accounts, nothing leaves your device.">
     <meta name="twitter:image"      content="https://nofnway.ca/og-image.png">
     <link rel="canonical" href="https://nofnway.ca/jpeger">
     <script type="application/ld+json">
@@ -72,7 +90,7 @@
       "@type": "WebApplication",
       "name": "[FN] JPEGer",
       "url": "https://nofnway.ca/jpeger",
-      "description": "Free, private PDF to JPEG converter. Works entirely in your browser. No uploads, no accounts, nothing leaves your device.",
+      "description": "Free, private PDF to JPEG converter with size and sharpness controls. Works in your browser. No uploads, no accounts, nothing leaves your device.",
       "applicationCategory": "UtilitiesApplication",
       "operatingSystem": "Any",
       "offers": {
@@ -126,18 +144,41 @@
         <p><strong>Drop a PDF. Get one JPEG per page, ready to download.</strong></p>
         <ul>
             <li>Drop a PDF onto the page or click to select one.</li>
-            <li>Each page renders as a high-quality JPEG thumbnail. Download any page individually or hit <strong>Save All JPEGs</strong> to grab everything at once.</li>
-            <li>Use the <strong>filename prefix</strong> field to set what your files are called before saving.</li>
+            <li>Pick smaller JPEGs for email nonsense, or sharper JPEGs when somebody is going to zoom in and complain.</li>
+            <li>Download any page individually or hit <strong>Save All JPEGs</strong> to grab everything at once.</li>
+            <li>Use the <strong>base name</strong> field to set what your files are called before saving.</li>
             <li>Nothing is uploaded. Everything happens in your browser. Close the tab and it is gone.</li>
         </ul>
     </div>
 
+    <section class="output-controls" aria-label="Output settings">
+        <div class="control-field">
+            <label for="scaleSelect">Sharpness</label>
+            <select id="scaleSelect">
+                <option value="1.5">Small file</option>
+                <option value="2">Normal</option>
+                <option value="2.5" selected>Sharp</option>
+            </select>
+            <span class="control-help">Higher is clearer, slower, and heavier.</span>
+        </div>
+        <div class="control-field">
+            <label for="qualitySelect">JPEG quality</label>
+            <select id="qualitySelect">
+                <option value="0.82">Smaller</option>
+                <option value="0.92" selected>Balanced</option>
+                <option value="0.96">Cleaner</option>
+            </select>
+            <span class="control-help">Balanced is usually enough for forms and receipts.</span>
+        </div>
+    </section>
+
     <div id="setup" class="drop-zone">
         <p class="drop-title">Drop or Click to Load PDF</p>
-        <p class="drop-sub">2.5× Scale &bull; QDoc Ordered Export</p>
+        <p class="drop-sub">One JPEG per page &bull; Device only</p>
         <input type="file" id="fileInput" class="hidden" accept="application/pdf">
     </div>
 
+    <div id="resultSummary" class="result-summary hidden" aria-live="polite"></div>
     <div id="previewGrid" class="preview-grid"></div>
 </main>
 
@@ -148,6 +189,7 @@
 
     const MAX_PAGES    = 50;
     const MAX_FILE_MB  = 200;
+    const MAX_CANVAS_PIXELS = 32000000;
     const MAX_FILE_BYTES = MAX_FILE_MB * 1024 * 1024;
 
     const setup         = document.getElementById('setup'),
@@ -159,6 +201,9 @@
           loadText      = document.getElementById('loadText'),
           filenameGroup = document.getElementById('filenameGroup'),
           filenameInput = document.getElementById('filenameInput'),
+          scaleSelect   = document.getElementById('scaleSelect'),
+          qualitySelect = document.getElementById('qualitySelect'),
+          resultSummary = document.getElementById('resultSummary'),
           errorBanner   = document.getElementById('errorBanner');
 
     let exportList       = [];
@@ -205,7 +250,7 @@
         e.preventDefault();
         setup.classList.remove('drag-over');
         if (isProcessing) {
-            showError('Already converting — wait for it to finish, or click Reset.');
+            showError('Already converting. Wait for it to finish, or click Reset.');
             return;
         }
         const file = e.dataTransfer.files[0];
@@ -227,8 +272,11 @@
         exportList.forEach(item => URL.revokeObjectURL(item.url));
         exportList = [];
         grid.innerHTML = '';
+        resultSummary.textContent = '';
+        resultSummary.classList.add('hidden');
         filenameInput.value = '';
         fileInput.value = '';
+        setControlsDisabled(false);
         setup.classList.remove('hidden');
         filenameGroup.classList.add('hidden');
         dlBtn.classList.add('hidden');
@@ -258,12 +306,18 @@
         errorBanner.style.display = 'none';
         loader.style.display = 'grid';
         grid.innerHTML = '';
+        resultSummary.textContent = '';
+        resultSummary.classList.add('hidden');
+        setControlsDisabled(true);
 
         // Revoke previous session URLs before starting fresh
         exportList.forEach(item => URL.revokeObjectURL(item.url));
         exportList = [];
 
         try {
+            const renderScale = Number(scaleSelect.value) || 2.5;
+            const jpegQuality = Number(qualitySelect.value) || 0.92;
+
             if (file.size > MAX_FILE_BYTES) {
                 showError(`That file is ${Math.round(file.size / 1024 / 1024)}MB. The limit is ${MAX_FILE_MB}MB.`);
                 return;
@@ -296,12 +350,18 @@
                 if (cancelled) break;
 
                 const page = await pdf.getPage(i);
-                const viewport = page.getViewport({ scale: 2.5, rotation: page.rotate });
+                const viewport = page.getViewport({ scale: renderScale, rotation: page.rotate });
+                if (viewport.width * viewport.height > MAX_CANVAS_PIXELS) {
+                    throw new Error('Page too large');
+                }
                 const canvas = document.createElement('canvas');
                 canvas.width  = viewport.width;
                 canvas.height = viewport.height;
+                const ctx = canvas.getContext('2d');
+                ctx.fillStyle = '#ffffff';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-                const renderTask = page.render({ canvasContext: canvas.getContext('2d'), viewport });
+                const renderTask = page.render({ canvasContext: ctx, viewport });
                 activeRenderTask = renderTask;
                 await renderTask.promise;
                 activeRenderTask = null;
@@ -309,29 +369,41 @@
 
                 if (cancelled) { canvas.width = 0; canvas.height = 0; break; }
 
-                const blob = await new Promise(res => canvas.toBlob(res, 'image/jpeg', 0.92));
+                const blob = await new Promise(res => canvas.toBlob(res, 'image/jpeg', jpegQuality));
                 canvas.width = 0;
                 canvas.height = 0;
 
                 if (!blob) throw new Error('Encoding failed');
 
                 const url = URL.createObjectURL(blob);
-                exportList.push({ url, pageIndex: i, total });
+                exportList.push({ url, pageIndex: i, total, size: blob.size });
 
+                const card = document.createElement('article');
+                card.className = 'page-card';
                 const btn = document.createElement('button');
                 btn.type = 'button';
-                btn.setAttribute('aria-label', `Download page ${i}`);
+                btn.setAttribute('aria-label', `Download page ${i} as JPEG`);
                 const img = document.createElement('img');
                 img.src = url;
                 img.alt = `Page ${i}`;
                 const dl = () => triggerDownload(url, buildName(i, total));
                 btn.addEventListener('click', dl);
                 btn.appendChild(img);
-                grid.appendChild(btn);
+                const meta = document.createElement('div');
+                meta.className = 'page-meta';
+                const name = document.createElement('span');
+                name.className = 'page-name';
+                name.textContent = `Page ${i}`;
+                const size = document.createElement('span');
+                size.textContent = formatBytes(blob.size);
+                meta.append(name, size);
+                card.append(btn, meta);
+                grid.appendChild(card);
             }
 
             if (!cancelled) {
                 filenameInput.value = baseName;
+                updateResultSummary(file.name, total);
                 setup.classList.add('hidden');
                 filenameGroup.classList.remove('hidden');
                 dlBtn.classList.remove('hidden');
@@ -340,13 +412,17 @@
 
         } catch (err) {
             if (err.name === 'RenderingCancelledException') {
-                // Expected when doReset() cancels an active render — not an error
+                // Expected when doReset() cancels an active render, not an error.
             } else if (!cancelled) {
                 console.error(err);
+                clearRenderedOutput();
+                setup.classList.remove('hidden');
                 if (err.name === 'PasswordException') {
                     showError('This PDF is password protected.');
                 } else if (err.message === 'Encoding failed') {
                     showError('Failed to encode a page as JPEG. Try a different PDF.');
+                } else if (err.message === 'Page too large') {
+                    showError('One page is too large at this sharpness. Choose Normal or Small file and try again.');
                 } else {
                     showError('Could not process this PDF.');
                 }
@@ -354,19 +430,61 @@
         } finally {
             activeRenderTask = null;
             if (activePdf) { try { activePdf.destroy(); } catch(_) {} activePdf = null; }
-            // Only touch shared state if this is still the active run — guards against
+            // Only touch shared state if this is still the active run. This guards against
             // a cancelled run's finally clobbering a new run that started after reset.
             if (runId === myRun) {
                 loader.style.display = 'none';
                 isProcessing = false;
+                setControlsDisabled(false);
             }
         }
     }
 
     /* --- HELPERS --- */
     function buildName(pageIndex, total) {
-        const base = filenameInput.value.trim() || 'export';
-        return `${base}_Page_${pageIndex}_of_${total}.jpg`;
+        const base = sanitizeFilename(filenameInput.value) || 'export';
+        const padLength = String(total).length;
+        const page = String(pageIndex).padStart(padLength, '0');
+        return `${base}_page_${page}_of_${total}.jpg`;
+    }
+
+    function clearRenderedOutput() {
+        exportList.forEach(item => URL.revokeObjectURL(item.url));
+        exportList = [];
+        grid.innerHTML = '';
+        resultSummary.textContent = '';
+        resultSummary.classList.add('hidden');
+        filenameGroup.classList.add('hidden');
+        dlBtn.classList.add('hidden');
+        resetBtn.classList.add('hidden');
+        dlBtn.disabled = false;
+        dlBtn.textContent = 'Save All JPEGs';
+    }
+
+    function sanitizeFilename(value) {
+        return value.trim()
+            .replace(/[<>:"/\\|?*\x00-\x1F]/g, '-')
+            .replace(/\s+/g, '_')
+            .replace(/-+/g, '-')
+            .replace(/^[._-]+|[._-]+$/g, '')
+            .slice(0, 80);
+    }
+
+    function formatBytes(bytes) {
+        if (bytes < 1024) return `${bytes} B`;
+        if (bytes < 1024 * 1024) return `${Math.round(bytes / 1024)} KB`;
+        return `${(bytes / 1024 / 1024).toFixed(1)} MB`;
+    }
+
+    function updateResultSummary(fileName, total) {
+        const totalBytes = exportList.reduce((sum, item) => sum + item.size, 0);
+        resultSummary.textContent = `${total} JPEG${total === 1 ? '' : 's'} ready from ${fileName}. Total size: ${formatBytes(totalBytes)}.`;
+        resultSummary.classList.remove('hidden');
+    }
+
+    function setControlsDisabled(disabled) {
+        scaleSelect.disabled = disabled;
+        qualitySelect.disabled = disabled;
     }
 
     function triggerDownload(url, filename) {
@@ -398,7 +516,7 @@
             dlBtn.disabled = false;
             dlBtn.textContent = 'Save All JPEGs';
         }
-        // NOTE: blob URLs are NOT revoked here — thumbnails and individual downloads
+        // NOTE: blob URLs are NOT revoked here. Thumbnails and individual downloads
         // still need them. They are revoked on reset or when a new PDF is loaded.
     }
 </script>

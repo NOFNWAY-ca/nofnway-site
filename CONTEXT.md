@@ -55,7 +55,7 @@ Built by someone who spent 40 years being told to try harder before getting a di
 ### Current Tools
 | Tool | File | Description |
 |------|------|-------------|
-| [FN] JPEGer | jpeger.html | Converts PDF to one JPEG per page |
+| [FN] JPEGer | jpeger.html | Converts PDF to one JPEG per page with size and sharpness controls |
 | [FN] PDFer | pdfer.html | Turns photos into a redacted PDF |
 | [FN] HOW LONG? | how_long.html | Records project measurements |
 | [FN] HOW MUCH? | how_much.html | Instant unit conversions |
