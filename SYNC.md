@@ -9,6 +9,7 @@ Primary live site at `nofnway.ca`.
 - Verify service worker activation after `sw.js` changes.
 
 ## Recent Changes
+- Polished `accountabilibugs.html` for release: rebuilt the setup panel, replaced the shoddy bug scene with a branded workbench scene, upgraded the bug SVG art, added visible activity labels, improved the timer treatment, and bumped `sw.js` to `nofnway-v34`.
 - Added shared `bug-report.js` and a fixed "Report bug" mailto button to the public tool pages, with `theme.css` styling and `sw.js` bumped to `nofnway-v33`.
 - `accountabilibugs.html` is live-ready: added the homepage card, tightened mobile/nav layout, restored user zoom, added reduced-motion handling, made hold-to-stop work from keyboard, and bumped `sw.js` to `nofnway-v32`.
 - `jpeger.html` now has output sharpness and JPEG quality controls, sanitized/padded download filenames, per-page size labels, a conversion summary, safer white page backgrounds for transparent PDFs, a canvas-size guard, and cleaner mobile viewport behavior.
@@ -27,4 +28,4 @@ Primary live site at `nofnway.ca`.
 - `sleep_math.html` now has a stronger hero, keyboard-accessible mode toggles and result buttons, clearer input validation, best-result emphasis, softer estimation copy, and DOM-built result cards instead of `innerHTML`.
 
 ## Next Recommended Step
-- Before deploying, preview `accountabilibugs.html` locally on desktop and mobile width, then verify start, pause/resume, hide timer, sound toggle, hold-to-stop by pointer and keyboard, natural finish, privacy panel, theme toggle, and homepage navigation.
+- Before deploying, recheck `accountabilibugs.html` on desktop and mobile width, then verify start, pause/resume, hide timer, sound toggle, hold-to-stop by pointer and keyboard, natural finish, privacy panel, theme toggle, and homepage navigation.
