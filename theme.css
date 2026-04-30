@@ -818,6 +818,52 @@ footer {
     color: var(--brand);
 }
 
+/* ═══════════════════════════════════════
+   BUG REPORT BUTTON
+═══════════════════════════════════════ */
+.bug-report-btn {
+    position: fixed;
+    right: 14px;
+    bottom: 14px;
+    z-index: 1200;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 36px;
+    padding: 0 12px;
+    border: 2px solid var(--accent);
+    border-radius: 6px;
+    background: var(--card-bg);
+    color: var(--accent);
+    box-shadow: 3px 3px 0 rgba(0,0,0,0.18);
+    font-family: 'Montserrat', sans-serif;
+    font-size: 0.68rem;
+    font-weight: 900;
+    letter-spacing: 0.04em;
+    line-height: 1;
+    text-decoration: none;
+    text-transform: uppercase;
+}
+.bug-report-btn:hover,
+.bug-report-btn:focus-visible {
+    background: var(--accent);
+    color: #fff;
+}
+
+@media print {
+    .bug-report-btn { display: none !important; }
+}
+
+@media (max-width: 520px) {
+    .bug-report-btn {
+        right: 10px;
+        bottom: 10px;
+        min-height: 32px;
+        padding: 0 10px;
+        font-size: 0.62rem;
+    }
+}
+
 
 /* ═══════════════════════════════════════
    MOBILE — RESPONSIVE NAVBAR

@@ -9,6 +9,7 @@ Primary live site at `nofnway.ca`.
 - Verify service worker activation after `sw.js` changes.
 
 ## Recent Changes
+- Added shared `bug-report.js` and a fixed "Report bug" mailto button to the public tool pages, with `theme.css` styling and `sw.js` bumped to `nofnway-v33`.
 - `accountabilibugs.html` is live-ready: added the homepage card, tightened mobile/nav layout, restored user zoom, added reduced-motion handling, made hold-to-stop work from keyboard, and bumped `sw.js` to `nofnway-v32`.
 - `jpeger.html` now has output sharpness and JPEG quality controls, sanitized/padded download filenames, per-page size labels, a conversion summary, safer white page backgrounds for transparent PDFs, a canvas-size guard, and cleaner mobile viewport behavior.
 - Added `MEMORY.md` as the fuller NOFNWAY voice/design reference for future sessions, covering tone, visual identity, interaction rules, privacy language, anti-patterns, and in-repo examples to follow.
