@@ -29,7 +29,7 @@
         .btn-help:hover { border-color: white; color: white; }
 
         /* Workspaces */
-        .workspace { flex: 1; overflow-y: auto; padding: 20px; display: none; -webkit-overflow-scrolling: touch; }
+        .workspace { flex: 1; overflow-y: auto; overflow-x: hidden; padding: 20px; display: none; -webkit-overflow-scrolling: touch; }
         .workspace.active { display: block; }
         .workspace::-webkit-scrollbar { width: 4px; }
         .workspace::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
@@ -146,6 +146,27 @@
         .page-manager .control-group { border-right: none; padding-right: 0; }
         .page-actions { display: flex; gap: 8px; flex-wrap: wrap; }
         .page-manager input[type="text"] { width: 180px; }
+        .page-strip {
+            max-width: 1100px;
+            margin: -6px auto 18px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .page-chip {
+            border: 1px solid var(--border);
+            background: var(--card-bg);
+            color: var(--text-main);
+            border-radius: 999px;
+            padding: 7px 12px;
+            cursor: pointer;
+            font: 700 0.82rem 'Roboto', sans-serif;
+        }
+        .page-chip.active {
+            background: var(--brand);
+            color: white;
+            border-color: var(--brand);
+        }
         @media (max-width: 820px) {
             .quick-build-grid { grid-template-columns: 1fr; }
             .page-manager { align-items: stretch; }
@@ -168,6 +189,38 @@
             justify-content: center;
             gap: 0.15in;
         }
+        .page-sheet.show-guides .circle { outline: 1px dashed rgba(44,62,80,0.45); outline-offset: 0.09in; }
+        .print-aids {
+            max-width: 1100px;
+            margin: 0 auto 12px;
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            justify-content: flex-end;
+            flex-wrap: wrap;
+        }
+        .calibration-box {
+            display: none;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 12px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            background: var(--card-bg);
+            color: var(--text-main);
+            font-size: 0.8rem;
+        }
+        .calibration-box.visible { display: inline-flex; }
+        .calibration-square {
+            width: 1in;
+            height: 1in;
+            border: 2px solid #111;
+            background:
+                linear-gradient(to right, transparent calc(50% - 0.5px), #111 calc(50% - 0.5px), #111 calc(50% + 0.5px), transparent calc(50% + 0.5px)),
+                linear-gradient(to bottom, transparent calc(50% - 0.5px), #111 calc(50% - 0.5px), #111 calc(50% + 0.5px), transparent calc(50% + 0.5px));
+            flex-shrink: 0;
+        }
+        .calibration-copy strong { display: block; }
 
         /* Tiles */
         .circle {
@@ -250,7 +303,7 @@
 
         /* Print */
         @media print {
-            .navbar, .toolbar, .modal-overlay, .confirm-overlay, .how-it-works, .draft-banner, .quick-build, .page-manager { display: none !important; }
+            .navbar, .toolbar, .modal-overlay, .confirm-overlay, .how-it-works, .draft-banner, .quick-build, .page-manager, .page-strip { display: none !important; }
             body { background: white; height: auto; overflow: visible; }
             .workspace { display: block !important; padding: 0; overflow: visible; }
             .workspace:not(.active) { display: none !important; }
@@ -260,7 +313,9 @@
             body.hide-empty .circle:not(.has-content) { display: none !important; }
             body.print-all-mode #circle-container { display: none !important; }
             body.print-all-mode #print-pages { display: block !important; }
+            body.print-all-mode .print-aids { display: none !important; }
             #print-pages { display: none; }
+            #print-pages .print-aids { display: flex; justify-content: flex-start; margin-bottom: 0.2in; }
             #print-pages .page-sheet { page-break-after: always; break-after: page; margin-bottom: 0.25in; }
             #print-pages .page-sheet:last-child { page-break-after: auto; break-after: auto; }
         }
@@ -398,11 +453,14 @@
                 <div class="page-actions">
                     <button class="btn-action btn-file" onclick="addProjectPage()">+ New</button>
                     <button class="btn-action btn-file" onclick="duplicateProjectPage()">Duplicate</button>
+                    <button class="btn-action btn-secondary" onclick="moveProjectPage(-1)">← Earlier</button>
+                    <button class="btn-action btn-secondary" onclick="moveProjectPage(1)">Later →</button>
                     <button class="btn-action btn-secondary" onclick="requestDeleteProjectPage()">Delete</button>
                 </div>
             </div>
         </div>
     </section>
+    <div class="page-strip" id="pageStrip"></div>
     <div class="toolbar">
         <div class="tools-global">
 
@@ -448,6 +506,14 @@
                     <label style="font-size:0.8rem; cursor:pointer; display:flex; align-items:center; gap:4px; margin-bottom:4px; color:var(--text-main);">
                         <input type="checkbox" id="hideEmptyCheck" onchange="toggleHideEmpty()" checked>
                         <strong>Hide Empty</strong>
+                    </label>
+                    <label style="font-size:0.8rem; cursor:pointer; display:flex; align-items:center; gap:4px; margin-bottom:4px; color:var(--text-main);">
+                        <input type="checkbox" id="cutGuidesCheck" onchange="toggleCutGuides()">
+                        <strong>Cut Guides</strong>
+                    </label>
+                    <label style="font-size:0.8rem; cursor:pointer; display:flex; align-items:center; gap:4px; margin-bottom:4px; color:var(--text-main);">
+                        <input type="checkbox" id="calibrationCheck" onchange="toggleCalibrationBox()">
+                        <strong>1&quot; Check</strong>
                     </label>
                     <div style="display:flex; gap:6px; align-items:center; flex-wrap:wrap;">
                         <select id="printScopeSelect" style="width:92px;">
@@ -521,6 +587,12 @@
         <button class="btn-action" style="background:#7f8c8d; margin-left:auto;" onclick="requestClearAll()">Clear All</button>
     </div>
 
+    <div class="print-aids">
+        <div class="calibration-box" id="calibrationBox">
+            <div class="calibration-square" aria-hidden="true"></div>
+            <div class="calibration-copy"><strong>1&quot; calibration square</strong>Print at 100% / Actual Size. Measure this before cutting.</div>
+        </div>
+    </div>
     <div class="page-sheet shape-circle" id="circle-container"></div>
     <div id="print-pages"></div>
 </div>
@@ -746,6 +818,8 @@
     }
     function toggleModal(isOpen) { document.getElementById('instructionsModal').classList.toggle('open', isOpen); }
     function toggleHideEmpty() { document.body.classList.toggle('hide-empty', document.getElementById('hideEmptyCheck').checked); }
+    function toggleCutGuides() { circleContainer.classList.toggle('show-guides', document.getElementById('cutGuidesCheck').checked); }
+    function toggleCalibrationBox() { document.getElementById('calibrationBox').classList.toggle('visible', document.getElementById('calibrationCheck').checked); }
 
     // ── Confirm dialog ────────────────────────────────────────────────────────
     let confirmResolve = null;
@@ -814,13 +888,22 @@
 
     function updatePageSelector() {
         const select = document.getElementById('pageSelect');
+        const strip = document.getElementById('pageStrip');
         select.replaceChildren();
+        strip.replaceChildren();
         projectPages.forEach((page, index) => {
             const option = document.createElement('option');
             option.value = String(index);
             option.textContent = page.title || `Page ${index + 1}`;
             option.selected = index === currentPageIndex;
             select.appendChild(option);
+
+            const chip = document.createElement('button');
+            chip.type = 'button';
+            chip.className = `page-chip${index === currentPageIndex ? ' active' : ''}`;
+            chip.textContent = page.title || `Page ${index + 1}`;
+            chip.onclick = () => switchProjectPage(index);
+            strip.appendChild(chip);
         });
         document.getElementById('pageNameInput').value = projectPages[currentPageIndex]?.title || `Page ${currentPageIndex + 1}`;
     }
@@ -1168,6 +1251,17 @@
         loadPageIntoDom(projectPages[currentPageIndex]);
         markDirty();
     }
+    function moveProjectPage(direction) {
+        syncCurrentPageToState();
+        const nextIndex = currentPageIndex + direction;
+        if (nextIndex < 0 || nextIndex >= projectPages.length) return;
+        pushHistory();
+        const [page] = projectPages.splice(currentPageIndex, 1);
+        projectPages.splice(nextIndex, 0, page);
+        currentPageIndex = nextIndex;
+        loadPageIntoDom(projectPages[currentPageIndex]);
+        markDirty();
+    }
     async function requestDeleteProjectPage() {
         if (projectPages.length <= 1) {
             if (!await showConfirm('Delete everything on this only page instead?')) return;
@@ -1259,6 +1353,7 @@
         page.className = `page-sheet ${pageData.shape || 'shape-circle'}`;
         const size = pageData.size || '1in';
         page.style.setProperty('--magnet-size', size);
+        if (document.getElementById('cutGuidesCheck').checked) page.classList.add('show-guides');
         const pageCapacity = Math.max(capacityMap[size] || 20, pageData.circles.length);
         for (let i = 0; i < pageCapacity; i++) {
             const circle = document.createElement('div');
@@ -1276,6 +1371,15 @@
         const printPages = document.getElementById('print-pages');
         printPages.replaceChildren();
         if (printAll) {
+            if (document.getElementById('calibrationCheck').checked) {
+                const aids = document.createElement('div');
+                aids.className = 'print-aids';
+                const box = document.getElementById('calibrationBox').cloneNode(true);
+                box.id = '';
+                box.classList.add('visible');
+                aids.appendChild(box);
+                printPages.appendChild(aids);
+            }
             projectPages.forEach(page => printPages.appendChild(buildPrintPage(page)));
         }
         window.print();
@@ -1468,6 +1572,8 @@
     circleContainer.innerHTML = '';
     loadPageIntoDom(projectPages[currentPageIndex]);
     toggleHideEmpty();
+    toggleCutGuides();
+    toggleCalibrationBox();
     syncWordStyleButtons();
     document.getElementById('printScopeSelect').value = 'current';
     const existingDraft = getStoredDraft();

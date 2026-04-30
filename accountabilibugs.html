@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="author" content="Gerry McMahon">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Accountabilibugs – NOFNWAY</title>
     <meta name="description" content="Set a timer. Bugs come out to work with you. When the last one goes home, you're done.">
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
@@ -20,6 +20,8 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
+            box-sizing: border-box;
+            width: 100%;
             padding: 1.5rem 1rem 2rem;
         }
 
@@ -576,6 +578,131 @@
         }
         .btn-audio-toggle:hover { color: var(--text-main); }
         .btn-audio-toggle.audio-on { color: var(--brand); }
+
+        @media (max-width: 640px) {
+            html,
+            body {
+                max-width: 100%;
+                overflow-x: hidden;
+            }
+
+            .navbar {
+                padding: 0.75rem 0.85rem;
+                gap: 0.6rem;
+                box-sizing: border-box;
+                width: 100vw;
+                max-width: 100vw;
+                overflow: hidden;
+                justify-content: flex-start;
+            }
+
+            .brand {
+                font-size: 1.45rem;
+                letter-spacing: 1.5px;
+                flex-shrink: 0;
+            }
+
+            .brand-sub {
+                display: none;
+            }
+
+            .nav-controls {
+                flex: 0 0 140px;
+                min-width: 0;
+                max-width: 140px;
+                margin-left: auto;
+                gap: 6px;
+                justify-content: flex-end;
+            }
+
+            .theme-toggle,
+            .share-btn {
+                box-sizing: border-box;
+                width: 50px;
+                padding: 8px 7px;
+                font-size: 0;
+                letter-spacing: 0.02em;
+                white-space: nowrap;
+            }
+
+            .share-btn::after {
+                content: 'Tools';
+                font-size: 0.64rem;
+            }
+
+            .theme-toggle::after {
+                content: 'Mode';
+                font-size: 0.64rem;
+            }
+
+            .privacy-btn {
+                width: 28px;
+                height: 32px;
+                padding: 4px;
+            }
+
+            .main-wrap {
+                justify-content: flex-start;
+                padding: 1.35rem 1rem 1.75rem;
+                overflow-x: hidden;
+                width: 100vw;
+                max-width: 100vw;
+            }
+
+            .setup-screen,
+            .running-screen,
+            .done-screen {
+                width: 100%;
+                max-width: min(320px, calc(100vw - 2rem));
+                box-sizing: border-box;
+            }
+
+            .setup-field,
+            .task-input {
+                max-width: 100%;
+            }
+
+            .setup-title {
+                font-size: clamp(1.8rem, 8vw, 2.05rem);
+                letter-spacing: 0.03em;
+                max-width: 100%;
+                text-align: center;
+            }
+
+            .preset-row {
+                max-width: 270px;
+                margin: 0 auto;
+            }
+
+            .preset-btn {
+                min-width: 82px;
+                padding: 8px 10px;
+            }
+
+            .bug-scene {
+                min-height: 250px;
+                padding-inline: 8px;
+            }
+
+            .bug-wrap {
+                width: 68px;
+            }
+
+            .bug-svg {
+                width: 68px;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *,
+            *::before,
+            *::after {
+                animation-duration: 0.001ms !important;
+                animation-iteration-count: 1 !important;
+                scroll-behavior: auto !important;
+                transition-duration: 0.001ms !important;
+            }
+        }
     </style>
     <meta property="og:type"        content="website">
     <meta property="og:url"         content="https://nofnway.ca/accountabilibugs">
@@ -694,6 +821,7 @@
                 onpointerdown="stopHoldStart()"
                 onpointerup="stopHoldCancel()"
                 onpointerleave="stopHoldCancel()"
+                onpointercancel="stopHoldCancel()"
                 oncontextmenu="return false">Hold to stop</button>
         </div>
     </div>
@@ -1159,6 +1287,20 @@ function stopHoldReset() {
     const btn = document.getElementById('stop-btn');
     if (btn) btn.style.setProperty('--hold-progress', '0%');
 }
+
+document.getElementById('stop-btn').addEventListener('keydown', e => {
+    if ((e.key === ' ' || e.key === 'Enter') && !holdRaf) {
+        e.preventDefault();
+        stopHoldStart();
+    }
+});
+
+document.getElementById('stop-btn').addEventListener('keyup', e => {
+    if (e.key === ' ' || e.key === 'Enter') {
+        e.preventDefault();
+        stopHoldCancel();
+    }
+});
 
 // ── Finish ─────────────────────────────────────────────────────────────────────
 

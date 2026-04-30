@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="author" content="Gerry McMahon">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Free Sleep Cycle Calculator – NOFNWAY</title>
     <meta name="description" content="Tell it when you need to wake up, it tells you when to go to sleep. Or flip it: sleeping now, here are your best alarm times. Based on 90-minute sleep cycles.">
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
@@ -20,6 +20,7 @@
             flex: 1;
             min-height: 0;
             overflow-y: auto;
+            overflow-x: hidden;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -30,10 +31,47 @@
         .workspace::-webkit-scrollbar { width: 4px; }
         .workspace::-webkit-scrollbar-thumb { background: var(--brand); border-radius: 4px; }
 
-        /* ── Mode chips ── */
+        .hero {
+            width: 100%;
+            max-width: 640px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            gap: 0.7rem;
+            align-items: center;
+        }
+
+        .eyebrow {
+            font-size: 0.78rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            color: var(--accent);
+        }
+
+        .hero-title {
+            margin: 0;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 900;
+            font-size: clamp(2rem, 7vw, 3.8rem);
+            line-height: 0.95;
+            text-transform: uppercase;
+            color: var(--text-main);
+        }
+
+        .hero-copy {
+            margin: 0;
+            max-width: 560px;
+            font-size: 1rem;
+            line-height: 1.55;
+            color: var(--text-dim);
+        }
+
         .chip-row {
             display: flex;
             gap: 8px;
+            flex-wrap: wrap;
+            justify-content: center;
         }
         .chip {
             background: var(--bg);
@@ -53,8 +91,14 @@
             color: var(--brand);
             background: rgba(0, 87, 184, 0.07);
         }
+        .chip:focus-visible,
+        .ampm-btn:focus-visible,
+        .btn-refresh:focus-visible,
+        .result-card:focus-visible {
+            outline: 3px solid var(--gold);
+            outline-offset: 2px;
+        }
 
-        /* ── Time input area ── */
         .input-area {
             display: flex;
             flex-direction: column;
@@ -62,11 +106,22 @@
             gap: 14px;
         }
 
-        /* Custom time picker: hour : min  AM|PM */
         .time-picker {
             display: flex;
             align-items: center;
             gap: 4px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .time-label {
+            width: 100%;
+            text-align: center;
+            font-size: 0.85rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--text-dim);
         }
 
         .time-part {
@@ -148,15 +203,41 @@
         }
         .btn-refresh:hover { border-color: var(--brand); color: var(--brand); }
 
-        /* ── Placeholder state ── */
         .placeholder-hint {
-            font-size: 0.85rem;
+            font-size: 0.95rem;
             color: var(--text-dim);
-            opacity: 0.6;
+            opacity: 0.8;
+            text-align: center;
+            max-width: 32rem;
+            margin: 0;
+        }
+
+        .input-feedback {
+            min-height: 1.1rem;
+            font-size: 0.82rem;
+            font-weight: 700;
+            color: var(--accent);
             text-align: center;
         }
 
-        /* ── Result cards ── */
+        .results-wrap {
+            width: 100%;
+            max-width: 640px;
+            display: flex;
+            flex-direction: column;
+            gap: 0.9rem;
+            align-items: center;
+        }
+
+        .results-heading {
+            margin: 0;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 900;
+            font-size: clamp(1.2rem, 4vw, 1.7rem);
+            color: var(--text-main);
+            text-align: center;
+        }
+
         .results-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -179,10 +260,19 @@
             text-align: center;
             user-select: none;
             -webkit-tap-highlight-color: transparent;
+            font: inherit;
+            appearance: none;
+            width: 100%;
         }
         .result-card:hover  { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0,0,0,0.1); }
         .result-card:active { transform: scale(0.95); }
         .result-card.emergency { border-left-color: var(--accent); }
+        .result-card.best {
+            border-color: var(--brand);
+            border-left-width: 8px;
+            box-shadow: 4px 4px 0 var(--brand);
+            transform: translate(-2px, -2px);
+        }
 
         .card-cycles {
             font-size: 0.6rem;
@@ -200,8 +290,16 @@
             line-height: 1.1;
         }
         .result-card.emergency .card-time { color: var(--accent); }
+        .card-label {
+            font-size: 0.68rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            margin-top: 0.55rem;
+            color: var(--text-dim);
+        }
         .card-quality {
-            font-size: 0.6rem;
+            font-size: 0.68rem;
             font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 0.08em;
@@ -209,18 +307,29 @@
             color: var(--text-dim);
         }
         .result-card.emergency .card-quality { color: var(--accent); opacity: 0.8; }
+        .card-best {
+            display: inline-block;
+            margin-bottom: 0.55rem;
+            padding: 0.2rem 0.45rem;
+            border: 2px solid var(--gold);
+            background: rgba(249, 168, 37, 0.12);
+            color: var(--text-main);
+            font-size: 0.62rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
 
-        /* ── How it works blurb ── */
         .blurb {
             max-width: 520px;
-            font-size: 0.78rem;
+            margin: 0;
+            font-size: 0.82rem;
             color: var(--text-dim);
             text-align: center;
             line-height: 1.7;
             opacity: 0.75;
         }
 
-        /* ── Toast ── */
         .toast {
             position: fixed;
             bottom: 20px;
@@ -239,6 +348,21 @@
         }
 
         .hidden { display: none !important; }
+
+        @media (max-width: 540px) {
+            .workspace {
+                justify-content: flex-start;
+                padding-top: 1.2rem;
+            }
+
+            .time-part {
+                width: 2.1ch;
+            }
+
+            .hero-copy {
+                font-size: 0.95rem;
+            }
+        }
     </style>
     <!-- Open Graph / social sharing -->
     <meta property="og:type"        content="website">
@@ -296,81 +420,91 @@
 
 <main class="workspace">
 
-    <!-- Mode chips -->
-    <div class="chip-row">
-        <div class="chip active" id="chip-wake" onclick="setMode('wake')">Wake up at...</div>
-        <div class="chip"        id="chip-now"  onclick="setMode('now')">Sleeping now</div>
+    <header class="hero">
+        <div class="eyebrow">Sleep Cycle Calculator</div>
+        <h1 class="hero-title">Sleep Math</h1>
+        <p class="hero-copy">Need to wake up at a specific time, or crashing right now? This gives you the least-bad windows to aim for instead of guessing.</p>
+    </header>
+
+    <div class="chip-row" role="tablist" aria-label="Sleep calculation mode">
+        <button type="button" class="chip active" id="chip-wake" role="tab" aria-selected="true" aria-controls="wake-panel" onclick="setMode('wake')">Wake up at...</button>
+        <button type="button" class="chip" id="chip-now" role="tab" aria-selected="false" aria-controls="now-panel" onclick="setMode('now')">Sleeping now</button>
     </div>
 
-    <!-- Input area -->
     <div class="input-area">
-        <!-- Wake mode -->
-        <div class="time-picker" id="wake-input-wrap">
+        <div class="time-picker" id="wake-panel" role="tabpanel" aria-labelledby="chip-wake">
+            <div class="time-label">When do you need to be conscious again?</div>
             <input type="number" id="wake-hour" class="time-part" min="1" max="12" placeholder="7"
-                   oninput="update()" aria-label="Hour">
+                   oninput="update()" inputmode="numeric" aria-label="Wake hour">
             <span class="time-sep">:</span>
             <input type="number" id="wake-min" class="time-part" min="0" max="59" placeholder="00"
-                   oninput="update()" aria-label="Minutes">
+                   oninput="update()" inputmode="numeric" aria-label="Wake minutes">
             <div class="ampm-wrap">
-                <button class="ampm-btn active" id="am-btn" onclick="setAmPm('AM')">AM</button>
-                <button class="ampm-btn"        id="pm-btn" onclick="setAmPm('PM')">PM</button>
+                <button type="button" class="ampm-btn active" id="am-btn" aria-pressed="true" onclick="setAmPm('AM')">AM</button>
+                <button type="button" class="ampm-btn" id="pm-btn" aria-pressed="false" onclick="setAmPm('PM')">PM</button>
             </div>
         </div>
 
-        <!-- Sleep-now mode -->
-        <div id="now-wrap" class="hidden" style="display:flex; flex-direction:column; align-items:center; gap:8px;">
-            <span class="sleep-now-label" id="now-label">Sleeping at —</span>
-            <button class="btn-refresh" onclick="refreshNow()">Refresh time</button>
+        <div id="now-panel" class="hidden" role="tabpanel" aria-labelledby="chip-now" style="display:flex; flex-direction:column; align-items:center; gap:8px;">
+            <span class="sleep-now-label" id="now-label">Sleeping at -</span>
+            <button type="button" class="btn-refresh" onclick="refreshNow()">Refresh time</button>
         </div>
     </div>
 
-    <!-- Placeholder (wake mode, no time chosen yet) -->
-    <p class="placeholder-hint" id="placeholder">Pick a wake-up time above.</p>
+    <p class="placeholder-hint" id="placeholder">Pick a wake-up time and I&apos;ll show the bedtimes that give you the best shot at waking up like less of a corpse.</p>
+    <p class="input-feedback" id="input-feedback" aria-live="polite"></p>
 
-    <!-- Results -->
-    <div class="results-grid hidden" id="results"></div>
+    <section class="results-wrap hidden" id="results-wrap" aria-live="polite">
+        <h2 class="results-heading" id="results-heading">Your best bets</h2>
+        <div class="results-grid" id="results"></div>
+    </section>
 
-    <!-- Explainer -->
-    <p class="blurb">Sleep runs in 90-minute cycles. Waking up at the end of one feels better than waking up in the middle of one — even if the total sleep time is the same. The 14-minute offset accounts for how long it actually takes to fall asleep. Tap any result to copy the time.</p>
+    <p class="blurb">This is a rough sleep-cycle estimate, not medical truth carved into stone. The 14-minute offset is just a decent average for falling asleep. Tap any result to copy it.</p>
 
 </main>
 
-<div class="toast" id="toast">COPIED</div>
+<div class="toast" id="toast" role="status" aria-live="polite">COPIED</div>
 
 <script>
 
-// ── Theme ──────────────────────────────────────────────────────────────────
 function toggleTheme() {
     const next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
     localStorage.setItem('nofnway-theme', next);
     document.documentElement.setAttribute('data-theme', next);
 }
 
-// ── Constants ──────────────────────────────────────────────────────────────
 const CYCLE_MIN  = 90;
-const OFFSET_MIN = 14;  // average time to fall asleep
+const OFFSET_MIN = 14;
 
 const CYCLES = [
-    { n: 6, quality: 'Optimal',   emergency: false },
-    { n: 5, quality: 'Good',      emergency: false },
-    { n: 4, quality: 'Workable',  emergency: false },
-    { n: 3, quality: 'Emergency', emergency: true  },
+    { n: 6, quality: 'Best Shot', emergency: false },
+    { n: 5, quality: 'Solid',     emergency: false },
+    { n: 4, quality: 'Fine',      emergency: false },
+    { n: 3, quality: 'Brutal',    emergency: true  },
 ];
 
-// ── State ──────────────────────────────────────────────────────────────────
-let mode      = 'wake';   // 'wake' | 'now'
-let nowBase   = null;     // Date used as sleep-now baseline
-let wakeAmPm  = 'AM';     // 'AM' | 'PM'
+let mode = 'wake';
+let wakeAmPm = 'AM';
 
-// ── Mode switch ────────────────────────────────────────────────────────────
 function setMode(m) {
     mode = m;
 
-    document.getElementById('chip-wake').classList.toggle('active', m === 'wake');
-    document.getElementById('chip-now').classList.toggle('active',  m === 'now');
+    const wakeTab = document.getElementById('chip-wake');
+    const nowTab = document.getElementById('chip-now');
+    const wakePanel = document.getElementById('wake-panel');
+    const nowPanel = document.getElementById('now-panel');
 
-    document.getElementById('wake-input-wrap').classList.toggle('hidden', m !== 'wake');
-    document.getElementById('now-wrap').classList.toggle('hidden',        m !== 'now');
+    wakeTab.classList.toggle('active', m === 'wake');
+    nowTab.classList.toggle('active', m === 'now');
+    wakeTab.setAttribute('aria-selected', String(m === 'wake'));
+    nowTab.setAttribute('aria-selected', String(m === 'now'));
+
+    wakePanel.classList.toggle('hidden', m !== 'wake');
+    nowPanel.classList.toggle('hidden', m !== 'now');
+    wakePanel.hidden = m !== 'wake';
+    nowPanel.hidden = m !== 'now';
+
+    clearFeedback();
 
     if (m === 'now') {
         refreshNow();
@@ -379,99 +513,151 @@ function setMode(m) {
     }
 }
 
-// ── Sleep-now: set baseline to current time ────────────────────────────────
 function refreshNow() {
-    nowBase = new Date();
-    document.getElementById('now-label').textContent = 'Sleeping at ' + formatTime(nowBase);
-    renderAlarms(nowBase);
+    const now = new Date();
+    document.getElementById('placeholder').classList.add('hidden');
+    document.getElementById('now-label').textContent = 'Sleeping at ' + formatTime(now);
+    document.getElementById('results-heading').textContent = 'Set your alarm for one of these';
+    renderAlarms(now);
 }
 
-// ── AM/PM toggle ───────────────────────────────────────────────────────────
 function setAmPm(val) {
     wakeAmPm = val;
     document.getElementById('am-btn').classList.toggle('active', val === 'AM');
     document.getElementById('pm-btn').classList.toggle('active', val === 'PM');
+    document.getElementById('am-btn').setAttribute('aria-pressed', String(val === 'AM'));
+    document.getElementById('pm-btn').setAttribute('aria-pressed', String(val === 'PM'));
     update();
 }
 
-// ── Wake-up mode: read custom inputs → calc bedtimes ──────────────────────
 function update() {
+    if (mode !== 'wake') return;
+
     const h12 = parseInt(document.getElementById('wake-hour').value, 10);
-    const min  = parseInt(document.getElementById('wake-min').value,  10) || 0;
+    const rawMin = document.getElementById('wake-min').value.trim();
+    const min = rawMin === '' ? 0 : parseInt(rawMin, 10);
 
     if (isNaN(h12) || h12 < 1 || h12 > 12) {
-        document.getElementById('placeholder').classList.remove('hidden');
-        document.getElementById('results').classList.add('hidden');
+        showPlaceholder("Pick a wake-up time and I'll show the bedtimes that give you the best shot at waking up like less of a corpse.");
+        hideResults();
+        clearFeedback();
         return;
     }
 
-    document.getElementById('placeholder').classList.add('hidden');
+    if (isNaN(min) || min < 0 || min > 59) {
+        showPlaceholder('Wake-up time needs real minutes.');
+        showFeedback('Minutes need to be between 00 and 59.');
+        hideResults();
+        return;
+    }
 
-    // Convert 12-hour + AM/PM to 24-hour
-    let h24 = h12 % 12;               // 12 AM → 0, 12 PM → 12
+    clearFeedback();
+    document.getElementById('placeholder').classList.add('hidden');
+    document.getElementById('results-heading').textContent = 'Go to bed at one of these';
+
+    let h24 = h12 % 12;
     if (wakeAmPm === 'PM') h24 += 12;
 
     const wake = new Date();
-    wake.setHours(h24, Math.min(min, 59), 0, 0);
+    wake.setHours(h24, min, 0, 0);
 
     renderBedtimes(wake);
 }
 
-// ── Calc: bedtimes from wake time ──────────────────────────────────────────
 function renderBedtimes(wakeDate) {
     const times = CYCLES.map(c => {
         const totalMin = OFFSET_MIN + c.n * CYCLE_MIN;
         const bed = new Date(wakeDate.getTime() - totalMin * 60000);
         return { ...c, date: bed, totalMin };
     });
-    renderCards(times, 'sleep');
+    renderCards(times, 'Go to bed');
 }
 
-// ── Calc: alarm times from sleep time ─────────────────────────────────────
 function renderAlarms(sleepDate) {
-    // Show shortest-first for "sleeping now"
-    const ordered = [...CYCLES].reverse();
-    const times = ordered.map(c => {
+    const times = CYCLES.map(c => {
         const totalMin = OFFSET_MIN + c.n * CYCLE_MIN;
         const alarm = new Date(sleepDate.getTime() + totalMin * 60000);
         return { ...c, date: alarm, totalMin };
     });
-    renderCards(times, 'wake');
+    renderCards(times, 'Set alarm');
 }
 
-// ── Render result cards ────────────────────────────────────────────────────
 function renderCards(times, cardType) {
     const grid = document.getElementById('results');
-    grid.innerHTML = '';
+    const resultsWrap = document.getElementById('results-wrap');
+    grid.replaceChildren();
 
-    times.forEach(t => {
+    times.forEach((t, index) => {
         const hoursSlept = (t.n * CYCLE_MIN) / 60;
-        const hLabel     = hoursSlept % 1 === 0 ? hoursSlept + ' hrs' : hoursSlept.toFixed(1) + ' hrs';
-        const timeStr    = formatTime(t.date);
+        const hLabel = hoursSlept % 1 === 0 ? hoursSlept + ' hrs' : hoursSlept.toFixed(1) + ' hrs';
+        const timeStr = formatTime(t.date);
 
-        const card = document.createElement('div');
+        const card = document.createElement('button');
+        card.type = 'button';
         card.className = 'result-card' + (t.emergency ? ' emergency' : '');
-        card.innerHTML =
-            '<div class="card-cycles">' + t.n + ' cycles \u00b7 ' + hLabel + '</div>' +
-            '<div class="card-time">'   + timeStr + '</div>' +
-            '<div class="card-quality">' + t.quality + '</div>';
+        if (index === 0) card.classList.add('best');
+        card.setAttribute('aria-label', cardType + ' at ' + timeStr + '. ' + t.quality + '. Tap to copy.');
+
+        if (index === 0) {
+            const best = document.createElement('div');
+            best.className = 'card-best';
+            best.textContent = 'Best bet';
+            card.appendChild(best);
+        }
+
+        const cycles = document.createElement('div');
+        cycles.className = 'card-cycles';
+        cycles.textContent = t.n + ' cycles · ' + hLabel;
+
+        const time = document.createElement('div');
+        time.className = 'card-time';
+        time.textContent = timeStr;
+
+        const label = document.createElement('div');
+        label.className = 'card-label';
+        label.textContent = cardType;
+
+        const quality = document.createElement('div');
+        quality.className = 'card-quality';
+        quality.textContent = t.quality;
+
+        card.appendChild(cycles);
+        card.appendChild(time);
+        card.appendChild(label);
+        card.appendChild(quality);
         card.addEventListener('click', () => copyTime(timeStr));
         grid.appendChild(card);
     });
 
-    grid.classList.remove('hidden');
+    resultsWrap.classList.remove('hidden');
 }
 
-// ── Time formatting ────────────────────────────────────────────────────────
 function formatTime(date) {
     let h = date.getHours();
-    const m   = date.getMinutes();
+    const m = date.getMinutes();
     const ampm = h >= 12 ? 'PM' : 'AM';
     h = h % 12 || 12;
     return h + ':' + String(m).padStart(2, '0') + ' ' + ampm;
 }
 
-// ── Clipboard ──────────────────────────────────────────────────────────────
+function showPlaceholder(text) {
+    const placeholder = document.getElementById('placeholder');
+    placeholder.textContent = text;
+    placeholder.classList.remove('hidden');
+}
+
+function showFeedback(text) {
+    document.getElementById('input-feedback').textContent = text;
+}
+
+function clearFeedback() {
+    document.getElementById('input-feedback').textContent = '';
+}
+
+function hideResults() {
+    document.getElementById('results-wrap').classList.add('hidden');
+}
+
 function copyTime(text) {
     const showToast = () => {
         const toast = document.getElementById('toast');
@@ -495,6 +681,8 @@ function fallbackCopy(text, cb) {
     try { document.execCommand('copy'); cb(); } catch (e) {}
     document.body.removeChild(el);
 }
+
+setMode('wake');
 
 </script>
 <script>
