@@ -9,6 +9,7 @@ Primary live site at `nofnway.ca`.
 - Verify service worker activation after `sw.js` changes.
 
 ## Recent Changes
+- Updated `accountabilibugs.html` setup/done copy per Gerry's exact text, and bumped `sw.js` to `nofnway-v35` for deploy.
 - Polished `accountabilibugs.html` for release: rebuilt the setup panel, replaced the shoddy bug scene with a branded workbench scene, upgraded the bug SVG art, added visible activity labels, improved the timer treatment, and bumped `sw.js` to `nofnway-v34`.
 - Added shared `bug-report.js` and a fixed "Report bug" mailto button to the public tool pages, with `theme.css` styling and `sw.js` bumped to `nofnway-v33`.
 - `accountabilibugs.html` is live-ready: added the homepage card, tightened mobile/nav layout, restored user zoom, added reduced-motion handling, made hold-to-stop work from keyboard, and bumped `sw.js` to `nofnway-v32`.
