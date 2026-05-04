@@ -60,6 +60,12 @@
         .required-star { color:var(--accent); margin-left:2px; }
         .fields-row { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; }
         @media(max-width:520px){ .fields-row { grid-template-columns:1fr; } }
+        @supports (-webkit-touch-callout: none) {
+            .form-input, .form-textarea,
+            .filter-select, .filter-tag-input,
+            .notes-filter-select,
+            .count-input, .quiz-answer-input { font-size: 16px; }
+        }
 
         /* Template picker */
         .tpl-picker { display:flex; gap:6px; flex-wrap:wrap; margin-bottom:24px; padding:14px; background:var(--card-bg); border:2px solid var(--border); border-radius:8px; }

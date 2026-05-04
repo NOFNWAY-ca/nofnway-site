@@ -99,6 +99,12 @@
         .filter-tag { width:120px; }
         @media(max-width:520px){ .filter-input, .filter-select, .filter-tag { width:100%; min-width:0; flex:none; } }
 
+        /* Prevent iOS Safari from zooming on input focus (inputs < 16px trigger zoom) */
+        @supports (-webkit-touch-callout: none) {
+            .form-input, .form-textarea,
+            .filter-input, .filter-select { font-size: 16px; }
+        }
+
         /* Storage indicator */
         .storage-bar { font-size:.78rem; color:var(--text-dim); margin-bottom:20px; }
         .storage-warn { color:var(--gold); font-weight:700; }
