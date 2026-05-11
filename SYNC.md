@@ -9,6 +9,9 @@ Primary live site at `nofnway.ca`.
 - Verify service worker activation after `sw.js` changes.
 
 ## Recent Changes
+- Bumped `sw.js` to `nofnway-v36` for the `[FN] FIDGET` Ripple trail deploy.
+- Smoothed `[FN] FIDGET` Ripple trails with capped DPR canvas rendering, interpolated drag particles between pointer events, slower particle drift, and recycled particle slots after the 300-particle cap to avoid memory growth.
+- Upgraded the `[FN] FIDGET` Ripple tab with a dark canvas field, semi-transparent fade overlay, capped sparkler-style trail particles on drag/touch, tap bursts that preserve the original ripple rings, and cleanup after inactivity.
 - Updated `accountabilibugs.html` setup/done copy per Gerry's exact text, and bumped `sw.js` to `nofnway-v35` for deploy.
 - Polished `accountabilibugs.html` for release: rebuilt the setup panel, replaced the shoddy bug scene with a branded workbench scene, upgraded the bug SVG art, added visible activity labels, improved the timer treatment, and bumped `sw.js` to `nofnway-v34`.
 - Added shared `bug-report.js` and a fixed "Report bug" mailto button to the public tool pages, with `theme.css` styling and `sw.js` bumped to `nofnway-v33`.
