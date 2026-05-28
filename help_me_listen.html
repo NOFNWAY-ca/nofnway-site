@@ -1,0 +1,1141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="author" content="Gerry McMahon">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HELP ME [FN] LISTEN - NOFNWAY</title>
+    <meta name="description" content="A private browser-only active listening practice tool built around realistic conversation scenarios. No accounts. No uploads. No AI. No scoring.">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'self' https://fonts.googleapis.com 'unsafe-inline'; font-src https://fonts.gstatic.com; script-src 'self' 'unsafe-inline'; connect-src 'none'; img-src 'self' https://nofnway.ca; frame-src 'none';">
+
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://nofnway.ca/help_me_listen">
+    <meta property="og:title" content="HELP ME [FN] LISTEN - NOFNWAY">
+    <meta property="og:description" content="Practice listening without fixing, minimizing, or turning the conversation back toward yourself.">
+    <meta property="og:site_name" content="NOFNWAY">
+    <meta property="og:image" content="https://nofnway.ca/og-image.png">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="HELP ME [FN] LISTEN - NOFNWAY">
+    <meta name="twitter:description" content="Practice listening without fixing, minimizing, or turning the conversation back toward yourself.">
+    <meta name="twitter:image" content="https://nofnway.ca/og-image.png">
+    <link rel="canonical" href="https://nofnway.ca/help_me_listen">
+
+    <script>document.documentElement.setAttribute('data-theme', localStorage.getItem('nofnway-theme') || 'light');</script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bangers&family=Montserrat:wght@900&family=Roboto:wght@400;700&display=swap" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bangers&family=Montserrat:wght@900&family=Roboto:wght@400;700&display=swap"></noscript>
+    <link rel="stylesheet" href="theme.css">
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "HELP ME [FN] LISTEN",
+      "url": "https://nofnway.ca/help_me_listen",
+      "description": "A private browser-only active listening practice tool built around realistic conversation scenarios.",
+      "applicationCategory": "EducationApplication",
+      "operatingSystem": "Any",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "creator": {
+        "@type": "Organization",
+        "name": "NOFNWAY",
+        "url": "https://nofnway.ca"
+      }
+    }
+    </script>
+    <script>if ('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js').catch(() => {});</script>
+    <style>
+        body {
+            min-height: 100vh;
+        }
+
+        .listen-wrap {
+            width: min(1000px, calc(100% - 32px));
+            margin: 0 auto;
+            padding: 30px 0 72px;
+        }
+
+        .listen-hero {
+            padding: 30px 0 28px;
+        }
+
+        .listen-kicker {
+            margin: 0 0 8px;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.72rem;
+            font-weight: 900;
+            letter-spacing: 0.13em;
+            text-transform: uppercase;
+            color: var(--brand);
+        }
+
+        .listen-hero h1 {
+            margin: 0;
+            font-family: 'Bangers', 'Montserrat', sans-serif;
+            font-size: clamp(3rem, 12vw, 6rem);
+            line-height: 0.95;
+            letter-spacing: 0.04em;
+            color: var(--text-main);
+        }
+
+        .listen-hero p {
+            max-width: 690px;
+            margin: 14px 0 0;
+            color: var(--text-dim);
+            font-size: clamp(1rem, 3.6vw, 1.2rem);
+            line-height: 1.55;
+        }
+
+        .quiet-note {
+            margin-top: 14px;
+            max-width: 620px;
+            font-size: 0.92rem;
+            color: var(--text-dim);
+        }
+
+        .landing-breath {
+            max-width: 700px;
+            margin: 0 auto 28px;
+            padding: 18px 20px;
+            border-top: 2px solid var(--border);
+            border-bottom: 2px solid var(--border);
+            color: var(--text-dim);
+            font-size: clamp(1rem, 3vw, 1.14rem);
+            line-height: 1.65;
+            text-align: center;
+        }
+
+        .scenario-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 14px;
+        }
+
+        .scenario-btn,
+        .response-btn,
+        .plain-btn {
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            background: var(--card-bg);
+            color: var(--text-main);
+            cursor: pointer;
+            text-align: left;
+            transition: border-color 0.15s, box-shadow 0.15s, transform 0.15s;
+        }
+
+        .scenario-btn {
+            min-height: 116px;
+            padding: 18px;
+            box-shadow: 3px 3px 0 var(--border);
+        }
+
+        .scenario-btn:hover,
+        .response-btn:hover,
+        .plain-btn:hover {
+            border-color: var(--brand);
+            box-shadow: 4px 4px 0 var(--brand);
+            transform: translate(-1px, -1px);
+        }
+
+        .scenario-btn:focus-visible,
+        .response-btn:focus-visible,
+        .plain-btn:focus-visible,
+        .theme-toggle:focus-visible,
+        .share-btn:focus-visible,
+        .privacy-btn:focus-visible {
+            outline: 3px solid var(--gold);
+            outline-offset: 2px;
+        }
+
+        .scenario-title {
+            display: block;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1rem;
+            font-weight: 900;
+            line-height: 1.25;
+        }
+
+        .scenario-desc {
+            display: block;
+            margin-top: 8px;
+            color: var(--text-dim);
+            font-size: 0.9rem;
+            line-height: 1.45;
+        }
+
+        .practice-shell {
+            display: grid;
+            grid-template-columns: minmax(0, 0.82fr) minmax(320px, 1.18fr);
+            gap: 20px;
+            align-items: start;
+        }
+
+        .side-card,
+        .conversation-card,
+        .reflection-card {
+            background: var(--card-bg);
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            box-shadow: 4px 4px 0 var(--border);
+        }
+
+        .side-card {
+            padding: 18px;
+        }
+
+        .side-label,
+        .step-label,
+        .reflection-label {
+            margin: 0 0 8px;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.68rem;
+            font-weight: 900;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--brand);
+        }
+
+        .side-title {
+            margin: 0;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 1.2rem;
+            font-weight: 900;
+            line-height: 1.25;
+            color: var(--text-main);
+        }
+
+        .side-copy {
+            margin: 12px 0 0;
+            color: var(--text-dim);
+            font-size: 0.94rem;
+            line-height: 1.55;
+        }
+
+        .side-actions {
+            display: grid;
+            gap: 10px;
+            margin-top: 18px;
+        }
+
+        .plain-btn {
+            padding: 11px 12px;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.72rem;
+            font-weight: 900;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            text-align: center;
+            background: var(--bg);
+        }
+
+        .conversation-stack {
+            display: grid;
+            gap: 16px;
+        }
+
+        .conversation-card {
+            padding: clamp(18px, 4vw, 30px);
+        }
+
+        .scene-text {
+            margin: 0 0 18px;
+            color: var(--text-dim);
+            font-size: 0.95rem;
+            line-height: 1.55;
+        }
+
+        .speaker-box {
+            border-left: 5px solid var(--brand);
+            padding: 4px 0 4px 16px;
+        }
+
+        .speaker-name {
+            display: block;
+            margin-bottom: 8px;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.78rem;
+            font-weight: 900;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--text-dim);
+        }
+
+        .speaker-line {
+            margin: 0;
+            font-size: clamp(1.35rem, 4.8vw, 2.1rem);
+            line-height: 1.28;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        .response-list {
+            display: grid;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .response-btn {
+            min-height: 58px;
+            padding: 14px 15px;
+            font: 700 1rem/1.4 'Roboto', sans-serif;
+            background: var(--bg);
+        }
+
+        .response-btn.selected {
+            border-color: var(--brand);
+            box-shadow: 4px 4px 0 var(--brand);
+            background: var(--card-bg);
+        }
+
+        .reflection-card {
+            padding: clamp(18px, 4vw, 24px);
+            border-left: 5px solid var(--brand);
+        }
+
+        .reflection-card[hidden] {
+            display: none;
+        }
+
+        .choice-repeat {
+            margin: 0 0 14px;
+            color: var(--text-main);
+            font-size: 1rem;
+            font-weight: 700;
+            line-height: 1.45;
+        }
+
+        .reflection-text {
+            margin: 0;
+            color: var(--text-dim);
+            font-size: 1.02rem;
+            line-height: 1.65;
+        }
+
+        .why-note {
+            margin-top: 18px;
+            border-top: 1px solid var(--border);
+            padding-top: 14px;
+        }
+
+        .why-note summary {
+            color: var(--brand);
+            cursor: pointer;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.72rem;
+            font-weight: 900;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        .why-note p {
+            margin: 10px 0 0;
+            color: var(--text-dim);
+            font-size: 0.96rem;
+            line-height: 1.6;
+        }
+
+        .continue-row {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 18px;
+        }
+
+        .continue-btn {
+            border: none;
+            border-radius: 7px;
+            background: var(--brand);
+            color: #fff;
+            padding: 13px 18px;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.78rem;
+            font-weight: 900;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            cursor: pointer;
+        }
+
+        .continue-btn:hover {
+            filter: brightness(1.08);
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        @media (max-width: 820px) {
+            .scenario-grid,
+            .practice-shell {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .navbar {
+                padding: 0.85rem 1rem;
+                align-items: flex-start;
+                gap: 10px;
+            }
+
+            .brand-sub {
+                display: none;
+            }
+
+            .nav-controls {
+                gap: 8px;
+                flex-wrap: wrap;
+                justify-content: flex-end;
+            }
+
+            .theme-toggle,
+            .share-btn {
+                padding: 8px 10px;
+                font-size: 0.68rem;
+            }
+
+            .listen-wrap {
+                width: min(100% - 22px, 1000px);
+                padding-top: 16px;
+            }
+
+            .speaker-line {
+                font-size: 1.35rem;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *,
+            *::before,
+            *::after {
+                transition-duration: 0.001ms !important;
+                animation-duration: 0.001ms !important;
+                scroll-behavior: auto !important;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<nav class="navbar">
+    <a href="index" class="brand">NO<span>FN</span>WAY<span class="brand-sub"> // HELP ME [FN] LISTEN</span></a>
+    <div class="nav-controls">
+        <a href="index" class="share-btn">All Tools</a>
+        <button class="theme-toggle" onclick="toggleTheme()">Light/Dark</button>
+        <button class="privacy-btn" onclick="togglePrivacy()" aria-label="Privacy information"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><text x="12" y="16.5" text-anchor="middle" font-size="9" fill="currentColor" stroke="none" font-weight="700" font-family="sans-serif">?</text></svg></button>
+    </div>
+</nav>
+
+<div class="privacy-panel" id="privacy-panel" hidden>
+    <div class="privacy-panel-hd">
+        <div class="privacy-panel-title"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> Privacy &amp; Data</div>
+        <button class="privacy-close" onclick="document.getElementById('privacy-panel').hidden=true" aria-label="Close">&#x2715;</button>
+    </div>
+    <p>Nothing entered here is stored or uploaded. This tool is for practicing understanding, not evaluating people.</p>
+</div>
+
+<main class="listen-wrap">
+    <section class="listen-hero" aria-labelledby="page-title">
+        <p class="listen-kicker">Active listening practice</p>
+        <h1 id="page-title">HELP ME [FN] LISTEN</h1>
+        <p>Most people aren't trying to ignore each other. They're just listening for the wrong thing.</p>
+        <p class="quiet-note">Pick a scene. Try a response. Notice what it might feel like from the other side. No grades. No gold stars. Just a little less accidental damage.</p>
+    </section>
+
+    <p class="landing-breath">Read the room slowly. The point is not to win the moment. It is to notice what the person may be trying to hand you.</p>
+
+    <section id="scenario-picker" aria-label="Choose a listening scenario">
+        <div class="scenario-grid" id="scenario-grid"></div>
+    </section>
+
+    <section id="practice-view" class="practice-shell hidden" aria-label="Listening practice">
+        <aside class="side-card">
+            <p class="side-label">Scene</p>
+            <h2 class="side-title" id="scenario-title"></h2>
+            <p class="side-copy" id="scenario-summary"></p>
+            <p class="side-copy" id="step-count"></p>
+            <div class="side-actions">
+                <button class="plain-btn" type="button" id="change-scenario-btn">Change scene</button>
+                <button class="plain-btn" type="button" id="restart-btn">Restart this scene</button>
+            </div>
+        </aside>
+
+        <div class="conversation-stack">
+            <article class="conversation-card" id="conversation-card">
+                <p class="step-label">Speaker</p>
+                <p class="scene-text" id="scene-text"></p>
+                <div class="speaker-box">
+                    <span class="speaker-name" id="speaker-name"></span>
+                    <p class="speaker-line" id="speaker-line"></p>
+                </div>
+                <div class="response-list" id="response-list" aria-label="Response choices"></div>
+            </article>
+
+            <article class="reflection-card" id="reflection-card" hidden>
+                <p class="reflection-label">How that can land</p>
+                <p class="choice-repeat" id="choice-repeat"></p>
+                <p class="reflection-text" id="reflection-text"></p>
+                <details class="why-note" id="why-note">
+                    <summary>Why people say this</summary>
+                    <p id="why-note-text"></p>
+                </details>
+                <div class="continue-row">
+                    <button class="continue-btn" type="button" id="continue-btn">Continue</button>
+                </div>
+            </article>
+        </div>
+    </section>
+</main>
+
+<script>
+const scenarios = [
+    {
+        title: 'Friend venting about work',
+        summary: 'They are tired, irritated, and trying not to feel ridiculous for being this upset.',
+        steps: [
+            {
+                scene: 'Your friend drops into the chair and exhales before they even start talking.',
+                speaker: 'Friend',
+                line: 'My boss picked apart my work in front of everyone again. I know it is probably not a huge deal, but I wanted to disappear. [everybody saw]',
+                why: 'People often soften a painful story before telling it because they are already bracing for someone to tell them it was not that bad.',
+                responses: [
+                    {
+                        text: 'That is brutal. I can see why you wanted out of that room.',
+                        reflection: 'This stays with the feeling instead of rushing past it. They may feel less alone before deciding what to do next.'
+                    },
+                    {
+                        text: 'You should start documenting everything. That boss sounds like a problem.',
+                        reflection: 'This may be useful later, but it can feel like the hurt got skipped. They brought you the sting first, not the case file.'
+                    },
+                    {
+                        text: 'Honestly, everybody gets criticized at work. Try not to take it personally.',
+                        reflection: 'This can land as a polite shove away from the conversation. The message they may hear is that their reaction is the problem.'
+                    },
+                    {
+                        text: 'That reminds me of what happened at my last job.',
+                        reflection: 'This can feel like the floor moved under them. Your story might fit, but it takes the spotlight before they have finished needing it.'
+                    }
+                ]
+            },
+            {
+                scene: 'They look down at their hands and keep going.',
+                speaker: 'Friend',
+                line: 'The worst part is I worked so hard on it. Then he made it sound like I had just thrown it together.',
+                why: 'People often repeat the effort because the hurt is not only the criticism. It is the feeling that none of the care counted.',
+                responses: [
+                    {
+                        text: 'You wanted the effort to be seen, not dragged through the mud.',
+                        reflection: 'This reflects the part under the complaint. It gives them a chance to say yes, no, or more.'
+                    },
+                    {
+                        text: 'Maybe he was under pressure too.',
+                        reflection: 'This may be true and still feel lonely. Explaining the other person too soon can sound like taking their side.'
+                    },
+                    {
+                        text: 'At least you know you worked hard.',
+                        reflection: 'This tries to soften it, but can feel like a quick patch over a real bruise.'
+                    },
+                    {
+                        text: 'Did you tell him that?',
+                        reflection: 'Questions can help, but this one moves straight to performance review mode. They may not be ready to defend what they did next.'
+                    }
+                ]
+            },
+            {
+                scene: 'They pause. The anger has gone quiet.',
+                speaker: 'Friend',
+                line: 'I hate that I still care this much. I feel stupid.',
+                why: 'People often say this when they are trying to soften their own pain before someone else dismisses it.',
+                responses: [
+                    {
+                        text: 'Caring about being treated with basic respect is not stupid.',
+                        reflection: 'This names the unfair self-blame without turning it into a lecture. It can give them a little ground back.'
+                    },
+                    {
+                        text: 'Do not let him get to you.',
+                        reflection: 'This sounds strong, but it can make normal pain feel like a personal failure.'
+                    },
+                    {
+                        text: 'You need to be more confident.',
+                        reflection: 'This turns the wound into homework. They may already be beating themselves up.'
+                    },
+                    {
+                        text: 'Workplaces are just like that.',
+                        reflection: 'This can make the problem feel permanent and their reaction feel pointless.'
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        title: 'Partner overwhelmed by daily load',
+        summary: 'They are not asking for a productivity hack. They are trying to show you the pile.',
+        steps: [
+            {
+                scene: 'Your partner is staring at the counter, surrounded by bags, dishes, and half-finished chores.',
+                speaker: 'Partner',
+                line: 'I feel like I am holding the whole house in my head all the time. Even when you help, I still have to remember everything.',
+                why: 'People often describe the invisible part when the visible help is not the whole problem. They are trying to show the weight that does not look like a chore.',
+                responses: [
+                    {
+                        text: 'You are carrying the remembering part, not just the doing part.',
+                        reflection: 'This hears the hidden load. It can feel like you noticed the invisible job they were trying to explain.'
+                    },
+                    {
+                        text: 'Just make me a list and I will do it.',
+                        reflection: 'This sounds helpful, but it hands them another task. The list is part of what they are tired of carrying.'
+                    },
+                    {
+                        text: 'I do help around here.',
+                        reflection: 'This may be true, but it turns the conversation into your defense. They may stop telling you the hard part.'
+                    },
+                    {
+                        text: 'We are both tired.',
+                        reflection: 'This can be fair and still flatten what they said. Shared tired is not the same as this specific load.'
+                    }
+                ]
+            },
+            {
+                scene: 'They rub their forehead and lower their voice.',
+                speaker: 'Partner',
+                line: 'I do not want to be the manager of everything. I want to stop feeling like the backup alarm for everybody else.',
+                why: 'People often reach for blunt images when normal words have failed. The image may be the closest they can get to the constant pressure.',
+                responses: [
+                    {
+                        text: 'You do not want help that still leaves you in charge of noticing everything.',
+                        reflection: 'This keeps the focus on the real complaint. It can help them feel understood before plans show up.'
+                    },
+                    {
+                        text: 'Okay, then tell me exactly what you want me to take over.',
+                        reflection: 'This may be meant well, but exact instructions can feel like more managing. They may need you to think with them, not wait for orders.'
+                    },
+                    {
+                        text: 'You are making it sound like I do nothing.',
+                        reflection: 'This makes them take care of your hurt while they are already overloaded.'
+                    },
+                    {
+                        text: 'Let us not fight about this right now.',
+                        reflection: 'This may avoid heat, but it can also sound like the topic only matters when it is convenient.'
+                    }
+                ]
+            },
+            {
+                scene: 'They look tired more than angry.',
+                speaker: 'Partner',
+                line: 'I miss feeling like we are on the same team.',
+                why: 'People often move from details to belonging when the argument underneath is really about whether they are alone in it.',
+                responses: [
+                    {
+                        text: 'I hear that. I want us back on the same team too. Can I sit with that for a second before we plan?',
+                        reflection: 'This answers the relationship part before the logistics part. It slows the room down without dodging responsibility.'
+                    },
+                    {
+                        text: 'We are on the same team. You just get stressed.',
+                        reflection: 'This can feel like correcting their reality. Reassurance that erases the complaint often does not reassure.'
+                    },
+                    {
+                        text: 'Fine, I will do more.',
+                        reflection: 'This sounds like surrender, not partnership. It can leave the real issue untouched.'
+                    },
+                    {
+                        text: 'What do you want from me?',
+                        reflection: 'This can be honest, but when it is too broad it may feel like another weight dropped in their lap.'
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        title: 'Kid embarrassed at school',
+        summary: 'They are testing whether it is safe to tell the whole story.',
+        steps: [
+            {
+                scene: 'A kid comes home quiet and keeps their backpack on.',
+                speaker: 'Kid',
+                line: 'Everyone laughed when I read out loud. I messed up one word and then I could not make my mouth work.',
+                why: 'Kids often tell the visible facts first because the shame is harder to name. The facts are the doorway.',
+                responses: [
+                    {
+                        text: 'That sounds awful. Getting stuck while people are watching can feel huge.',
+                        reflection: 'This takes the embarrassment seriously. A kid may need that before they can talk about what happened next.'
+                    },
+                    {
+                        text: 'They probably forgot about it already.',
+                        reflection: 'This tries to comfort, but it can feel like you are arguing with how big it felt.'
+                    },
+                    {
+                        text: 'You just need more practice reading out loud.',
+                        reflection: 'This turns the first response into fixing. Practice may matter later. Right now they brought you shame.'
+                    },
+                    {
+                        text: 'Who laughed? I will call the school.',
+                        reflection: 'This may feel protective, but it can also make the kid regret telling you if they wanted comfort first.'
+                    }
+                ]
+            },
+            {
+                scene: 'They pick at the edge of their sleeve.',
+                speaker: 'Kid',
+                line: 'I do not want to go tomorrow. What if it happens again?',
+                why: 'Kids often ask about tomorrow because today is still happening in their body. The fear is trying to get ahead of the next hurt.',
+                responses: [
+                    {
+                        text: 'Tomorrow feels scary because your brain is already replaying today.',
+                        reflection: 'This shows you heard the fear, not just the school refusal. It leaves room for a plan after the feeling has a place.'
+                    },
+                    {
+                        text: 'You have to go. Avoiding it makes it worse.',
+                        reflection: 'This may be practical, but it can feel like the fear got dismissed because attendance matters.'
+                    },
+                    {
+                        text: 'Nothing bad is going to happen.',
+                        reflection: 'This is meant to reassure, but kids know adults cannot promise that. It may make them feel harder to understand.'
+                    },
+                    {
+                        text: 'When I was your age, I had way worse happen.',
+                        reflection: 'This can make them feel small for being upset. Bigger stories do not make their moment smaller in their body.'
+                    }
+                ]
+            },
+            {
+                scene: 'They finally sit down beside you.',
+                speaker: 'Kid',
+                line: 'I wish I could be invisible sometimes.',
+                why: 'Kids may use big, scary-sounding sentences when they do not have smaller words for wanting the attention and embarrassment to stop.',
+                responses: [
+                    {
+                        text: 'Sometimes being seen feels too sharp. I am here with you.',
+                        reflection: 'This does not panic or minimize. It meets the sentence gently and keeps the kid from being alone with it.'
+                    },
+                    {
+                        text: 'Do not say that.',
+                        reflection: 'This can teach them to hide scary sentences. The sentence may be hard to hear, but it is information.'
+                    },
+                    {
+                        text: 'You are being dramatic.',
+                        reflection: 'This can shut the door fast. They may decide the next hard thing is safer kept inside.'
+                    },
+                    {
+                        text: 'Let us do something fun and forget about it.',
+                        reflection: 'Distraction can help later. Right here, it may feel like their pain needs to disappear to keep you comfortable.'
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        title: 'Family disagreement',
+        summary: 'Everybody has history in the room. That makes simple words heavier.',
+        steps: [
+            {
+                scene: 'A family member brings up a decision you thought was already settled.',
+                speaker: 'Family member',
+                line: 'You always decide things and then tell the rest of us after. It feels like our opinions are decorative.',
+                why: 'Family complaints often come out as patterns because the person is not only reacting to today. They are carrying the whole stack.',
+                responses: [
+                    {
+                        text: 'You feel like the decision is already made before you get invited in.',
+                        reflection: 'This reflects the pattern they are naming without agreeing to every accusation. It keeps the door open.'
+                    },
+                    {
+                        text: 'That is not fair. I ask for opinions all the time.',
+                        reflection: 'This may be accurate, but it starts a courtroom. They may get louder to prove the feeling exists.'
+                    },
+                    {
+                        text: 'Can we not do the always and never thing?',
+                        reflection: 'This catches the wording, but may miss the hurt. Sometimes people use big words when they feel repeatedly small.'
+                    },
+                    {
+                        text: 'If you cared so much, you should have spoken up earlier.',
+                        reflection: 'This puts the whole problem back on them. It may confirm exactly what they are afraid is happening.'
+                    }
+                ]
+            },
+            {
+                scene: 'They fold their arms, but their voice drops.',
+                speaker: 'Family member',
+                line: 'I am tired of feeling like I have to fight just to be considered.',
+                why: 'People often talk about fighting when they feel they have not been able to enter the room any softer way.',
+                responses: [
+                    {
+                        text: 'Having to fight for basic consideration would wear anyone down.',
+                        reflection: 'This hears the exhaustion. It does not solve the disagreement, but it makes the person less invisible inside it.'
+                    },
+                    {
+                        text: 'Nobody is trying to exclude you.',
+                        reflection: 'This defends intent. They are talking about impact. Those are not the same conversation.'
+                    },
+                    {
+                        text: 'You come in hot every time.',
+                        reflection: 'This may name a real pattern, but it leads with blame. They may hear that their tone matters more than their place in the family.'
+                    },
+                    {
+                        text: 'What do you want me to say?',
+                        reflection: 'This can sound cornered. It may make them responsible for making the conversation easier for you.'
+                    }
+                ]
+            },
+            {
+                scene: 'The room is quieter now.',
+                speaker: 'Family member',
+                line: 'I do not want a fight. I want to know I matter before everything is already done.',
+                why: 'People often clarify they do not want a fight when they are afraid the emotion will be used to ignore the request.',
+                responses: [
+                    {
+                        text: 'You want to be included early enough that it still counts.',
+                        reflection: 'This gets close to the request. It gives the next step something concrete to grow from.'
+                    },
+                    {
+                        text: 'Fine. Next time you can handle it.',
+                        reflection: 'This sounds like punishment disguised as agreement. It can make inclusion feel like a burden.'
+                    },
+                    {
+                        text: 'I already said I would try.',
+                        reflection: 'This may be true, but it asks them to stop needing more. Sometimes people repeat themselves because the first answer did not land.'
+                    },
+                    {
+                        text: 'This family is exhausting.',
+                        reflection: 'This may be how you feel, but it widens the blast zone. The person may feel blamed for bringing it up.'
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        title: 'Coworker frustration',
+        summary: 'They need to know whether you are hearing the problem or just protecting the workflow.',
+        steps: [
+            {
+                scene: 'A coworker messages you after a tense meeting.',
+                speaker: 'Coworker',
+                line: 'I am so tired of getting pulled in at the last second and then being treated like I am slowing everyone down.',
+                why: 'People often sound frustrated when they are trying to point at a setup that keeps making them look worse than they are.',
+                responses: [
+                    {
+                        text: 'You are being asked to catch up instantly, then blamed for needing context.',
+                        reflection: 'This names the unfair bind. It can help them feel less unreasonable for being frustrated.'
+                    },
+                    {
+                        text: 'That is just how this project is moving right now.',
+                        reflection: 'This explains the chaos, but it may sound like their frustration has no place to go.'
+                    },
+                    {
+                        text: 'You should push back harder.',
+                        reflection: 'This gives advice before understanding the cost. They may already be trying to survive the politics.'
+                    },
+                    {
+                        text: 'I am swamped too.',
+                        reflection: 'This may be true, but it turns the lane back to you before they get a full sentence of room.'
+                    }
+                ]
+            },
+            {
+                scene: 'They send another message before you answer.',
+                speaker: 'Coworker',
+                line: 'I do not mind helping. I mind being set up to look difficult.',
+                why: 'People often make this distinction when they want their willingness seen without accepting the unfair framing around it.',
+                responses: [
+                    {
+                        text: 'The issue is not helping. It is being put in a spot where helping makes you look like the problem.',
+                        reflection: 'This separates the work from the unfair position. That distinction may matter a lot to them.'
+                    },
+                    {
+                        text: 'I am sure nobody sees it that way.',
+                        reflection: 'This tries to calm them, but it can feel like you are asking them to ignore what they are noticing.'
+                    },
+                    {
+                        text: 'Can you just send me the blocker list?',
+                        reflection: 'This may move work forward, but it skips the human part. They may feel useful, not heard.'
+                    },
+                    {
+                        text: 'Yeah, this place is a disaster.',
+                        reflection: 'This matches frustration, but it may not help them feel specifically understood. Agreement can still miss.'
+                    }
+                ]
+            },
+            {
+                scene: 'The typing indicator appears and disappears a few times.',
+                speaker: 'Coworker',
+                line: 'I am probably overreacting. I just needed to say it somewhere.',
+                why: 'People often call themselves overreacting when they are checking whether the listener will punish them for having a reaction.',
+                responses: [
+                    {
+                        text: 'I do not think you are wrong for needing somewhere to put it.',
+                        reflection: 'This gives the vent a place to land without making a big performance out of it.'
+                    },
+                    {
+                        text: 'No worries.',
+                        reflection: 'This is polite, but thin. They may not know whether you understood anything they said.'
+                    },
+                    {
+                        text: 'You should talk to your manager.',
+                        reflection: 'This may be the later step. Right now it can feel like you are redirecting them out of your inbox.'
+                    },
+                    {
+                        text: 'It could be worse.',
+                        reflection: 'This can make frustration feel unearned. People often know it could be worse and still need the current thing heard.'
+                    }
+                ]
+            }
+        ]
+    },
+    {
+        title: 'Someone scared about something',
+        summary: 'Fear does not always need a debate. Sometimes it needs a steady witness first.',
+        steps: [
+            {
+                scene: 'Someone you care about says this quietly, like they are embarrassed by it.',
+                speaker: 'Someone',
+                line: 'I know this might sound irrational, but I am scared something bad is going to happen.',
+                why: 'People often label their own fear as irrational first because they are trying to beat the listener to the dismissal.',
+                responses: [
+                    {
+                        text: 'It sounds like your body is on high alert, and that is exhausting.',
+                        reflection: 'This does not argue with the fear. It notices the strain of carrying it.'
+                    },
+                    {
+                        text: 'What evidence do you have?',
+                        reflection: 'Evidence can matter later. Too soon, it can feel like they are on trial for being scared.'
+                    },
+                    {
+                        text: 'You are fine. Nothing is going to happen.',
+                        reflection: 'This aims for comfort, but it may feel like a promise you cannot actually keep.'
+                    },
+                    {
+                        text: 'I get anxious too. Last week I completely spiraled.',
+                        reflection: 'This might connect eventually, but it can pull attention away before their fear has landed.'
+                    }
+                ]
+            },
+            {
+                scene: 'They keep their eyes on the floor.',
+                speaker: 'Someone',
+                line: 'I hate telling people because then I feel like I have to prove I am not being ridiculous.',
+                why: 'People often talk about proving themselves when past conversations made them feel judged before they felt heard.',
+                responses: [
+                    {
+                        text: 'You are tired of having to defend the fear before anyone will sit with you in it.',
+                        reflection: 'This hears the second fear, the fear of being dismissed. That may be the bigger one in the room.'
+                    },
+                    {
+                        text: 'I do not think you are ridiculous.',
+                        reflection: 'This is kind, but it may need more shape. Saying what you heard can make it feel more real.'
+                    },
+                    {
+                        text: 'Have you tried breathing exercises?',
+                        reflection: 'This can feel like a handoff to a technique. Helpful tools can still land badly when offered too fast.'
+                    },
+                    {
+                        text: 'Lots of people feel like that.',
+                        reflection: 'This can normalize, but it can also blur the edges of what they just trusted you with.'
+                    }
+                ]
+            },
+            {
+                scene: 'They take a slow breath.',
+                speaker: 'Someone',
+                line: 'Can you just stay here for a minute? I do not need you to fix it. I just do not want to be alone with it.',
+                why: 'People often ask for presence this directly when advice would make them feel farther away from the person they reached for.',
+                responses: [
+                    {
+                        text: 'Yes. I can stay. We do not have to solve it this minute.',
+                        reflection: 'This answers the actual request. It gives steadiness without taking over.'
+                    },
+                    {
+                        text: 'Of course, but we should make a plan.',
+                        reflection: 'The yes matters, but the plan may crowd it. They asked for company first.'
+                    },
+                    {
+                        text: 'You need to stop thinking about it.',
+                        reflection: 'This can make fear feel like disobedience. Most people would stop if it were that simple.'
+                    },
+                    {
+                        text: 'I do not know what to say.',
+                        reflection: 'This is honest, but it may leave them holding your helplessness too. Sometimes a simple yes is enough.'
+                    }
+                ]
+            }
+        ]
+    }
+];
+
+const state = {
+    scenarioIndex: 0,
+    stepIndex: 0,
+    selectedResponse: null
+};
+
+const picker = document.getElementById('scenario-picker');
+const scenarioGrid = document.getElementById('scenario-grid');
+const practiceView = document.getElementById('practice-view');
+const scenarioTitle = document.getElementById('scenario-title');
+const scenarioSummary = document.getElementById('scenario-summary');
+const stepCount = document.getElementById('step-count');
+const sceneText = document.getElementById('scene-text');
+const speakerName = document.getElementById('speaker-name');
+const speakerLine = document.getElementById('speaker-line');
+const responseList = document.getElementById('response-list');
+const reflectionCard = document.getElementById('reflection-card');
+const choiceRepeat = document.getElementById('choice-repeat');
+const reflectionText = document.getElementById('reflection-text');
+const whyNote = document.getElementById('why-note');
+const whyNoteText = document.getElementById('why-note-text');
+const continueBtn = document.getElementById('continue-btn');
+
+function toggleTheme() {
+    const next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    localStorage.setItem('nofnway-theme', next);
+    document.documentElement.setAttribute('data-theme', next);
+}
+
+function clearNode(node) {
+    while (node.firstChild) {
+        node.removeChild(node.firstChild);
+    }
+}
+
+function buildScenarioPicker() {
+    clearNode(scenarioGrid);
+    scenarios.forEach((scenario, index) => {
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'scenario-btn';
+        button.addEventListener('click', () => startScenario(index));
+
+        const title = document.createElement('span');
+        title.className = 'scenario-title';
+        title.textContent = scenario.title;
+
+        const desc = document.createElement('span');
+        desc.className = 'scenario-desc';
+        desc.textContent = scenario.summary;
+
+        button.appendChild(title);
+        button.appendChild(desc);
+        scenarioGrid.appendChild(button);
+    });
+}
+
+function startScenario(index) {
+    state.scenarioIndex = index;
+    state.stepIndex = 0;
+    state.selectedResponse = null;
+    picker.classList.add('hidden');
+    practiceView.classList.remove('hidden');
+    renderStep();
+    document.getElementById('conversation-card').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function currentScenario() {
+    return scenarios[state.scenarioIndex];
+}
+
+function currentStep() {
+    return currentScenario().steps[state.stepIndex];
+}
+
+function renderStep() {
+    const scenario = currentScenario();
+    const step = currentStep();
+    state.selectedResponse = null;
+
+    scenarioTitle.textContent = scenario.title;
+    scenarioSummary.textContent = scenario.summary;
+    stepCount.textContent = 'Part ' + (state.stepIndex + 1) + ' of ' + scenario.steps.length + '.';
+    sceneText.textContent = step.scene;
+    speakerName.textContent = step.speaker;
+    speakerLine.textContent = step.line;
+
+    clearNode(responseList);
+    step.responses.forEach((response, index) => {
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.className = 'response-btn';
+        button.textContent = response.text;
+        button.addEventListener('click', () => chooseResponse(index));
+        responseList.appendChild(button);
+    });
+
+    reflectionCard.hidden = true;
+    whyNote.open = false;
+    choiceRepeat.textContent = '';
+    reflectionText.textContent = '';
+    whyNoteText.textContent = step.why || '';
+    continueBtn.textContent = state.stepIndex === scenario.steps.length - 1 ? 'Finish scene' : 'Continue';
+}
+
+function chooseResponse(index) {
+    const step = currentStep();
+    const response = step.responses[index];
+    state.selectedResponse = index;
+
+    Array.from(responseList.children).forEach((button, buttonIndex) => {
+        button.classList.toggle('selected', buttonIndex === index);
+    });
+
+    choiceRepeat.textContent = '"' + response.text + '"';
+    reflectionText.textContent = response.reflection;
+    reflectionCard.hidden = false;
+    reflectionCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function continueScenario() {
+    const scenario = currentScenario();
+    if (state.stepIndex < scenario.steps.length - 1) {
+        state.stepIndex += 1;
+        renderStep();
+        document.getElementById('conversation-card').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        return;
+    }
+
+    picker.classList.remove('hidden');
+    practiceView.classList.add('hidden');
+    picker.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+document.getElementById('change-scenario-btn').addEventListener('click', () => {
+    picker.classList.remove('hidden');
+    practiceView.classList.add('hidden');
+    picker.scrollIntoView({ behavior: 'smooth', block: 'start' });
+});
+
+document.getElementById('restart-btn').addEventListener('click', () => {
+    state.stepIndex = 0;
+    renderStep();
+});
+
+continueBtn.addEventListener('click', continueScenario);
+
+buildScenarioPicker();
+</script>
+<script>
+function shareThisPage() {
+    if (navigator.share) {
+        navigator.share({
+            title: document.title,
+            url: window.location.href
+        }).catch(() => {});
+    } else {
+        navigator.clipboard.writeText(window.location.href).then(() => {
+            const btn = document.querySelector('.footer-share-btn');
+            const orig = btn.textContent;
+            btn.textContent = 'Link copied!';
+            setTimeout(() => { btn.textContent = orig; }, 2000);
+        }).catch(() => {});
+    }
+}
+</script>
+<script src="privacy.js"></script>
+<script src="bug-report.js"></script>
+<footer style="text-align:center; padding:8px 20px; font-size:0.65rem; color:var(--text-dim); border-top:1px solid var(--border); flex-shrink:0;">
+    <div class="footer-share">
+        <button class="footer-share-btn" onclick="shareThisPage()">You know who might need this?</button>
+    </div>
+    &copy; 2026 NOFNWAY. All Rights Reserved.
+</footer>
+</body>
+</html>

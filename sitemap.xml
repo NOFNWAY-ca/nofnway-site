@@ -93,6 +93,13 @@
   </url>
 
   <url>
+    <loc>https://nofnway.ca/just_write</loc>
+    <lastmod>2026-05-28</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
     <loc>https://nofnway.ca/duly_noted</loc>
     <lastmod>2026-03-12</lastmod>
     <changefreq>monthly</changefreq>
@@ -109,6 +116,20 @@
   <url>
     <loc>https://nofnway.ca/this_works_at_school</loc>
     <lastmod>2026-03-13</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://nofnway.ca/let_me_talk</loc>
+    <lastmod>2026-05-13</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://nofnway.ca/help_me_listen</loc>
+    <lastmod>2026-05-13</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>

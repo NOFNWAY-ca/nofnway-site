@@ -9,6 +9,15 @@ Primary live site at `nofnway.ca`.
 - Verify service worker activation after `sw.js` changes.
 
 ## Recent Changes
+- Added `just_write.html`, a browser-only distraction-free writing surface where typed words fade, older words lock outside the editable window, sessions save as localStorage blurbs, and blurbs can be copied, deleted, or exported as text.
+- Added the `JUST [FN] WRITE` homepage card, sitemap entry, service worker cache entry, and bumped `sw.js` to `nofnway-v39`.
+- Added gentler landing-state spacing and centered intro lines to `let_me_talk.html` and `help_me_listen.html`, and bumped `sw.js` to `nofnway-v38`.
+- Added optional `Why people say this` expandable notes after LISTEN reflections, tied to each speaker turn rather than scoring or correct answers.
+- Added optional `Conversation starters` chips to `let_me_talk.html` so users can insert bracketed opening lines under the context field without using templates or scripts.
+- Added `let_me_talk.html`, a browser-only conversation alignment card tool with mode selection, optional context, helper lines, fullscreen, copy, native share support, theme and font selectors, privacy panel, metadata, and service worker registration.
+- Added `help_me_listen.html`, a browser-only active listening practice tool with six realistic scenarios, reflective response feedback, no scoring, no storage, privacy panel, metadata, and service worker registration.
+- Added a new homepage category, `Connect & Communicate`, with cards for `LET ME [FN] TALK` and `HELP ME [FN] LISTEN`.
+- Added both new pages to `sitemap.xml` and `sw.js`, and bumped `CACHE_NAME` to `nofnway-v37`.
 - Bumped `sw.js` to `nofnway-v36` for the `[FN] FIDGET` Ripple trail deploy.
 - Smoothed `[FN] FIDGET` Ripple trails with capped DPR canvas rendering, interpolated drag particles between pointer events, slower particle drift, and recycled particle slots after the 300-particle cap to avoid memory growth.
 - Upgraded the `[FN] FIDGET` Ripple tab with a dark canvas field, semi-transparent fade overlay, capped sparkler-style trail particles on drag/touch, tap bursts that preserve the original ripple rings, and cleanup after inactivity.
