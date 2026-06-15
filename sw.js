@@ -4,7 +4,7 @@
    updates to users: e.g. nofnway-v1 → nofnway-v2
    ============================================================ */
 
-const CACHE_NAME = 'nofnway-v39';
+const CACHE_NAME = 'nofnway-v40';
 
 /* Pre-cached on install — all HTML, CSS, JS, SVG.
    Images are cached on first access (see fetch handler). */
@@ -31,6 +31,7 @@ const PRECACHE = [
     '/sleep_math',
     '/just_pick',
     '/just_write',
+    '/fn_rewrite',
     '/duly_noted',
     '/i_knew_that',
     '/this_works_at_school',

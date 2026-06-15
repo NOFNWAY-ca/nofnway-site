@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="author" content="Gerry McMahon">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>[FN] Rewrite — PDF Text Extractor - NOFNWAY</title>
+    <meta name="description" content="Pull readable text out of a PDF and into an editable field you can copy from. Works in your browser. Nothing is uploaded anywhere.">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://nofnway.ca/fn_rewrite">
+    <meta property="og:title" content="[FN] Rewrite — PDF Text Extractor - NOFNWAY">
+    <meta property="og:description" content="Pull readable text out of a PDF and into an editable field you can copy from. Nothing is uploaded anywhere.">
+    <meta property="og:site_name" content="NOFNWAY">
+    <meta property="og:image" content="https://nofnway.ca/og-image.png">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="[FN] Rewrite — PDF Text Extractor - NOFNWAY">
+    <meta name="twitter:description" content="Pull readable text out of a PDF and into an editable field you can copy from. Nothing is uploaded anywhere.">
+    <meta name="twitter:image" content="https://nofnway.ca/og-image.png">
+    <link rel="canonical" href="https://nofnway.ca/fn_rewrite">
+
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "[FN] Rewrite",
+      "url": "https://nofnway.ca/fn_rewrite",
+      "description": "PDF text extractor. Pulls readable text out of a PDF and into an editable field you can copy from.",
+      "applicationCategory": "UtilitiesApplication",
+      "operatingSystem": "Any",
+      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+      "creator": { "@type": "Organization", "name": "NOFNWAY", "url": "https://nofnway.ca" }
+    }
+    </script>
+
+    <script>document.documentElement.setAttribute('data-theme', localStorage.getItem('nofnway-theme') || 'light');</script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bangers&family=Montserrat:wght@900&family=Roboto:wght@400;700&display=swap" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bangers&family=Montserrat:wght@900&family=Roboto:wght@400;700&display=swap"></noscript>
+    <link rel="stylesheet" href="theme.css">
+    <script>if ('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js').catch(() => {});</script>
+    <style>
+        html, body {
+            height: 100%;
+            overflow: hidden;
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+            background: #1c2833;
+            color: #f5f7fa;
+            font-family: 'Roboto', sans-serif;
+        }
+
+        .hidden { display: none !important; }
+
+        /* ── Navbar overrides for dark surface ── */
+        .navbar {
+            border-bottom-color: rgba(0,87,184,0.4);
+            flex-shrink: 0;
+        }
+
+        .brand-sub {
+            color: rgba(255,255,255,0.65);
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.57rem;
+            font-weight: 900;
+            letter-spacing: 0.12em;
+            vertical-align: middle;
+        }
+
+        .nav-btn {
+            background: transparent;
+            color: rgba(255,255,255,0.55);
+            border: 1px solid rgba(255,255,255,0.18);
+            padding: 5px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.72rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            transition: color 0.15s, border-color 0.15s;
+            white-space: nowrap;
+        }
+        .nav-btn:hover { color: #f5f7fa; border-color: rgba(255,255,255,0.45); }
+
+        .btn-primary {
+            background: var(--brand);
+            color: #fff;
+            border: none;
+            padding: 5px 16px;
+            border-radius: 4px;
+            font-weight: 700;
+            font-size: 0.72rem;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            cursor: pointer;
+            transition: filter 0.15s;
+            white-space: nowrap;
+        }
+        .btn-primary:hover { filter: brightness(1.12); }
+
+        /* ── Main layout ── */
+        .workspace {
+            flex: 1;
+            min-height: 0;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* ── Setup / drop zone ── */
+        .setup-zone {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem 1.25rem 3rem;
+            overflow-y: auto;
+            gap: 0;
+        }
+
+        .setup-heading {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 900;
+            font-size: 2rem;
+            text-transform: uppercase;
+            letter-spacing: -0.03em;
+            color: #f5f7fa;
+            margin: 0 0 4px;
+            text-align: center;
+        }
+
+        .setup-heading .fn { color: var(--brand); }
+
+        .divider-line {
+            color: var(--brand);
+            letter-spacing: 0.5em;
+            margin: 14px 0 16px;
+            font-size: 0.75rem;
+            opacity: 0.7;
+        }
+
+        .setup-desc {
+            color: rgba(255,255,255,0.58);
+            font-size: 0.88rem;
+            line-height: 1.6;
+            max-width: 440px;
+            text-align: center;
+            margin: 0 0 28px;
+        }
+
+        .drop-zone {
+            border: 2px dashed rgba(255,255,255,0.18);
+            border-radius: 10px;
+            padding: 3.5rem 3rem;
+            text-align: center;
+            cursor: pointer;
+            width: 100%;
+            max-width: 480px;
+            box-sizing: border-box;
+            transition: border-color 0.2s, background 0.2s;
+            background:
+                repeating-linear-gradient(
+                    -45deg,
+                    transparent,
+                    transparent 8px,
+                    rgba(0, 87, 184, 0.055) 8px,
+                    rgba(0, 87, 184, 0.055) 16px
+                );
+            box-shadow: 4px 4px 0 var(--brand);
+        }
+
+        .drop-zone:hover,
+        .drop-zone.drag-over {
+            border-color: var(--brand);
+            background:
+                repeating-linear-gradient(
+                    -45deg,
+                    transparent,
+                    transparent 8px,
+                    rgba(0, 87, 184, 0.12) 8px,
+                    rgba(0, 87, 184, 0.12) 16px
+                );
+        }
+
+        .drop-label {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 900;
+            font-size: 1.05rem;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            color: rgba(255,255,255,0.65);
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        .drop-sub {
+            font-size: 0.7rem;
+            color: rgba(255,255,255,0.32);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        .setup-hint {
+            margin: 18px 0 0;
+            font-size: 0.72rem;
+            color: rgba(255,255,255,0.3);
+            max-width: 380px;
+            text-align: center;
+            line-height: 1.55;
+        }
+
+        /* ── Error banner ── */
+        #errorBanner {
+            background: rgba(198,40,40,0.14);
+            border: 1px solid rgba(198,40,40,0.4);
+            color: #fca5a5;
+            padding: 9px 18px;
+            border-radius: 6px;
+            margin: 0 16px 14px;
+            text-align: center;
+            font-size: 0.84rem;
+            flex-shrink: 0;
+        }
+
+        /* ── Result zone ── */
+        .result-zone {
+            flex: 1;
+            min-height: 0;
+            display: flex;
+            flex-direction: column;
+            padding: 14px 16px 16px;
+            gap: 10px;
+        }
+
+        .result-toolbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 8px;
+            flex-shrink: 0;
+        }
+
+        .result-meta {
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: rgba(255,255,255,0.38);
+        }
+
+        .result-meta strong { color: rgba(255,255,255,0.65); }
+
+        .output-area {
+            flex: 1;
+            min-height: 0;
+            width: 100%;
+            background: rgba(7, 13, 18, 0.55);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-left: 4px solid var(--brand);
+            border-radius: 6px;
+            color: #f0f4f8;
+            font-family: 'Roboto', monospace, sans-serif;
+            font-size: 0.88rem;
+            line-height: 1.65;
+            padding: 16px 18px;
+            box-sizing: border-box;
+            resize: none;
+            box-shadow: 4px 4px 0 rgba(0,87,184,0.22);
+        }
+
+        .output-area:focus {
+            outline: none;
+            border-color: rgba(255,255,255,0.2);
+            border-left-color: var(--brand);
+        }
+
+        /* ── Scanned notice ── */
+        .scanned-zone {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem 1.5rem;
+            text-align: center;
+            gap: 14px;
+        }
+
+        .scanned-diamond {
+            font-size: 2rem;
+            color: rgba(255,255,255,0.18);
+        }
+
+        .scanned-title {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 900;
+            font-size: 1.1rem;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            color: rgba(255,255,255,0.6);
+            margin: 0;
+        }
+
+        .scanned-body {
+            color: rgba(255,255,255,0.42);
+            font-size: 0.86rem;
+            line-height: 1.65;
+            max-width: 420px;
+            margin: 0;
+        }
+
+        /* ── Loading overlay ── */
+        .loading-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.85);
+            display: none;
+            place-items: center;
+            z-index: 3000;
+        }
+
+        .load-text {
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 900;
+            color: var(--brand);
+            font-size: 1.4rem;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.25; }
+        }
+
+        @media (max-width: 540px) {
+            .setup-heading { font-size: 1.5rem; }
+            .drop-zone { padding: 2.5rem 1.5rem; }
+            .result-zone { padding: 10px 10px 12px; }
+            .output-area { font-size: 0.82rem; padding: 12px 14px; }
+        }
+    </style>
+</head>
+<body>
+
+<div id="loader" class="loading-overlay" aria-hidden="true">
+    <p class="load-text" aria-live="polite">Reading&hellip;</p>
+</div>
+
+<nav class="navbar">
+    <a href="index" class="brand">NO<span>FN</span>WAY<span class="brand-sub"> // [FN] REWRITE</span></a>
+    <div class="nav-controls">
+        <button id="resetBtn" class="nav-btn hidden" onclick="doReset()">New PDF</button>
+        <a href="index" class="nav-btn">&#8592; Hub</a>
+        <button class="privacy-btn" onclick="togglePrivacy()" aria-label="Privacy information"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><text x="12" y="16.5" text-anchor="middle" font-size="9" fill="currentColor" stroke="none" font-weight="700" font-family="sans-serif">?</text></svg></button>
+    </div>
+</nav>
+
+<div class="privacy-panel" id="privacy-panel" hidden>
+    <div class="privacy-panel-hd">
+        <div class="privacy-panel-title"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> Privacy &amp; Data</div>
+        <button class="privacy-close" onclick="document.getElementById('privacy-panel').hidden=true" aria-label="Close">&#x2715;</button>
+    </div>
+    <p>Your PDF never leaves your browser. Text is extracted here using PDF.js — the same library Mozilla uses in Firefox. Nothing is sent anywhere. Nothing is saved. Close the tab and it is gone.</p>
+</div>
+
+<main class="workspace">
+
+    <div id="errorBanner" class="hidden" role="alert"></div>
+
+    <!-- ── Setup / drop zone ── -->
+    <section id="setup" class="setup-zone" aria-label="Load a PDF">
+        <h1 class="setup-heading">[<span class="fn">FN</span>] Rewrite</h1>
+        <p class="setup-desc">PDFs weren't built for editing. Getting the text back out of one should be a one-step thing. Drop a PDF, get the text, fix what needs fixing, copy it and go.</p>
+        <div class="divider-line" aria-hidden="true">&#9670; &nbsp; &#9670; &nbsp; &#9670;</div>
+        <div id="dropZone" class="drop-zone" role="button" tabindex="0" aria-label="Drop a PDF here or press Enter to browse">
+            <span class="drop-label">Drop a PDF or click to browse</span>
+            <span class="drop-sub">Text-based PDFs only &bull; Stays on your device</span>
+        </div>
+        <input type="file" id="fileInput" accept="application/pdf" class="hidden" aria-hidden="true">
+        <p class="setup-hint">Works on PDFs that were created digitally — exports, reports, forms filled out on a computer. Scanned or photographed PDFs have no text to find, and this tool will say so.</p>
+    </section>
+
+    <!-- ── Result zone ── -->
+    <section id="result" class="result-zone hidden" aria-label="Extracted text">
+        <div class="result-toolbar">
+            <p id="resultMeta" class="result-meta"></p>
+            <button id="copyBtn" class="btn-primary" onclick="copyText()">Copy all</button>
+        </div>
+        <textarea id="output" class="output-area" spellcheck="false" autocorrect="off" autocomplete="off" aria-label="Extracted text — editable"></textarea>
+    </section>
+
+    <!-- ── Scanned PDF notice ── -->
+    <section id="scanNotice" class="scanned-zone hidden" aria-label="No text found">
+        <p class="scanned-diamond" aria-hidden="true">&#9670;</p>
+        <h2 class="scanned-title">No text found</h2>
+        <p class="scanned-body">This PDF doesn't appear to have any extractable text. It was probably scanned or photographed. [FN] Rewrite can only read PDFs that were created digitally. Scanned pages are images in a wrapper &mdash; there's no text layer to pull from.</p>
+        <button class="btn-primary" onclick="doReset()">Try another file</button>
+    </section>
+
+</main>
+
+<script src="vendor/pdf.min.js"></script>
+<script>
+    const pdfjsLib = window['pdfjs-dist/build/pdf'];
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'vendor/pdf.worker.min.js';
+
+    const MAX_PAGES   = 200;
+    const MAX_FILE_MB = 100;
+
+    const dropZone   = document.getElementById('dropZone');
+    const fileInput  = document.getElementById('fileInput');
+    const setup      = document.getElementById('setup');
+    const result     = document.getElementById('result');
+    const scanNotice = document.getElementById('scanNotice');
+    const outputArea = document.getElementById('output');
+    const resultMeta = document.getElementById('resultMeta');
+    const copyBtn    = document.getElementById('copyBtn');
+    const resetBtn   = document.getElementById('resetBtn');
+    const loader     = document.getElementById('loader');
+    const errBanner  = document.getElementById('errorBanner');
+
+    /* ── Drop zone ── */
+    dropZone.addEventListener('click', () => fileInput.click());
+    dropZone.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); fileInput.click(); } });
+    dropZone.addEventListener('dragenter', e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
+    dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
+    dropZone.addEventListener('dragleave', e => { if (!dropZone.contains(e.relatedTarget)) dropZone.classList.remove('drag-over'); });
+    dropZone.addEventListener('drop', e => {
+        e.preventDefault();
+        dropZone.classList.remove('drag-over');
+        const f = e.dataTransfer.files[0];
+        if (f) handleFile(f);
+    });
+    fileInput.addEventListener('change', e => { if (e.target.files[0]) handleFile(e.target.files[0]); });
+
+    function handleFile(file) {
+        if (file.type !== 'application/pdf' && !file.name.toLowerCase().endsWith('.pdf')) {
+            showError('That doesn\'t look like a PDF.');
+            return;
+        }
+        if (file.size > MAX_FILE_MB * 1024 * 1024) {
+            showError('File is over ' + MAX_FILE_MB + ' MB. Try a smaller one.');
+            return;
+        }
+        processPdf(file);
+    }
+
+    async function processPdf(file) {
+        hideError();
+        loader.style.display = 'grid';
+
+        try {
+            const arrayBuffer = await file.arrayBuffer();
+            const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+            const pageCount = pdf.numPages;
+
+            if (pageCount > MAX_PAGES) {
+                showError('That PDF has ' + pageCount + ' pages. Limit is ' + MAX_PAGES + '.');
+                loader.style.display = 'none';
+                return;
+            }
+
+            const pageTexts = [];
+
+            for (let i = 1; i <= pageCount; i++) {
+                const page = await pdf.getPage(i);
+                const content = await page.getTextContent();
+                const items = content.items.filter(item => typeof item.str === 'string' && item.str.length > 0);
+
+                if (!items.length) {
+                    pageTexts.push('');
+                    continue;
+                }
+
+                /* Group text items into lines by approximate y-position.
+                   PDF y=0 is at the bottom; items generally arrive top-to-bottom
+                   in a well-formed PDF (y values decreasing). */
+                const lines = [];
+                let lineBuf = [];
+                let lastY = null;
+
+                for (const item of items) {
+                    const y = item.transform[5];
+                    if (lastY !== null && Math.abs(y - lastY) > 5) {
+                        lines.push(lineBuf.join('').trimEnd());
+                        lineBuf = [];
+                    }
+                    lineBuf.push(item.str);
+                    lastY = y;
+                }
+                if (lineBuf.length) lines.push(lineBuf.join('').trimEnd());
+
+                pageTexts.push(lines.filter(l => l.length > 0).join('\n'));
+            }
+
+            /* Build combined output with page markers when multi-page */
+            let fullText;
+            if (pageCount === 1) {
+                fullText = pageTexts[0];
+            } else {
+                fullText = pageTexts.map((t, i) => '― p.' + (i + 1) + ' ―\n' + t).join('\n\n');
+            }
+
+            const trimmed = fullText.trim();
+
+            loader.style.display = 'none';
+
+            if (!trimmed) {
+                showState('scan');
+                resetBtn.classList.remove('hidden');
+                return;
+            }
+
+            outputArea.value = trimmed;
+
+            const wordCount = trimmed.split(/\s+/).filter(Boolean).length;
+            const pageLabel = pageCount === 1 ? 'page' : 'pages';
+            resultMeta.textContent = '';
+            const b1 = document.createElement('strong');
+            b1.textContent = pageCount;
+            const b2 = document.createElement('strong');
+            b2.textContent = wordCount.toLocaleString();
+            resultMeta.appendChild(b1);
+            resultMeta.append(' ' + pageLabel + ' • ~');
+            resultMeta.appendChild(b2);
+            resultMeta.append(' words • editable');
+
+            showState('result');
+            resetBtn.classList.remove('hidden');
+
+        } catch (err) {
+            loader.style.display = 'none';
+            if (err && err.name === 'PasswordException') {
+                showError('That PDF is password-protected. Remove the password and try again.');
+            } else {
+                showError('Could not read that file. It may be damaged or unsupported.');
+            }
+        }
+    }
+
+    function showState(state) {
+        setup.classList.add('hidden');
+        result.classList.add('hidden');
+        scanNotice.classList.add('hidden');
+        if (state === 'setup') {
+            setup.classList.remove('hidden');
+            resetBtn.classList.add('hidden');
+        } else if (state === 'result') {
+            result.classList.remove('hidden');
+        } else if (state === 'scan') {
+            outputArea.value = '';
+            resultMeta.textContent = '';
+            scanNotice.classList.remove('hidden');
+        }
+    }
+
+    function doReset() {
+        fileInput.value = '';
+        outputArea.value = '';
+        resultMeta.textContent = '';
+        hideError();
+        showState('setup');
+    }
+
+    async function copyText() {
+        const text = outputArea.value;
+        if (!text) return;
+        try {
+            await navigator.clipboard.writeText(text);
+            copyBtn.textContent = 'Copied';
+            setTimeout(() => { copyBtn.textContent = 'Copy all'; }, 2200);
+        } catch {
+            outputArea.select();
+            try { document.execCommand('copy'); } catch { /* nothing to do */ }
+            copyBtn.textContent = 'Copied';
+            setTimeout(() => { copyBtn.textContent = 'Copy all'; }, 2200);
+        }
+    }
+
+    let errorTimer;
+    function showError(msg) {
+        clearTimeout(errorTimer);
+        errBanner.textContent = msg;
+        errBanner.classList.remove('hidden');
+        errorTimer = setTimeout(hideError, 6000);
+    }
+
+    function hideError() {
+        errBanner.classList.add('hidden');
+        errBanner.textContent = '';
+    }
+</script>
+<script src="privacy.js"></script>
+<script src="bug-report.js"></script>
+</body>
+</html>
