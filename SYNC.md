@@ -9,6 +9,9 @@ Primary live site at `nofnway.ca`.
 - Verify service worker activation after `sw.js` changes.
 
 ## Recent Changes
+- Restored user zoom on older mobile tool pages by removing `maximum-scale` and `user-scalable` viewport restrictions from `how_much.html`, `get_lost.html`, `one_thing.html`, `how_long.html`, `copy_that.html`, `dial_in.html`, and `just_pick.html`.
+- Added missing public pages to `sitemap.xml`: `accountabilibugs`, `right-questions/`, and `about`.
+- Bumped `sw.js` to `nofnway-v41` and corrected its offline navigation fallback comment.
 - Added `just_write.html`, a browser-only distraction-free writing surface where typed words fade, older words lock outside the editable window, sessions save as localStorage blurbs, and blurbs can be copied, deleted, or exported as text.
 - Added the `JUST [FN] WRITE` homepage card, sitemap entry, service worker cache entry, and bumped `sw.js` to `nofnway-v39`.
 - Added gentler landing-state spacing and centered intro lines to `let_me_talk.html` and `help_me_listen.html`, and bumped `sw.js` to `nofnway-v38`.
@@ -41,4 +44,4 @@ Primary live site at `nofnway.ca`.
 - `sleep_math.html` now has a stronger hero, keyboard-accessible mode toggles and result buttons, clearer input validation, best-result emphasis, softer estimation copy, and DOM-built result cards instead of `innerHTML`.
 
 ## Next Recommended Step
-- Before deploying, recheck `accountabilibugs.html` on desktop and mobile width, then verify start, pause/resume, hide timer, sound toggle, hold-to-stop by pointer and keyboard, natural finish, privacy panel, theme toggle, and homepage navigation.
+- Before deploying, verify the updated pages locally, then deploy only after confirming the `sw.js` cache bump and sitemap changes should go live.

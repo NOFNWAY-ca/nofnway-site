@@ -4,7 +4,7 @@
    updates to users: e.g. nofnway-v1 → nofnway-v2
    ============================================================ */
 
-const CACHE_NAME = 'nofnway-v40';
+const CACHE_NAME = 'nofnway-v41';
 
 /* Pre-cached on install — all HTML, CSS, JS, SVG.
    Images are cached on first access (see fetch handler). */
@@ -123,7 +123,7 @@ self.addEventListener('fetch', event => {
     if (url.origin !== self.location.origin) return;
 
     /* HTML navigation: network-first so pages are always fresh.
-       Falls back to cache when offline, then to 404.html. */
+       Falls back to cache when offline, then to the homepage. */
     if (request.mode === 'navigate') {
         event.respondWith(
             fetch(request).then(response => {
